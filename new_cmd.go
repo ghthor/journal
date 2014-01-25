@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"syscall"
 	"text/template"
 	"time"
@@ -18,7 +19,12 @@ var newEntryCmd = &Command{
 	Summary: "Create a new journal entry",
 	Help:    "TODO",
 	Run: func(c *Command, args ...string) {
-		err := newEntry(true, c, args...)
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = newEntry(wd, true, c, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -28,13 +34,14 @@ var newEntryCmd = &Command{
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
-func IsJournalDirectoryClean() error {
+func IsJournalDirectoryClean(dir string) error {
 	gitPath, err := exec.LookPath("git")
 	if err != nil {
 		return err
 	}
 
 	c := exec.Command(gitPath, "status", "-s")
+	c.Dir = dir
 
 	o, err := c.Output()
 	if err != nil {
@@ -48,8 +55,8 @@ func IsJournalDirectoryClean() error {
 	return nil
 }
 
-func newEntry(openInEditor bool, c *Command, args ...string) error {
-	if err := IsJournalDirectoryClean(); err != nil {
+func newEntry(dir string, openInEditor bool, c *Command, args ...string) error {
+	if err := IsJournalDirectoryClean(dir); err != nil {
 		return err
 	}
 
@@ -68,7 +75,7 @@ func newEntry(openInEditor bool, c *Command, args ...string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(j.Filename, b.Bytes(), os.FileMode(0600))
+	err = ioutil.WriteFile(path.Join(dir, j.Filename), b.Bytes(), os.FileMode(0600))
 	if err != nil {
 		return err
 	}

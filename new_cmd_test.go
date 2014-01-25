@@ -80,13 +80,11 @@ func DescribeNewCmd(c gospec.Context) {
 		c.Expect(jd, IsAGitRepository)
 	})
 
-	c.Assume(os.Chdir(jd), IsNil)
-
 	c.Specify("the `new` command", func() {
 		c.Specify("will fail", func() {
 			c.Specify("if the journal directory has a dirty git repository", func() {
 				c.Assume(ioutil.WriteFile(path.Join(jd, "dirty"), []byte("some data"), os.FileMode(0600)), IsNil)
-				err := newEntry(false, &Command{})
+				err := newEntry(jd, false, &Command{})
 				c.Expect(err, Not(IsNil))
 			})
 		})
