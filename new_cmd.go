@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"io/ioutil"
@@ -8,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"syscall"
 	"text/template"
 	"time"
 )
@@ -24,7 +24,7 @@ var newEntryCmd = &Command{
 			log.Fatal(err)
 		}
 
-		err = newEntry(wd, true, c, args...)
+		_, err = newEntry(wd, entryTmpl, MutateInto, c, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -55,56 +55,73 @@ func IsJournalDirectoryClean(dir string) error {
 	return nil
 }
 
-func newEntry(dir string, mutateIntoEditor bool, c *Command, args ...string) error {
+func newEntry(dir string, entryTmpl *template.Template, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
 	if err := IsJournalDirectoryClean(dir); err != nil {
-		return err
+		return j, err
 	}
 
 	b := bytes.NewBuffer(make([]byte, 0, 256))
 
 	now := time.Now()
 
-	j := journalEntry{
-		Filename:  now.Format(filenameLayout),
-		TimeStamp: now.Format(time.UnixDate),
+	j = journalEntry{
+		Filename: now.Format(filenameLayout),
+		OpenedAt: now.Format(time.UnixDate),
 	}
 
 	// *sigh* can't stop laughing.....
-	err := entryTmpl.Execute(b, j)
+	err = entryTmpl.Execute(b, j)
 	if err != nil {
-		return err
+		return j, err
 	}
 
-	err = ioutil.WriteFile(path.Join(dir, j.Filename), b.Bytes(), os.FileMode(0600))
+	entryFilepath := path.Join(dir, j.Filename)
+	err = ioutil.WriteFile(entryFilepath, b.Bytes(), os.FileMode(0600))
 	if err != nil {
-		return err
+		return j, err
 	}
 
 	// Open the Editor
-	if mutateIntoEditor {
+	if mutateIntoEditor != nil {
 		// TODO: enable the editor to configurable
-		editor, err := exec.LookPath("vim")
+		editorPath, err := exec.LookPath("vim")
 		if err != nil {
-			return err
+			return j, err
 		}
 
-		// Mutate the Process into the Editor
-		err = syscall.Exec(editor, []string{editor, j.Filename}, os.Environ())
+		editor, err := mutateIntoEditor(exec.Command(editorPath, entryFilepath))
 		if err != nil {
-			return err
+			return j, err
+		}
+
+		err = editor.Wait()
+		if err != nil {
+			return j, err
 		}
 	}
 
-	return nil
+	j.ClosedAt = time.Now().Format(time.UnixDate)
+
+	f, err := os.OpenFile(entryFilepath, os.O_WRONLY|os.O_APPEND, 0600)
+	if err != nil {
+		return j, err
+	}
+	defer f.Close()
+
+	fbuf := bufio.NewWriter(f)
+	fbuf.WriteString("\n" + j.ClosedAt + "\n")
+
+	return j, fbuf.Flush()
 }
 
 type journalEntry struct {
-	Filename  string
-	TimeStamp string
+	Filename string
+	OpenedAt string
+	ClosedAt string
 }
 
 var entryTmpl = template.Must(template.New("entry").Parse(
-	`{{.TimeStamp}}
+	`{{.OpenedAt}}
 
 # Subject
 TODO Make this some random quote or something stupid
