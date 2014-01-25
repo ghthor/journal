@@ -55,7 +55,7 @@ func IsJournalDirectoryClean(dir string) error {
 	return nil
 }
 
-func newEntry(dir string, openInEditor bool, c *Command, args ...string) error {
+func newEntry(dir string, mutateIntoEditor bool, c *Command, args ...string) error {
 	if err := IsJournalDirectoryClean(dir); err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func newEntry(dir string, openInEditor bool, c *Command, args ...string) error {
 	}
 
 	// Open the Editor
-	if openInEditor {
+	if mutateIntoEditor {
 		// TODO: enable the editor to configurable
 		editor, err := exec.LookPath("vim")
 		if err != nil {
