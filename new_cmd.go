@@ -80,14 +80,15 @@ func newEntry(dir string, openInEditor bool, c *Command, args ...string) error {
 		return err
 	}
 
-	// TODO: enable the editor to configurable
-	editor, err := exec.LookPath("vim")
-	if err != nil {
-		return err
-	}
-
 	// Open the Editor
 	if openInEditor {
+		// TODO: enable the editor to configurable
+		editor, err := exec.LookPath("vim")
+		if err != nil {
+			return err
+		}
+
+		// Mutate the Process into the Editor
 		err = syscall.Exec(editor, []string{editor, j.Filename}, os.Environ())
 		if err != nil {
 			return err
