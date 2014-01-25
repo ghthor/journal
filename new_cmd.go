@@ -17,7 +17,7 @@ var newEntryCmd = &Command{
 	Summary: "Create a new journal entry",
 	Help:    "TODO",
 	Run: func(c *Command, args ...string) {
-		err := newEntry(c, args...)
+		err := newEntry(true, c, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -27,7 +27,7 @@ var newEntryCmd = &Command{
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
-func newEntry(c *Command, args ...string) error {
+func newEntry(openInEditor bool, c *Command, args ...string) error {
 	b := bytes.NewBuffer(make([]byte, 0, 256))
 
 	now := time.Now()
@@ -55,9 +55,11 @@ func newEntry(c *Command, args ...string) error {
 	}
 
 	// Open the Editor
-	err = syscall.Exec(editor, []string{editor, j.Filename}, os.Environ())
-	if err != nil {
-		return err
+	if openInEditor {
+		err = syscall.Exec(editor, []string{editor, j.Filename}, os.Environ())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
