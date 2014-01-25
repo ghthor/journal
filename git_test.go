@@ -69,8 +69,9 @@ func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Me
 
 func DescribeGitIntegration(c gospec.Context) {
 	c.Specify("a temporary git repository can be created", func() {
-		jd, err := tmpGitRepository("git_integration_test")
+		d, err := tmpGitRepository("git_integration_test")
 		c.Expect(err, IsNil)
-		c.Expect(jd, IsAGitRepository)
+		c.Expect(d, IsAGitRepository)
+		c.Expect(os.RemoveAll(d), IsNil)
 	})
 }
