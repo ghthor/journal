@@ -2,3 +2,4 @@
 *.test
 journal
 journal-config.json
+test_journal/
