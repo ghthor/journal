@@ -4,6 +4,7 @@ This program is intended to help me write and enjoy writing my personal journal.
 
 ## Potential ways to expand this simple project
 
+- [ ] Don't allow a new entry is the git wd is dirty
 - [ ] Watch the journal entry file after it is created and store the time the entry was completed
 - [ ] When the entry is completed store automatically make a git commit
 - [ ] Link journal stores across machines with automatic git merges
