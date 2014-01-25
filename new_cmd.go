@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -27,7 +28,31 @@ var newEntryCmd = &Command{
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
+func IsJournalDirectoryClean() error {
+	gitPath, err := exec.LookPath("git")
+	if err != nil {
+		return err
+	}
+
+	c := exec.Command(gitPath, "status", "-s")
+
+	o, err := c.Output()
+	if err != nil {
+		return err
+	}
+
+	if len(o) != 0 {
+		return errors.New("directory is dirty")
+	}
+
+	return nil
+}
+
 func newEntry(openInEditor bool, c *Command, args ...string) error {
+	if err := IsJournalDirectoryClean(); err != nil {
+		return err
+	}
+
 	b := bytes.NewBuffer(make([]byte, 0, 256))
 
 	now := time.Now()
