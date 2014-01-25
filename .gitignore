@@ -1,3 +1,4 @@
 *.swp
 *.test
 journal
+journal-config.json

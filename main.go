@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/ghthor/journal/config"
+	"log"
 	"os"
 	"strings"
 	"text/template"
@@ -13,8 +15,18 @@ var commands = []*Command{
 }
 
 func main() {
+	configPath := flag.String("config", os.ExpandEnv("$HOME/.journal-config.json"), "a path to the configuration file")
+
 	flag.Usage = usage
 	flag.Parse()
+
+	if c, err := config.ReadFromFile(*configPath); err == nil {
+		if err := os.Chdir(os.ExpandEnv(c.Directory)); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		log.Fatal(err)
+	}
 
 	args := flag.Args()
 	if len(args) == 0 || args[0] == "-h" {
