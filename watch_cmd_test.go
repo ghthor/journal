@@ -54,8 +54,15 @@ func DescribeWatchCmd(c gospec.Context) {
 			defer f.Close()
 
 			fscan := bufio.NewScanner(f)
+
+			// Check the data is intact
 			c.Expect(fscan.Scan(), IsTrue)
 			c.Expect(fscan.Text(), Equals, "Some data that shouldn't be modified")
+
+			// Check that a newline spacer was put in place
+			c.Expect(fscan.Scan(), IsTrue)
+
+			// Check that the last line in the file is the time the watch completed at
 			c.Expect(fscan.Scan(), IsTrue)
 			c.Expect(fscan.Text(), Equals, completedTime.Format(time.UnixDate))
 			c.Expect(fscan.Scan(), IsFalse)

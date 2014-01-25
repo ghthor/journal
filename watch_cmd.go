@@ -54,7 +54,7 @@ func watchEntry(statusCh chan<- string, c *Command, args ...string) (t time.Time
 				fbuf := bufio.NewWriter(f)
 
 				t = time.Now()
-				fbuf.WriteString(t.Format(time.UnixDate) + "\n")
+				fbuf.WriteString("\n" + t.Format(time.UnixDate) + "\n")
 
 				err = fbuf.Flush()
 				if err != nil {
