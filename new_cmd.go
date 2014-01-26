@@ -35,11 +35,6 @@ var newEntryCmd = &Command{
 const filenameLayout = "2006-01-02-1504-MST"
 
 func IsJournalDirectoryClean(dir string) error {
-	gitPath, err := exec.LookPath("git")
-	if err != nil {
-		return err
-	}
-
 	c := exec.Command(gitPath, "status", "-s")
 	c.Dir = dir
 
