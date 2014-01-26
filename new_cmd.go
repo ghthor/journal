@@ -16,9 +16,11 @@ import (
 )
 
 var editEntry bool
+var ignoreDirty bool
 
 func init() {
 	flag.BoolVar(&editEntry, "edit", true, "open the target entry in the editor")
+	flag.BoolVar(&ignoreDirty, "ignoredirty", false, "ignore if the git repository is dirty")
 }
 
 var newEntryCmd = &Command{
@@ -43,8 +45,10 @@ var newEntryCmd = &Command{
 const filenameLayout = "2006-01-02-1504-MST"
 
 func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
-	if err := GitIsClean(dir); err != nil {
-		return j, err
+	if !ignoreDirty {
+		if err := GitIsClean(dir); err != nil {
+			return j, err
+		}
 	}
 
 	b := bytes.NewBuffer(make([]byte, 0, 256))
