@@ -16,11 +16,22 @@ var commands = []*Command{
 
 func main() {
 	configPath := flag.String("config", os.ExpandEnv("$HOME/.journal-config.json"), "a path to the configuration file")
+	init := flag.Bool("init", false, "`git init` the journal directory if it doesn't exist")
 
 	flag.Usage = usage
 	flag.Parse()
 
 	if c, err := config.ReadFromFile(*configPath); err == nil {
+		_, err := os.Stat(c.Directory)
+		if os.IsNotExist(err) && *init {
+			err := GitInit(c.Directory)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else if err != nil {
+			log.Fatal(err)
+		}
+
 		if err := os.Chdir(os.ExpandEnv(c.Directory)); err != nil {
 			log.Fatal(err)
 		}

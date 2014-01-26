@@ -21,3 +21,11 @@ func TestIntegrationSpecs(t *testing.T) {
 
 	gospec.MainGoTest(r, t)
 }
+
+func TestExecutableSpec(t *testing.T) {
+	r := gospec.NewRunner()
+
+	r.AddSpec(DescribeJournalCommand)
+
+	gospec.MainGoTest(r, t)
+}
