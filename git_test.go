@@ -72,6 +72,16 @@ func DescribeGitIntegration(c gospec.Context) {
 		d, err := tmpGitRepository("git_integration_test")
 		c.Expect(err, IsNil)
 		c.Expect(d, IsAGitRepository)
+
+		c.Specify("and will be clean", func() {
+			c.Expect(GitIsClean(d), IsNil)
+		})
+
+		c.Specify("and will be dirty", func() {
+			c.Assume(ioutil.WriteFile(path.Join(d, "test_file"), []byte("some data"), 0666), IsNil)
+			c.Expect(GitIsClean(d).Error(), Equals, "directory is dirty")
+		})
+
 		c.Expect(os.RemoveAll(d), IsNil)
 	})
 }
