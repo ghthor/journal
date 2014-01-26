@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"os"
 	"os/exec"
 )
 
@@ -20,6 +21,14 @@ func GitCommand(workingDirectory string, args ...string) *exec.Cmd {
 	c := exec.Command(gitPath, args...)
 	c.Dir = workingDirectory
 	return c
+}
+
+func GitInit(dir string) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	return GitCommand(wd, "init", dir).Run()
 }
 
 func GitIsClean(dir string) error {

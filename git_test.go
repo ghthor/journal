@@ -7,7 +7,6 @@ import (
 	. "github.com/ghthor/gospec"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 )
 
@@ -17,18 +16,7 @@ func tmpGitRepository(prefix string) (dir string, err error) {
 		return "", err
 	}
 
-	gitPath, err := exec.LookPath("git")
-	if err != nil {
-		return "", err
-	}
-
-	gitInitCmd := exec.Command(gitPath, "init", dir)
-	err = gitInitCmd.Run()
-	if err != nil {
-		return "", err
-	}
-
-	return
+	return dir, GitInit(dir)
 }
 
 func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Message, neg gospec.Message, err error) {
@@ -68,9 +56,16 @@ func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Me
 }
 
 func DescribeGitIntegration(c gospec.Context) {
-	c.Specify("a temporary git repository can be created", func() {
-		d, err := tmpGitRepository("git_integration_test")
-		c.Expect(err, IsNil)
+	c.Specify("a git repository will be created", func() {
+		d, err := ioutil.TempDir("", "git_integration_test")
+		c.Assume(err, IsNil)
+
+		defer func(dir string) {
+			c.Expect(os.RemoveAll(dir), IsNil)
+		}(d)
+
+		d = path.Join(d, "a_git_repo")
+		c.Expect(GitInit(d), IsNil)
 		c.Expect(d, IsAGitRepository)
 
 		c.Specify("and will be clean", func() {
@@ -108,7 +103,5 @@ index 0000000..4268632
 +some data
 `)
 		})
-
-		c.Expect(os.RemoveAll(d), IsNil)
 	})
 }
