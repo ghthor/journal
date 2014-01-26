@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"flag"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,6 +14,12 @@ import (
 	"text/template"
 	"time"
 )
+
+var editEntry bool
+
+func init() {
+	flag.BoolVar(&editEntry, "edit", true, "open the target entry in the editor")
+}
 
 var newEntryCmd = &Command{
 	Name:    "new",
@@ -65,7 +72,7 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 	}
 
 	// Open the Editor
-	if mutateIntoEditor != nil {
+	if mutateIntoEditor != nil && editEntry {
 		// TODO: enable the editor to configurable
 		editorPath, err := exec.LookPath("vim")
 		if err != nil {
