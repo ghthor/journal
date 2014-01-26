@@ -40,3 +40,7 @@ func GitIsClean(dir string) error {
 func GitAdd(dir string, filepath string) error {
 	return GitCommand(dir, "add", filepath).Run()
 }
+
+func GitCommitAll(dir string, msg string) error {
+	return GitCommand(dir, "commit", "-m", msg).Run()
+}
