@@ -55,18 +55,20 @@ Some data that shouldn't be modified
 			expectedData := bytes.NewBuffer(make([]byte, 0, 1024))
 
 			commitMsgTmpl, err := template.New("commitMsgTmpl").Parse(
-				`"Event(will be used as commit message)"
+				`"Title(will be used as commit message)"
 diff --git a/{{.Filename}} b/{{.Filename}}
 new file mode 100644
-index 0000000..951ffa6
+index 0000000..df0111e
 --- /dev/null
 +++ b/{{.Filename}}
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,9 @@
 +{{.OpenedAt}}
 +
-+#~ Event(will be used as commit message)
-+# Subject
++#~ Title(will be used as commit message)
 +TODO Make this some random quote or something stupid
++
++## [active] An Idea
++An idea carries over from entry to entry if it is active.
 +
 +{{.ClosedAt}}
 `)

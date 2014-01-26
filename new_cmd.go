@@ -153,7 +153,9 @@ type journalEntry struct {
 var entryTmpl = template.Must(template.New("entry").Parse(
 	`{{.OpenedAt}}
 
-#~ Event(will be used as commit message)
-# Subject
+#~ Title(will be used as commit message)
 TODO Make this some random quote or something stupid
+
+## [active] An Idea
+An idea carries over from entry to entry if it is active.
 `))
