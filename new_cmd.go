@@ -3,11 +3,13 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -23,7 +25,7 @@ var newEntryCmd = &Command{
 			log.Fatal(err)
 		}
 
-		_, err = newEntry(wd, entryTmpl, MutateInto, c, args...)
+		_, err = newEntry(wd, entryTmpl, nil, MutateInto, c, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -33,14 +35,17 @@ var newEntryCmd = &Command{
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
-func newEntry(dir string, entryTmpl *template.Template, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
+func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
 	if err := GitIsClean(dir); err != nil {
 		return j, err
 	}
 
 	b := bytes.NewBuffer(make([]byte, 0, 256))
 
-	now := time.Now()
+	if Now == nil {
+		Now = time.Now
+	}
+	now := Now()
 
 	j = journalEntry{
 		Filename: now.Format(filenameLayout),
@@ -78,8 +83,9 @@ func newEntry(dir string, entryTmpl *template.Template, mutateIntoEditor func(*e
 		}
 	}
 
-	j.ClosedAt = time.Now().Format(time.UnixDate)
+	j.ClosedAt = Now().Format(time.UnixDate)
 
+	// Append the ClosedAt time to the file
 	f, err := os.OpenFile(entryFilepath, os.O_WRONLY|os.O_APPEND, 0600)
 	if err != nil {
 		return j, err
@@ -88,8 +94,43 @@ func newEntry(dir string, entryTmpl *template.Template, mutateIntoEditor func(*e
 
 	fbuf := bufio.NewWriter(f)
 	fbuf.WriteString("\n" + j.ClosedAt + "\n")
+	err = fbuf.Flush()
+	if err != nil {
+		return j, err
+	}
 
-	return j, fbuf.Flush()
+	// Parse the commit msg from the journal entry
+	data, err := ioutil.ReadFile(entryFilepath)
+	if err != nil {
+		return j, err
+	}
+
+	var commitMsg string
+
+	s := bufio.NewScanner(bytes.NewReader(data))
+	for s.Scan() {
+		line := s.Text()
+		if i := strings.Index(line, "#~"); i == 0 {
+			commitMsg = line[3:]
+		} else {
+			continue
+		}
+	}
+
+	if commitMsg == "" {
+		return j, errors.New("entry is missing an event to use as the commit message")
+	}
+
+	// Commit the new journal entry to the git repository
+	if err := GitAdd(dir, entryFilepath); err != nil {
+		return j, err
+	}
+
+	if err := GitCommitAll(dir, commitMsg); err != nil {
+		return j, err
+	}
+
+	return j, nil
 }
 
 type journalEntry struct {
@@ -101,6 +142,7 @@ type journalEntry struct {
 var entryTmpl = template.Must(template.New("entry").Parse(
 	`{{.OpenedAt}}
 
+#~ Event(will be used as commit message)
 # Subject
 TODO Make this some random quote or something stupid
 `))
