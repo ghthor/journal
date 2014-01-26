@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"os/exec"
 )
@@ -19,4 +20,19 @@ func GitCommand(workingDirectory string, args ...string) *exec.Cmd {
 	c := exec.Command(gitPath, args...)
 	c.Dir = workingDirectory
 	return c
+}
+
+func GitIsClean(dir string) error {
+	c := GitCommand(dir, "status", "-s")
+
+	o, err := c.Output()
+	if err != nil {
+		return err
+	}
+
+	if len(o) != 0 {
+		return errors.New("directory is dirty")
+	}
+
+	return nil
 }

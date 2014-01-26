@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -34,23 +33,8 @@ var newEntryCmd = &Command{
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
-func IsJournalDirectoryClean(dir string) error {
-	c := GitCommand(dir, "status", "-s")
-
-	o, err := c.Output()
-	if err != nil {
-		return err
-	}
-
-	if len(o) != 0 {
-		return errors.New("directory is dirty")
-	}
-
-	return nil
-}
-
 func newEntry(dir string, entryTmpl *template.Template, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
-	if err := IsJournalDirectoryClean(dir); err != nil {
+	if err := GitIsClean(dir); err != nil {
 		return j, err
 	}
 
