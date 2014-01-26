@@ -77,9 +77,18 @@ func DescribeGitIntegration(c gospec.Context) {
 			c.Expect(GitIsClean(d), IsNil)
 		})
 
+		testFile := path.Join(d, "test_file")
+		c.Assume(ioutil.WriteFile(testFile, []byte("some data\n"), 0666), IsNil)
+
 		c.Specify("and will be dirty", func() {
-			c.Assume(ioutil.WriteFile(path.Join(d, "test_file"), []byte("some data"), 0666), IsNil)
 			c.Expect(GitIsClean(d).Error(), Equals, "directory is dirty")
+		})
+
+		c.Specify("and will add a file", func() {
+			c.Expect(GitAdd(d, testFile), IsNil)
+			o, err := GitCommand(d, "status", "-s").Output()
+			c.Assume(err, IsNil)
+			c.Expect(string(o), Equals, "A  test_file\n")
 		})
 
 		c.Expect(os.RemoveAll(d), IsNil)
