@@ -14,3 +14,9 @@ func init() {
 		log.Fatal("git must be installed")
 	}
 }
+
+func GitCommand(workingDirectory string, args ...string) *exec.Cmd {
+	c := exec.Command(gitPath, args...)
+	c.Dir = workingDirectory
+	return c
+}
