@@ -8,6 +8,7 @@ This program is intended to help me write and enjoy writing my personal journal.
 - [x] Watch the journal entry file after it is created and store the time the entry was completed
     - Completed with ease after I learned I didn't have to syscall.Exec() the editor. See mutate.go
 - [x] When the entry is completed store automatically make a git commit
+- [ ] create an `amend` command
 - [ ] Create a `fix` command to update the journal entries to the ever evolving format
 - [ ] Link journal stores across machines with automatic git merges
 - [ ] Open the previous entry as a vim split window
