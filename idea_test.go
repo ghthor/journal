@@ -46,7 +46,6 @@ And some more.
 
 There isn't a delimiter.
 So this next idea will be the delimiter.
-
 `)
 			})
 
@@ -66,7 +65,6 @@ So this next idea will be the delimiter.
 That is at the end of every entry.
 
 The newline before the timestamp should be included.
-
 `)
 			})
 		})

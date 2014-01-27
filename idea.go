@@ -155,7 +155,7 @@ scanBody:
 		Status: status,
 		// Strip beginning of line and the '\n' byte
 		Name: name,
-		Body: string(bodyBytes),
+		Body: string(bytes.TrimSpace(bodyBytes)) + "\n",
 	}
 
 	return true
