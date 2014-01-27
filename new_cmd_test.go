@@ -32,6 +32,49 @@ Some data that shouldn't be modified
 		tmpl, err := template.New(jd).Parse(fileData)
 		c.Assume(err, IsNil)
 
+		c.Specify("will include any active ideas from the previous entry", func() {
+			prevEntryRaw := `{{.OpenedAt}}
+#~ Previous Entry
+Some unstructure data.
+
+## [active] Active Idea
+Something about this Active Idea
+
+## [inactive] Inactive Idea
+blah blah blah
+`
+			prevEntryTmpl, err := template.New(jd).Parse(prevEntryRaw)
+			c.Assume(err, IsNil)
+
+			// Save 2 entries
+			prevEntry, err := newEntry(jd, prevEntryTmpl, func() time.Time {
+				return time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+			}, nil, &Command{})
+			c.Assume(err, IsNil)
+
+			currEntry, err := newEntry(jd, entryTmpl, func() time.Time {
+				return time.Date(2001, time.January, 1, 0, 0, 0, 0, time.UTC)
+			}, nil, &Command{})
+			c.Assume(err, IsNil)
+
+			// Open entry files and scan
+			prevFile, err := os.OpenFile(path.Join(jd, prevEntry.Filename), os.O_RDONLY, 0600)
+			c.Assume(err, IsNil)
+			currFile, err := os.OpenFile(path.Join(jd, currEntry.Filename), os.O_RDONLY, 0600)
+			c.Assume(err, IsNil)
+
+			prevSc := NewIdeaScanner(prevFile)
+			currSc := NewIdeaScanner(currFile)
+
+			c.Assume(prevSc.Scan(), IsTrue)
+			c.Expect(currSc.Scan(), IsTrue)
+
+			c.Expect(*currSc.Idea(), Equals, *prevSc.Idea())
+
+			c.Assume(prevSc.Scan(), IsTrue)
+			c.Expect(currSc.Scan(), IsFalse)
+		})
+
 		c.Specify("will append the current time after editting is completed", func() {
 			j, err := newEntry(jd, tmpl, nil, nil, &Command{})
 			c.Assume(err, IsNil)
@@ -58,17 +101,14 @@ Some data that shouldn't be modified
 				`"Title(will be used as commit message)"
 diff --git a/{{.Filename}} b/{{.Filename}}
 new file mode 100644
-index 0000000..df0111e
+index 0000000..862ab0b
 --- /dev/null
 +++ b/{{.Filename}}
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,6 @@
 +{{.OpenedAt}}
 +
 +#~ Title(will be used as commit message)
 +TODO Make this some random quote or something stupid
-+
-+## [active] An Idea
-+An idea carries over from entry to entry if it is active.
 +
 +{{.ClosedAt}}
 `)

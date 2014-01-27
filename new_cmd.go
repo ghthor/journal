@@ -51,8 +51,7 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 		}
 	}
 
-	b := bytes.NewBuffer(make([]byte, 0, 256))
-
+	// Get the OpenedAt time
 	if Now == nil {
 		Now = time.Now
 	}
@@ -62,6 +61,27 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 		Filename: now.Format(filenameLayout),
 		OpenedAt: now.Format(time.UnixDate),
 	}
+
+	// Scan for active ideas
+	filename, err := lastEntryFilename(dir)
+	if err != nil && err.Error() != "journal is empty" {
+		return j, err
+	}
+
+	lastEntry, err := os.OpenFile(path.Join(dir, filename), os.O_RDONLY, 0600)
+	if err != nil {
+		return j, err
+	}
+
+	ideaScanner := NewIdeaScanner(lastEntry)
+	for ideaScanner.Scan() {
+		i := ideaScanner.Idea()
+		if i.Status == IS_Active {
+			j.ActiveIdeas = append(j.ActiveIdeas, i)
+		}
+	}
+
+	b := bytes.NewBuffer(make([]byte, 0, 256))
 
 	// *sigh* can't stop laughing.....
 	err = entryTmpl.Execute(b, j)
@@ -165,9 +185,10 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 }
 
 type journalEntry struct {
-	Filename string
-	OpenedAt string
-	ClosedAt string
+	Filename    string
+	OpenedAt    string
+	ClosedAt    string
+	ActiveIdeas []*Idea
 }
 
 var entryTmpl = template.Must(template.New("entry").Parse(
@@ -175,7 +196,5 @@ var entryTmpl = template.Must(template.New("entry").Parse(
 
 #~ Title(will be used as commit message)
 TODO Make this some random quote or something stupid
-
-## [active] An Idea
-An idea carries over from entry to entry if it is active.
-`))
+{{range .ActiveIdeas}}## [{{.Status}}] {{.Name}}
+{{.Body}}{{end}}`))
