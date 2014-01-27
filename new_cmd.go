@@ -97,14 +97,34 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 	j.ClosedAt = Now().Format(time.UnixDate)
 
 	// Append the ClosedAt time to the file
-	f, err := os.OpenFile(entryFilepath, os.O_WRONLY|os.O_APPEND, 0600)
+	f, err := os.OpenFile(entryFilepath, os.O_RDWR, 0600)
 	if err != nil {
 		return j, err
 	}
 	defer f.Close()
 
+	// Goto EOF
+	_, err = f.Seek(-1, 2)
+	if err != nil {
+		return j, err
+	}
+
+	lastTwoBytes := make([]byte, 2)
+
+	_, err = f.Read(lastTwoBytes)
+	if err != nil {
+		return j, err
+	}
+
 	fbuf := bufio.NewWriter(f)
-	fbuf.WriteString("\n" + j.ClosedAt + "\n")
+
+	switch {
+	case bytes.Equal(lastTwoBytes, []byte("\n\n")):
+		fbuf.WriteString(j.ClosedAt + "\n")
+	default:
+		fbuf.WriteString("\n" + j.ClosedAt + "\n")
+	}
+
 	err = fbuf.Flush()
 	if err != nil {
 		return j, err
