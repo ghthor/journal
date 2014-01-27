@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	if c, err := config.ReadFromFile(*configPath); err == nil {
-		_, err := os.Stat(c.Directory)
+		_, err := os.Stat(os.ExpandEnv(c.Directory))
 		if os.IsNotExist(err) && *init {
 			err := GitInit(c.Directory)
 			if err != nil {
