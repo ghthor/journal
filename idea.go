@@ -23,8 +23,6 @@ type Idea struct {
 	Body   string
 }
 
-const IdeaTmpl = "## [{{.Status}}] {{.Name}}\n{{.Body}}"
-
 type IdeaScanner struct {
 	scanner *bufio.Scanner
 
