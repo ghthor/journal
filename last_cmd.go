@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,6 +23,10 @@ func lastEntryFilename(journalDirectory string) (filename string, err error) {
 		}
 		return nil
 	})
+
+	if filename == "" {
+		err = errors.New("journal is empty")
+	}
 
 	return
 }
