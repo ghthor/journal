@@ -28,7 +28,7 @@ func DescribeJournalCommand(c gospec.Context) {
 		c.Specify("will create a directory intialize an empty go repository", func() {
 			c.Assume(os.RemoveAll("_test/journal"), IsNil)
 
-			jc := exec.Command("./journal", "-edit=false", "-init", "-config=config.test.json")
+			jc := exec.Command("./journal", "-edit=false", "-init", "-config=config.test.json", "new")
 			c.Expect(jc.Run(), IsNil)
 			c.Expect("_test/journal", IsAGitRepository)
 		})
