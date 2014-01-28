@@ -3,9 +3,11 @@ package main
 import (
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 )
 
@@ -35,6 +37,35 @@ func DescribeJournalCommand(c gospec.Context) {
 	})
 
 	c.Specify("the journal command", func() {
+		c.Specify("will use environment variable expansion for filepaths", func() {
+			wd, err := os.Getwd()
+			c.Assume(err, IsNil)
+
+			wd, err = filepath.Abs(wd)
+			c.Assume(err, IsNil)
+			c.Assume(os.Setenv("JOURNAL_PKG_DIR", wd), IsNil)
+
+			c.Specify("for the configuration path", func() {
+				td := "_test/config.env_exp"
+				c.Assume(ioutil.WriteFile("_test/config.env_exp.json",
+					[]byte(`{"directory":"`+td+`"}`), 0666), IsNil)
+
+				jc := exec.Command("./journal", "-edit=false", "-init",
+					"-config=$JOURNAL_PKG_DIR/_test/config.env_exp.json", "new")
+				c.Expect(jc.Run(), IsNil)
+			})
+
+			c.Specify("for the directory stored in the configuration", func() {
+				td := "$JOURNAL_PKG_DIR/_test/config.directory.env_exp"
+				c.Assume(ioutil.WriteFile("_test/config.directory.env_exp.json",
+					[]byte(`{"directory":"`+td+`"}`), 0666), IsNil)
+
+				jc := exec.Command("./journal", "-edit=false", "-init",
+					"-config=_test/config.directory.env_exp.json", "new")
+				c.Expect(jc.Run(), IsNil)
+			})
+		})
+
 		c.Specify("will create a directory intialize an empty go repository", func() {
 			td := "_test/journal-init"
 			c.Assume(ioutil.WriteFile("_test/config.journal-init.json", []byte(`{"directory":"`+td+`"}`), 0666), IsNil)

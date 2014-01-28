@@ -47,31 +47,40 @@ var commands = []*Command{
 func main() {
 	showUsage := flag.Bool("h", false, "show this usage documentation")
 
-	configPath := flag.String("config", os.ExpandEnv("$HOME/.journal-config.json"), "a path to the configuration file")
+	configPath := flag.String("config", "$HOME/.journal-config.json", "a path to the configuration file")
 	init := flag.Bool("init", false, "`git init` the journal directory if it doesn't exist")
 
 	flag.Usage = usage
 	flag.Parse()
 
+	// Show Help
 	if *showUsage {
 		showUsageAndExit(EC_OK)
 	}
 
-	if c, err := config.ReadFromFile(*configPath); err == nil {
-		_, err := os.Stat(os.ExpandEnv(c.Directory))
-		if os.IsNotExist(err) && *init {
-			err := GitInit(c.Directory)
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else if err != nil {
-			log.Fatal(err)
-		}
+	*configPath = os.ExpandEnv(*configPath)
 
-		if err := os.Chdir(os.ExpandEnv(c.Directory)); err != nil {
-			log.Fatal(err)
-		}
-	} else {
+	// Open the Config file
+	config, err := config.ReadFromFile(*configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check if Directory exists
+	_, err = os.Stat(config.Directory)
+
+	// If NOT, Create and `git init` Directory
+	if os.IsNotExist(err) && *init {
+		err = GitInit(config.Directory)
+	}
+
+	// Check for `git init` error or Stat error that isn't os.IsNotExist()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Change Working Directory to the one in the configuration file
+	if err := os.Chdir(config.Directory); err != nil {
 		log.Fatal(err)
 	}
 
