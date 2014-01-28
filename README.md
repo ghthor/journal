@@ -1,18 +1,26 @@
-# Personal Journaling Command
+This program is intended to help me write and enjoy writing my personal journal.
+The `journal` stores each entry in a git repository.
 
-This program is intended to help me write and enjoy writing my personal journal. The output is intended to be stored in a git repository as plain text, somewhat Mark'ed-down.
+## Persistence from entry to entry
 
-## Potential ways to expand this simple project
+After using the journal for a few days I found myself needing something that persists from entry to entry.
+I'm calling this an `Idea`.
+The following is the syntax in a go template.
 
-- [x] Don't allow a new entry is the git wd is dirty
-- [x] Watch the journal entry file after it is created and store the time the entry was completed
-    - Completed with ease after I learned I didn't have to syscall.Exec() the editor. See mutate.go
-- [x] When the entry is completed store automatically make a git commit
-- [ ] create an `amend` command
-- [ ] Create a `fix` command to update the journal entries to the ever evolving format
-- [ ] Link journal stores across machines with automatic git merges
-- [ ] Open the previous entry as a vim split window
-- [ ] Add a tasklist that is a singleton(one file) | open this as a split window in vim
-- [ ] Identify tasks mentioned in the previous entry like shower or exercise and present a checklist for that task in the new entry
-- [x] Use a config file stored in $HOME/.journal-config.json or something to point to the journal git repository
-- [ ] Enable the editor to be configurable
+```
+## [{{.Status}}] {{.Title}}
+{{.Body}}
+```
+
+An Idea's status can be
+
+| Status |     |
+| :----: | --- |
+| active | Carried over from entry to entry |
+| inactive | Ignored when creating a new entry |
+| completed | Not used yet, is treated exactly like [inactive]. Will be used in the future. |
+
+To view how Idea's look in use view an entry in the `log/`.
+For instance, the commit where I added this documentation I transfered all the tasks from this readme into Idea's stored in the log.
+Most of them were marked as inactive because they are not the focus of work on the project at this time.
+But now they are stored in the log and I'll be able to resurrect [inactive] ideas in the future using `journal`.
