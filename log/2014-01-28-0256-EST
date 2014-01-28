@@ -1,0 +1,82 @@
+Tue Jan 28 02:56:55 EST 2014
+
+#~ Heres a perfect example for why we need the Idea's stored seperately
+I just had a new idea for a feature.
+It's short and small.
+But this commit is going to look huge because of the really big active ideas.
+
+It'd be nice to be able to just save a new Idea without all the noise from the others.
+Would clean up the commit messages and make what's happening much more clear.
+
+## [inactive] Prefix for `git commit message`
+Can be added to the configuration file.
+
+## [active] Idea Storage
+Right now each Idea is getting repeated with each entry.
+In the short run this is fine and will work for the immediate future.
+But in the long run I don't like it at all.
+
+If we splice the Ideas out of the entry and store them by themselves we get the following for free.
+
+- Modification tracking through git, don't have to make it ourselves
+- Idea indexing by ID
+- Can change the name of an Idea
+- No stress to keep the Idea short
+- Idea browsing without having to parse through all the previous journal entries
+
+It's a persistent document, It should be treated as such.
+
+So heres the plan.
+Editing and saving Ideas will function the same.
+They will be appended to the entry when it is made and you can edit them the same way.
+When the entry is saved and the editor is closed we parse out the Ideas and removed them from the entry.
+If an Idea is missing an Id, that means it's new and hasn't been seen before, so we give it one.
+
+The Id is used as the filename for the Idea in the `$journal/idea/` directory.
+Active Idea's can be indexed in the `$journal/idea/active` file, each line with an Id.
+We store the next available Id in the `$journal/idea/next` file.
+
+I should also go back and remove all the ideas from journal entries and bring them into the new system.
+Should do this manually I think since I can track the renames and more major edits.
+I could play around with automating this though, but I don't think it's worth the time right now.
+
+
+## [active] Missing Specifications
+In a rush to get Idea's functional enough to use today I passed over a few specifications.
+On top of that the terminal usage needs to be specified.
+Realized that it wasn't a difficult task today, see main_test.go, and made specs for a few of todays additions
+
+- [ ] Spec Environment Expansion of all User provided path's
+    - [x] config path
+    - [x] config.directory path
+- [ ] Spec the terminal usage of the `journal` command
+- [ ] Spec the "lastTwoBytes" tidbit
+- [ ] From now on all flags and terminal interaction will be specced
+- [ ] During the newEntry func -> type conversion rewrite all specifications as the behavior is introduced to avoid missing anything
+
+
+## [active] Software Architecture
+I'm not exactly happy with what's happening due to this rapid feature adding.
+Everything sort of getting out of hand, haha.
+It's not quite there but some of the functions are really long.
+
+I'd really like to revisit the Idea parser for some readability improvements.
+
+I also have a way to handle the pre and post processing of the entry.
+
+- [ ] Extract the entry into a type, currently it's just a big function
+- [ ] Identify a common interface for Pre and Post processes
+- [ ] Extract all current modifications into these Pre and Post processors
+- [ ] Chain them together
+
+Regarding the `type Command` that was yanked from the go cmd.
+It isn't really all that useful.
+I think it'd be a good Idea to revisit this structure and simplify it.
+Nothing from the struct itself is needed by the `new` command during execution
+
+I'd like to get the command itself fully spec'ed.
+Just today I realized how to test the command as used from the terminal.
+Pretty proud of that realization, it will be useful in the future.
+
+
+Tue Jan 28 03:01:06 EST 2014
