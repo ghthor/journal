@@ -10,6 +10,7 @@ import (
 )
 
 var BuildExecutableOnce sync.Once
+var MkTestDirectory sync.Once
 
 func DescribeJournalCommand(c gospec.Context) {
 	BuildExecutableOnce.Do(func() {
@@ -24,13 +25,23 @@ func DescribeJournalCommand(c gospec.Context) {
 		}
 	})
 
+	MkTestDirectory.Do(func() {
+		if err := os.Mkdir("_test", 0755); err != nil {
+			if !os.IsExist(err) {
+				// Only fatal if is isn't that the directory already exists
+				log.Fatal(err)
+			}
+		}
+	})
+
 	c.Specify("the journal command", func() {
 		c.Specify("will create a directory intialize an empty go repository", func() {
-			c.Assume(os.RemoveAll("_test/journal"), IsNil)
+			td := "_test/journal-init"
+			c.Assume(ioutil.WriteFile("_test/config.journal-init.json", []byte(`{"directory":"`+td+`"}`), 0666), IsNil)
 
-			jc := exec.Command("./journal", "-edit=false", "-init", "-config=config.test.json", "new")
+			jc := exec.Command("./journal", "-edit=false", "-init", "-config=_test/config.journal-init.json", "new")
 			c.Expect(jc.Run(), IsNil)
-			c.Expect("_test/journal", IsAGitRepository)
+			c.Expect(td, IsAGitRepository)
 		})
 	})
 }
