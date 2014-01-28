@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestUnitSpecs(t *testing.T) {
+func TestSpecs(t *testing.T) {
 	r := gospec.NewRunner()
 
 	r.AddSpec(DescribeConfigLoading)
