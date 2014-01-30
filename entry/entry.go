@@ -40,7 +40,7 @@ type OpenEntry interface {
 
 	Edit(EditorProcess) (OpenEntry, error)
 
-	Close() (ClosedEntry, []idea.Idea, error)
+	Close(time.Time) (ClosedEntry, []idea.Idea, error)
 }
 
 type ClosedEntry interface {
@@ -99,7 +99,8 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 
 	return e, proc.Wait()
 }
-func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
+
+func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, []idea.Idea, error) {
 	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
 
 	f, err := os.OpenFile(filename, os.O_RDWR, 0600)
@@ -161,12 +162,18 @@ func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
 		return nil, nil, errors.New("error re-writing entry without idea's")
 	}
 
-	// Truncate the File to it's new length
-	if err = f.Truncate(int64(n)); err != nil {
+	closedAtStr := closedAt.Format(time.UnixDate)
+	nn, err := f.WriteString("\n" + closedAtStr + "\n")
+	if err != nil {
 		return nil, nil, err
 	}
 
-	return &closedEntry{e.directory, e.openedAt, e.openedAt}, ideas, nil
+	// Truncate the File to it's new length
+	if err = f.Truncate(int64(n + nn)); err != nil {
+		return nil, nil, err
+	}
+
+	return &closedEntry{e.directory, e.openedAt, closedAt}, ideas, nil
 }
 
 type closedEntry struct {
@@ -182,6 +189,7 @@ func (e *closedEntry) FilesToAdd() ([]string, error) {
 		filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
 	}, nil
 }
+
 func (e *closedEntry) CommitMsg() (string, error) {
 	f, err := os.OpenFile(filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
 		os.O_RDONLY, 0600)

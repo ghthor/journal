@@ -60,7 +60,8 @@ func DescribeAnEntry(c gospec.Context) {
 				}
 			})
 		})
-		t := time.Date(2006, time.January, 1, 1, 0, 0, 0, time.UTC)
+		openedAt := time.Date(2006, time.January, 1, 1, 0, 0, 0, time.UTC)
+		closedAt := time.Date(2006, time.January, 1, 1, 10, 0, 0, time.UTC)
 
 		ideas := []idea.Idea{{
 			Name:   "Active Idea",
@@ -73,12 +74,12 @@ func DescribeAnEntry(c gospec.Context) {
 		}}
 
 		oe, err := ne.Open(func() time.Time {
-			return t
+			return openedAt
 		}, ideas)
 		c.Assume(err, IsNil)
-		c.Assume(oe.OpenedAt(), Equals, t)
+		c.Assume(oe.OpenedAt(), Equals, openedAt)
 
-		filename := filepath.Join(td, t.Format(filenameLayout))
+		filename := filepath.Join(td, openedAt.Format(filenameLayout))
 
 		c.Specify("that is open", func() {
 			c.Specify("is a file", func() {
@@ -108,7 +109,7 @@ Some other text
 			c.Specify("will have the time opened as the first line of the entry", func() {
 				scanner := bufio.NewScanner(f)
 				c.Assume(scanner.Scan(), IsTrue)
-				c.Expect(scanner.Text(), Equals, t.Format(time.UnixDate))
+				c.Expect(scanner.Text(), Equals, openedAt.Format(time.UnixDate))
 			})
 
 			c.Specify("will have a list of ideas appended to the entry", func() {
@@ -148,7 +149,7 @@ Some other text
 				_, err = oe.Edit(editCmd)
 				c.Assume(err, IsNil)
 
-				_, editedIdeas, err := oe.Close()
+				_, editedIdeas, err := oe.Close(closedAt)
 				c.Expect(err, IsNil)
 
 				c.Specify("and returns a list of the ideas", func() {
@@ -178,7 +179,7 @@ This is a new Idea
 				Body:   "This is a new Idea\n",
 			})
 
-			ce, closedIdeas, err := oe.Close()
+			ce, closedIdeas, err := oe.Close(closedAt)
 			c.Assume(err, IsNil)
 			c.Assume(len(closedIdeas), Equals, 3)
 			for i, actualIdea := range closedIdeas {
@@ -194,10 +195,23 @@ This is a new Idea
 
 #~ Title(will be used as commit message)
 TODO Make this some random quote or something stupid
+
+Sun Jan  1 01:10:00 UTC 2006
 `)
 			})
 
 			c.Specify("will have the time closed as the last line of the entry", func() {
+				actualBytes, err := ioutil.ReadFile(filename)
+				c.Assume(err, IsNil)
+
+				c.Expect(string(actualBytes), Equals,
+					`Sun Jan  1 01:00:00 UTC 2006
+
+#~ Title(will be used as commit message)
+TODO Make this some random quote or something stupid
+
+Sun Jan  1 01:10:00 UTC 2006
+`)
 			})
 
 			c.Specify("can be commited to the git repository", func() {
