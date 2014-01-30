@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -77,13 +78,6 @@ func DescribeAnEntry(c gospec.Context) {
 			c.Assume(err, IsNil)
 			c.Assume(oe.OpenedAt(), Equals, t)
 
-			defer func() {
-				_, _, err := oe.Close()
-				c.Assume(err, IsNil)
-				// Verify that the *os.File was closed
-				c.Expect(oe.(*openEntry).file.Close(), Not(IsNil))
-			}()
-
 			filename := filepath.Join(td, t.Format(filenameLayout))
 
 			c.Specify("is a file", func() {
@@ -125,7 +119,26 @@ Some other text
 			})
 
 			c.Specify("can be editted by a text editor", func() {
+				sed, err := exec.LookPath("sed")
+				c.Assume(err, IsNil)
+
+				editCmd := exec.Command(sed, "-i", "s_active_inactive_", filename)
+				_, err = oe.Edit(editCmd)
+				c.Expect(err, IsNil)
+
+				// Re-Open the file
+				c.Assume(f.Close(), IsNil)
+				f, err = os.OpenFile(filename, os.O_RDONLY, 0600)
+				c.Assume(err, IsNil)
+
+				// Check the Edit's went through
+				scanner := idea.NewIdeaScanner(f)
+				for i := 0; i < len(ideas); i++ {
+					c.Assume(scanner.Scan(), IsTrue)
+					c.Expect(scanner.Idea().Status, Equals, idea.IS_Inactive)
+				}
 			})
+
 			c.Specify("can be closed", func() {
 			})
 		})

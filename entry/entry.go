@@ -25,11 +25,16 @@ type NewEntry interface {
 	Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error)
 }
 
+type EditorProcess interface {
+	Start() error
+	Wait() error
+}
+
 type OpenEntry interface {
 	OpenedAt() time.Time
 	Ideas() []idea.Idea
 
-	Edit(mutateIntoEditor func() error) (OpenEntry, error)
+	Edit(EditorProcess) (OpenEntry, error)
 
 	Close() (ClosedEntry, []idea.Idea, error)
 }
@@ -49,10 +54,11 @@ type newEntry struct {
 func (e *newEntry) Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error) {
 	openedAt := Now()
 
-	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(filenameLayout)), os.O_RDWR|os.O_CREATE, 0600)
+	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(filenameLayout)), os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	type entry struct {
 		OpenedAt    string
@@ -67,11 +73,12 @@ func (e *newEntry) Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, err
 		return nil, err
 	}
 
-	return &openEntry{f, openedAt, ideas}, nil
+	return &openEntry{e.directory, openedAt, ideas}, nil
 }
 
 type openEntry struct {
-	file     *os.File
+	directory string
+
 	openedAt time.Time
 
 	ideas []idea.Idea
@@ -80,15 +87,19 @@ type openEntry struct {
 func (e *openEntry) OpenedAt() time.Time { return e.openedAt }
 func (e *openEntry) Ideas() []idea.Idea  { return e.ideas }
 
-func (e *openEntry) Edit(mutateIntoEditor func() error) (OpenEntry, error) {
-	return e, nil
+func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
+	err := proc.Start()
+	if err != nil {
+		return e, err
+	}
+
+	return e, proc.Wait()
 }
 func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
-	return nil, nil, e.file.Close()
+	return nil, nil, nil
 }
 
 type closedEntry struct {
-	file     os.File
 	openedAt time.Time
 	closedAt time.Time
 }
