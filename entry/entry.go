@@ -2,6 +2,7 @@ package entry
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
@@ -101,7 +102,7 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
 	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
 
-	f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+	f, err := os.OpenFile(filename, os.O_RDWR, 0600)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -114,6 +115,55 @@ func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
 			return nil, nil, err
 		}
 		ideas = append(ideas, *ideaScanner.Idea())
+	}
+
+	// Remove the Idea's from the File
+	// To Beginning of File
+	if _, err = f.Seek(0, 0); err != nil {
+		return nil, nil, err
+	}
+
+	fr := bufio.NewReader(f)
+	buf := bytes.NewBuffer(make([]byte, 0, 1024))
+
+	// Find the start of the Idea's list
+	// Collect the Lines up till then
+	for {
+		line, err := fr.ReadString('\n')
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if i := strings.Index(line, "## ["); i != -1 {
+			break
+		}
+
+		buf.WriteString(line)
+	}
+
+	// To Beginning of File
+	if _, err = f.Seek(0, 0); err != nil {
+		return nil, nil, err
+	}
+
+	// Clean up the Trailing newlines
+	b := buf.Bytes()
+	b = bytes.TrimRight(b, "\n")
+	b = append(b, '\n')
+
+	// Write back Contents with Idea's Truncated out
+	n, err := f.Write(b)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if n != len(b) {
+		return nil, nil, errors.New("error re-writing entry without idea's")
+	}
+
+	// Truncate the File to it's new length
+	if err = f.Truncate(int64(n)); err != nil {
+		return nil, nil, err
 	}
 
 	return &closedEntry{e.directory, e.openedAt, e.openedAt}, ideas, nil

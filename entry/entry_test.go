@@ -172,13 +172,31 @@ Some other text
 This is a new Idea
 `)
 			c.Assume(err, IsNil)
+			ideas = append(ideas, idea.Idea{
+				Name:   "A New Idea",
+				Status: idea.IS_Inactive,
+				Body:   "This is a new Idea\n",
+			})
 
 			ce, closedIdeas, err := oe.Close()
 			c.Assume(err, IsNil)
 			c.Assume(len(closedIdeas), Equals, 3)
+			for i, actualIdea := range closedIdeas {
+				c.Assume(actualIdea, Equals, ideas[i])
+			}
 
 			c.Specify("will have all ideas removed from the entry", func() {
+				actualBytes, err := ioutil.ReadFile(filename)
+				c.Assume(err, IsNil)
+
+				c.Expect(string(actualBytes), Equals,
+					`Sun Jan  1 01:00:00 UTC 2006
+
+#~ Title(will be used as commit message)
+TODO Make this some random quote or something stupid
+`)
 			})
+
 			c.Specify("will have the time closed as the last line of the entry", func() {
 			})
 
