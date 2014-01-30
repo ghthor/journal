@@ -4,10 +4,22 @@ import (
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"os"
+	"path/filepath"
+	"text/template"
 	"time"
 )
 
-type directory string
+//A layout to use as the entry's filename
+const filenameLayout = "2006-01-02-1504-MST"
+
+var entryTmpl = template.Must(template.New("entry").Parse(
+	`{{.OpenedAt}}
+
+#~ Title(will be used as commit message)
+TODO Make this some random quote or something stupid
+{{range .ActiveIdeas}}
+## [{{.Status}}] {{.Name}}
+{{.Body}}{{end}}`))
 
 type NewEntry interface {
 	Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error)
@@ -35,7 +47,27 @@ type newEntry struct {
 }
 
 func (e *newEntry) Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error) {
-	return &openEntry{nil, Now(), ideas}, nil
+	openedAt := Now()
+
+	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(filenameLayout)), os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	type entry struct {
+		OpenedAt    string
+		ActiveIdeas []idea.Idea
+	}
+
+	err = entryTmpl.Execute(f, entry{
+		openedAt.Format(time.UnixDate),
+		ideas,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &openEntry{f, openedAt, ideas}, nil
 }
 
 type openEntry struct {

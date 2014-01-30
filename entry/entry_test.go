@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -56,10 +57,46 @@ func DescribeAnEntry(c gospec.Context) {
 				}
 			})
 		})
+		t := time.Date(2006, time.January, 1, 1, 0, 0, 0, time.UTC)
+
+		ideas := []idea.Idea{{
+			Name:   "Active Idea",
+			Status: idea.IS_Active,
+			Body:   "Some text\n",
+		}, {
+			Name:   "Another Idea",
+			Status: idea.IS_Active,
+			Body:   "Some other text\n",
+		}}
+
+		oe, err := ne.Open(func() time.Time {
+			return t
+		}, ideas)
+		c.Assume(err, IsNil)
+		c.Assume(oe.OpenedAt(), Equals, t)
 
 		c.Specify("that is open", func() {
 			c.Specify("is a file", func() {
+				filename := filepath.Join(td, t.Format(filenameLayout))
+				_, err := os.Stat(filename)
+				c.Expect(os.IsNotExist(err), IsFalse)
+
+				actualBytes, err := ioutil.ReadFile(filename)
+				c.Expect(err, IsNil)
+				c.Expect(string(actualBytes), Equals,
+					`Sun Jan  1 01:00:00 UTC 2006
+
+#~ Title(will be used as commit message)
+TODO Make this some random quote or something stupid
+
+## [active] Active Idea
+Some text
+
+## [active] Another Idea
+Some other text
+`)
 			})
+
 			c.Specify("will have the time opened as the first line of the entry", func() {
 			})
 			c.Specify("will have a list of ideas appended to the entry", func() {
