@@ -208,6 +208,7 @@ Sun Jan  1 01:10:00 UTC 2006
 			c.Specify("can be commited to the git repository", func() {
 				commitable, isCommitable := ce.(git.Commitable)
 				c.Expect(isCommitable, IsTrue)
+
 				files, err := commitable.FilesToAdd()
 				c.Assume(err, IsNil)
 				c.Expect(len(files), Equals, 1)
