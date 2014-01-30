@@ -1,6 +1,7 @@
 package entry
 
 import (
+	"bufio"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
 	"github.com/ghthor/journal/idea"
@@ -106,7 +107,15 @@ Some other text
 			})
 
 			c.Specify("will have the time opened as the first line of the entry", func() {
+				f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+				c.Assume(err, IsNil)
+				defer f.Close()
+
+				scanner := bufio.NewScanner(f)
+				c.Assume(scanner.Scan(), IsTrue)
+				c.Expect(scanner.Text(), Equals, t.Format(time.UnixDate))
 			})
+
 			c.Specify("will have a list of ideas appended to the entry", func() {
 			})
 			c.Specify("can be editted by a text editor", func() {
