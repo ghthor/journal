@@ -55,7 +55,10 @@ func DescribeAnEntry(c gospec.Context) {
 
 				oe, err := ne.Open(time.Now, ideas)
 				c.Assume(err, IsNil)
-				for i, idea := range oe.Ideas() {
+				actualIdeas, err := oe.Ideas()
+				c.Assume(err, IsNil)
+				c.Expect(len(actualIdeas), Equals, len(ideas))
+				for i, idea := range actualIdeas {
 					c.Expect(idea, Equals, ideas[i])
 				}
 			})
@@ -113,10 +116,33 @@ Some other text
 			})
 
 			c.Specify("will have a list of ideas appended to the entry", func() {
-				scanner := idea.NewIdeaScanner(f)
-				for i := 0; i < len(ideas); i++ {
-					c.Assume(scanner.Scan(), IsTrue)
-					c.Expect(*scanner.Idea(), Equals, ideas[i])
+				actualIdeas, err := oe.Ideas()
+				c.Assume(err, IsNil)
+				c.Expect(len(actualIdeas), Equals, len(ideas))
+				for i, actualIdea := range actualIdeas {
+					c.Expect(actualIdea, Equals, ideas[i])
+				}
+
+				fa, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0600)
+				c.Assume(err, IsNil)
+				defer func() { c.Assume(fa.Close(), IsNil) }()
+
+				_, err = fa.WriteString(
+					`## [inactive] A Third Idea
+Sir Idea, The Third
+`)
+				ideas = append(ideas, idea.Idea{
+					Name:   "A Third Idea",
+					Status: idea.IS_Inactive,
+					Body:   "Sir Idea, The Third\n",
+				})
+				c.Assume(err, IsNil)
+
+				actualIdeas, err = oe.Ideas()
+				c.Assume(err, IsNil)
+				c.Expect(len(actualIdeas), Equals, len(ideas))
+				for i, actualIdea := range actualIdeas {
+					c.Expect(actualIdea, Equals, ideas[i])
 				}
 			})
 

@@ -36,7 +36,7 @@ type EditorProcess interface {
 
 type OpenEntry interface {
 	OpenedAt() time.Time
-	Ideas() []idea.Idea
+	Ideas() ([]idea.Idea, error)
 
 	Edit(EditorProcess) (OpenEntry, error)
 
@@ -89,7 +89,26 @@ type openEntry struct {
 }
 
 func (e *openEntry) OpenedAt() time.Time { return e.openedAt }
-func (e *openEntry) Ideas() []idea.Idea  { return e.ideas }
+func (e *openEntry) Ideas() ([]idea.Idea, error) {
+	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
+
+	f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	ideas := make([]idea.Idea, 0, len(e.ideas))
+	ideaScanner := idea.NewIdeaScanner(f)
+	for ideaScanner.Scan() {
+		if err := ideaScanner.Err(); err != nil {
+			return nil, err
+		}
+		ideas = append(ideas, *ideaScanner.Idea())
+	}
+	e.ideas = ideas
+	return ideas, nil
+}
 
 func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 	err := proc.Start()
