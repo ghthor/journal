@@ -43,14 +43,14 @@ func DescribeAnEntry(c gospec.Context) {
 				ideas := []idea.Idea{{
 					Name:   "Active Idea",
 					Status: idea.IS_Active,
-					Body:   "Some text\n.",
+					Body:   "Some text\n",
 				}, {
 					Name:   "Another Idea",
 					Status: idea.IS_Active,
 					Body:   "Some other text\n",
 				}}
-				oe, err := ne.Open(time.Now, ideas)
 
+				oe, err := ne.Open(time.Now, ideas)
 				c.Assume(err, IsNil)
 				for i, idea := range oe.Ideas() {
 					c.Expect(idea, Equals, ideas[i])
