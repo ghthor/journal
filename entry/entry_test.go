@@ -112,14 +112,7 @@ Some other text
 				c.Expect(scanner.Text(), Equals, openedAt.Format(time.UnixDate))
 			})
 
-			c.Specify("will have a list of ideas appended to the entry", func() {
-				actualIdeas, err := oe.Ideas()
-				c.Assume(err, IsNil)
-				c.Expect(len(actualIdeas), Equals, len(ideas))
-				for i, actualIdea := range actualIdeas {
-					c.Expect(actualIdea, Equals, ideas[i])
-				}
-
+			c.Specify("can scan the entry for a list of ideas", func() {
 				fa, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0600)
 				c.Assume(err, IsNil)
 				defer func() { c.Assume(fa.Close(), IsNil) }()
@@ -135,7 +128,16 @@ Sir Idea, The Third
 				})
 				c.Assume(err, IsNil)
 
-				actualIdeas, err = oe.Ideas()
+				actualIdeas, err := oe.Ideas()
+				c.Assume(err, IsNil)
+				c.Expect(len(actualIdeas), Equals, len(ideas))
+				for i, actualIdea := range actualIdeas {
+					c.Expect(actualIdea, Equals, ideas[i])
+				}
+			})
+
+			c.Specify("will have a list of ideas appended to the entry", func() {
+				actualIdeas, err := oe.Ideas()
 				c.Assume(err, IsNil)
 				c.Expect(len(actualIdeas), Equals, len(ideas))
 				for i, actualIdea := range actualIdeas {
