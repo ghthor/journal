@@ -84,7 +84,7 @@ func (e *openEntry) Edit(mutateIntoEditor func() error) (OpenEntry, error) {
 	return e, nil
 }
 func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
-	return nil, nil, nil
+	return nil, nil, e.file.Close()
 }
 
 type closedEntry struct {

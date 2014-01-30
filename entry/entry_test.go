@@ -69,15 +69,23 @@ func DescribeAnEntry(c gospec.Context) {
 			Body:   "Some other text\n",
 		}}
 
-		oe, err := ne.Open(func() time.Time {
-			return t
-		}, ideas)
-		c.Assume(err, IsNil)
-		c.Assume(oe.OpenedAt(), Equals, t)
-
 		c.Specify("that is open", func() {
+			oe, err := ne.Open(func() time.Time {
+				return t
+			}, ideas)
+			c.Assume(err, IsNil)
+			c.Assume(oe.OpenedAt(), Equals, t)
+
+			defer func() {
+				_, _, err := oe.Close()
+				c.Assume(err, IsNil)
+				// Verify that the *os.File was closed
+				c.Expect(oe.(*openEntry).file.Close(), Not(IsNil))
+			}()
+
+			filename := filepath.Join(td, t.Format(filenameLayout))
+
 			c.Specify("is a file", func() {
-				filename := filepath.Join(td, t.Format(filenameLayout))
 				_, err := os.Stat(filename)
 				c.Expect(os.IsNotExist(err), IsFalse)
 
