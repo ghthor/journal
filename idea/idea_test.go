@@ -1,4 +1,4 @@
-package main
+package idea
 
 import (
 	"github.com/ghthor/gospec"

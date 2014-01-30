@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"os"
 	"path"
@@ -63,8 +64,8 @@ blah blah blah
 			currFile, err := os.OpenFile(path.Join(jd, currEntry.Filename), os.O_RDONLY, 0600)
 			c.Assume(err, IsNil)
 
-			prevSc := NewIdeaScanner(prevFile)
-			currSc := NewIdeaScanner(currFile)
+			prevSc := idea.NewIdeaScanner(prevFile)
+			currSc := idea.NewIdeaScanner(currFile)
 
 			c.Assume(prevSc.Scan(), IsTrue)
 			c.Expect(currSc.Scan(), IsTrue)

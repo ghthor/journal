@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"flag"
+	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"log"
 	"os"
@@ -73,10 +74,10 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 		return j, err
 	}
 
-	ideaScanner := NewIdeaScanner(lastEntry)
+	ideaScanner := idea.NewIdeaScanner(lastEntry)
 	for ideaScanner.Scan() {
 		i := ideaScanner.Idea()
-		if i.Status == IS_Active {
+		if i.Status == idea.IS_Active {
 			j.ActiveIdeas = append(j.ActiveIdeas, i)
 		}
 	}
@@ -188,7 +189,7 @@ type journalEntry struct {
 	Filename    string
 	OpenedAt    string
 	ClosedAt    string
-	ActiveIdeas []*Idea
+	ActiveIdeas []*idea.Idea
 }
 
 var entryTmpl = template.Must(template.New("entry").Parse(
