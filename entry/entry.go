@@ -96,7 +96,24 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 	return e, proc.Wait()
 }
 func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
-	return nil, nil, nil
+	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
+
+	f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer f.Close()
+
+	ideas := make([]idea.Idea, 0, len(e.ideas))
+	ideaScanner := idea.NewIdeaScanner(f)
+	for ideaScanner.Scan() {
+		if err := ideaScanner.Err(); err != nil {
+			return nil, nil, err
+		}
+		ideas = append(ideas, *ideaScanner.Idea())
+	}
+
+	return nil, ideas, nil
 }
 
 type closedEntry struct {

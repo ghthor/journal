@@ -140,6 +140,23 @@ Some other text
 			})
 
 			c.Specify("can be closed", func() {
+				sed, err := exec.LookPath("sed")
+				c.Assume(err, IsNil)
+
+				editCmd := exec.Command(sed, "-i", "s_active_inactive_", filename)
+				_, err = oe.Edit(editCmd)
+				c.Assume(err, IsNil)
+
+				_, editedIdeas, err := oe.Close()
+				c.Expect(err, IsNil)
+
+				c.Specify("and returns a list of the ideas", func() {
+					c.Expect(len(editedIdeas), Equals, len(ideas))
+
+					for _, actualIdea := range editedIdeas {
+						c.Expect(actualIdea.Status, Equals, idea.IS_Inactive)
+					}
+				})
 			})
 		})
 
