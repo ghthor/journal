@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"log"
@@ -71,15 +72,15 @@ func DescribeAnEntry(c gospec.Context) {
 			Body:   "Some other text\n",
 		}}
 
+		oe, err := ne.Open(func() time.Time {
+			return t
+		}, ideas)
+		c.Assume(err, IsNil)
+		c.Assume(oe.OpenedAt(), Equals, t)
+
+		filename := filepath.Join(td, t.Format(filenameLayout))
+
 		c.Specify("that is open", func() {
-			oe, err := ne.Open(func() time.Time {
-				return t
-			}, ideas)
-			c.Assume(err, IsNil)
-			c.Assume(oe.OpenedAt(), Equals, t)
-
-			filename := filepath.Join(td, t.Format(filenameLayout))
-
 			c.Specify("is a file", func() {
 				_, err := os.Stat(filename)
 				c.Expect(os.IsNotExist(err), IsFalse)
@@ -161,11 +162,37 @@ Some other text
 		})
 
 		c.Specify("that is closed", func() {
+			f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0600)
+			c.Assume(err, IsNil)
+			defer func() { c.Assume(f.Close(), IsNil) }()
+
+			// Add another Idea to the Entry
+			_, err = f.WriteString(
+				`## [inactive] A New Idea
+This is a new Idea
+`)
+			c.Assume(err, IsNil)
+
+			ce, closedIdeas, err := oe.Close()
+			c.Assume(err, IsNil)
+			c.Assume(len(closedIdeas), Equals, 3)
+
 			c.Specify("will have all ideas removed from the entry", func() {
 			})
 			c.Specify("will have the time closed as the last line of the entry", func() {
 			})
+
 			c.Specify("can be commited to the git repository", func() {
+				commitable, isCommitable := ce.(git.Commitable)
+				c.Expect(isCommitable, IsTrue)
+				files, err := commitable.FilesToAdd()
+				c.Assume(err, IsNil)
+				c.Expect(len(files), Equals, 1)
+				c.Expect(files[0], Equals, filename)
+
+				commitMsg, err := commitable.CommitMsg()
+				c.Assume(err, IsNil)
+				c.Expect(commitMsg, Equals, "ENTRY - Title(will be used as commit message)")
 			})
 		})
 	})

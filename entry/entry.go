@@ -1,10 +1,13 @@
 package entry
 
 import (
+	"bufio"
+	"errors"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -113,18 +116,40 @@ func (e *openEntry) Close() (ClosedEntry, []idea.Idea, error) {
 		ideas = append(ideas, *ideaScanner.Idea())
 	}
 
-	return nil, ideas, nil
+	return &closedEntry{e.directory, e.openedAt, e.openedAt}, ideas, nil
 }
 
 type closedEntry struct {
+	directory string
+
 	openedAt time.Time
 	closedAt time.Time
 }
 
 // Implement Commitable
 func (e *closedEntry) FilesToAdd() ([]string, error) {
-	return nil, nil
+	return []string{
+		filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
+	}, nil
 }
 func (e *closedEntry) CommitMsg() (string, error) {
-	return "", nil
+	f, err := os.OpenFile(filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
+		os.O_RDONLY, 0600)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return "", err
+		}
+
+		line := scanner.Text()
+		if i := strings.Index(line, "#~"); i != -1 {
+			return "ENTRY - " + strings.TrimPrefix(line, "#~ "), nil
+		}
+	}
+	return "", errors.New("missing commit msg")
 }
