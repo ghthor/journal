@@ -168,49 +168,14 @@ Sir Idea, The Third
 			})
 
 			c.Specify("can be closed", func() {
-				sed, err := exec.LookPath("sed")
-				c.Assume(err, IsNil)
-
-				editCmd := exec.Command(sed, "-i", "s_active_inactive_", filename)
-				_, err = oe.Edit(editCmd)
-				c.Assume(err, IsNil)
-
-				_, editedIdeas, err := oe.Close(closedAt)
+				_, err = oe.Close(closedAt)
 				c.Expect(err, IsNil)
-
-				c.Specify("and returns a list of the ideas", func() {
-					c.Expect(len(editedIdeas), Equals, len(ideas))
-
-					for _, actualIdea := range editedIdeas {
-						c.Expect(actualIdea.Status, Equals, idea.IS_Inactive)
-					}
-				})
 			})
 		})
 
 		c.Specify("that is closed", func() {
-			f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0600)
+			ce, err := oe.Close(closedAt)
 			c.Assume(err, IsNil)
-			defer func() { c.Assume(f.Close(), IsNil) }()
-
-			// Add another Idea to the Entry
-			_, err = f.WriteString(
-				`## [inactive] A New Idea
-This is a new Idea
-`)
-			c.Assume(err, IsNil)
-			ideas = append(ideas, idea.Idea{
-				Name:   "A New Idea",
-				Status: idea.IS_Inactive,
-				Body:   "This is a new Idea\n",
-			})
-
-			ce, closedIdeas, err := oe.Close(closedAt)
-			c.Assume(err, IsNil)
-			c.Assume(len(closedIdeas), Equals, 3)
-			for i, actualIdea := range closedIdeas {
-				c.Assume(actualIdea, Equals, ideas[i])
-			}
 
 			c.Specify("will have all ideas removed from the entry", func() {
 				actualBytes, err := ioutil.ReadFile(filename)

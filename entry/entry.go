@@ -40,7 +40,7 @@ type OpenEntry interface {
 
 	Edit(EditorProcess) (OpenEntry, error)
 
-	Close(time.Time) (ClosedEntry, []idea.Idea, error)
+	Close(time.Time) (ClosedEntry, error)
 }
 
 type ClosedEntry interface {
@@ -119,29 +119,14 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 	return e, proc.Wait()
 }
 
-func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, []idea.Idea, error) {
+func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
 
 	f, err := os.OpenFile(filename, os.O_RDWR, 0600)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer f.Close()
-
-	ideas := make([]idea.Idea, 0, len(e.ideas))
-	ideaScanner := idea.NewIdeaScanner(f)
-	for ideaScanner.Scan() {
-		if err := ideaScanner.Err(); err != nil {
-			return nil, nil, err
-		}
-		ideas = append(ideas, *ideaScanner.Idea())
-	}
-
-	// Remove the Idea's from the File
-	// To Beginning of File
-	if _, err = f.Seek(0, 0); err != nil {
-		return nil, nil, err
-	}
 
 	fr := bufio.NewReader(f)
 	buf := bytes.NewBuffer(make([]byte, 0, 1024))
@@ -151,7 +136,7 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, []idea.Idea, error) 
 	for {
 		line, err := fr.ReadString('\n')
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		if i := strings.Index(line, "## ["); i != -1 {
@@ -163,7 +148,7 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, []idea.Idea, error) 
 
 	// To Beginning of File
 	if _, err = f.Seek(0, 0); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Clean up the Trailing newlines
@@ -174,25 +159,25 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, []idea.Idea, error) 
 	// Write back Contents with Idea's Truncated out
 	n, err := f.Write(b)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if n != len(b) {
-		return nil, nil, errors.New("error re-writing entry without idea's")
+		return nil, errors.New("error re-writing entry without idea's")
 	}
 
 	closedAtStr := closedAt.Format(time.UnixDate)
 	nn, err := f.WriteString("\n" + closedAtStr + "\n")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Truncate the File to it's new length
 	if err = f.Truncate(int64(n + nn)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return &closedEntry{e.directory, e.openedAt, closedAt}, ideas, nil
+	return &closedEntry{e.directory, e.openedAt, closedAt}, nil
 }
 
 type closedEntry struct {
