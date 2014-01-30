@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -117,6 +118,8 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 	return e, proc.Wait()
 }
 
+var ErrNoCommitMsg = errors.New("entry has no commit msg")
+
 func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
 
@@ -129,19 +132,39 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 	fr := bufio.NewReader(f)
 	buf := bytes.NewBuffer(make([]byte, 0, 1024))
 
+	hasCommitMsg := false
+
 	// Find the start of the Idea's list
 	// Collect the Lines up till then
 	for {
 		line, err := fr.ReadString('\n')
-		if err != nil {
+		if err != nil && err == io.EOF {
+			break
+		} else if err != nil {
 			return nil, err
 		}
 
+		// Is a commit msg header
+		if i := strings.Index(line, "#~"); i != -1 {
+			if len(line) > 3 {
+				hasCommitMsg = true
+			}
+		}
+
+		// Is the Start of an Idea block
 		if i := strings.Index(line, "## ["); i != -1 {
 			break
 		}
 
-		buf.WriteString(line)
+		_, err = buf.WriteString(line)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Commit Msg Check
+	if !hasCommitMsg {
+		return nil, ErrNoCommitMsg
 	}
 
 	// To Beginning of File
@@ -211,5 +234,5 @@ func (e *closedEntry) CommitMsg() (string, error) {
 			return "ENTRY - " + strings.TrimPrefix(line, "#~ "), nil
 		}
 	}
-	return "", errors.New("missing commit msg")
+	return "", ErrNoCommitMsg
 }

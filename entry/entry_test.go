@@ -170,6 +170,18 @@ Sir Idea, The Third
 				_, err = oe.Close(closedAt)
 				c.Expect(err, IsNil)
 			})
+
+			c.Specify("cannot be closed without a commit msg", func() {
+				err := ioutil.WriteFile(filename, []byte(
+					`
+A file without a commit message
+`), 0600)
+				c.Assume(err, IsNil)
+
+				_, err = oe.Close(closedAt)
+				c.Expect(err, Not(IsNil))
+				c.Expect(err, Equals, ErrNoCommitMsg)
+			})
 		})
 
 		c.Specify("that is closed", func() {
