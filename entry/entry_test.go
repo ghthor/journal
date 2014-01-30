@@ -106,18 +106,24 @@ Some other text
 `)
 			})
 
-			c.Specify("will have the time opened as the first line of the entry", func() {
-				f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
-				c.Assume(err, IsNil)
-				defer f.Close()
+			f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
+			c.Assume(err, IsNil)
+			defer f.Close()
 
+			c.Specify("will have the time opened as the first line of the entry", func() {
 				scanner := bufio.NewScanner(f)
 				c.Assume(scanner.Scan(), IsTrue)
 				c.Expect(scanner.Text(), Equals, t.Format(time.UnixDate))
 			})
 
 			c.Specify("will have a list of ideas appended to the entry", func() {
+				scanner := idea.NewIdeaScanner(f)
+				for i := 0; i < len(ideas); i++ {
+					c.Assume(scanner.Scan(), IsTrue)
+					c.Expect(*scanner.Idea(), Equals, ideas[i])
+				}
 			})
+
 			c.Specify("can be editted by a text editor", func() {
 			})
 			c.Specify("can be closed", func() {
