@@ -33,11 +33,10 @@ func DescribeAnEntry(c gospec.Context) {
 
 	c.Specify("an entry", func() {
 		c.Specify("can be opened", func() {
+			t := time.Date(2006, time.January, 1, 1, 0, 0, 0, time.UTC)
+
 			c.Specify("at a specific time", func() {
-				t := time.Date(2006, time.January, 1, 1, 0, 0, 0, time.UTC)
-				oe, err := ne.Open(func() time.Time {
-					return t
-				}, nil)
+				oe, err := ne.Open(t, nil)
 				c.Assume(err, IsNil)
 				c.Expect(oe.OpenedAt(), Equals, t)
 			})
@@ -53,7 +52,7 @@ func DescribeAnEntry(c gospec.Context) {
 					Body:   "Some other text\n",
 				}}
 
-				oe, err := ne.Open(time.Now, ideas)
+				oe, err := ne.Open(t, ideas)
 				c.Assume(err, IsNil)
 				actualIdeas, err := oe.Ideas()
 				c.Assume(err, IsNil)
@@ -76,9 +75,7 @@ func DescribeAnEntry(c gospec.Context) {
 			Body:   "Some other text\n",
 		}}
 
-		oe, err := ne.Open(func() time.Time {
-			return openedAt
-		}, ideas)
+		oe, err := ne.Open(openedAt, ideas)
 		c.Assume(err, IsNil)
 		c.Assume(oe.OpenedAt(), Equals, openedAt)
 

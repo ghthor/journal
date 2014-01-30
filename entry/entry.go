@@ -26,7 +26,7 @@ TODO Make this some random quote or something stupid
 {{.Body}}{{end}}`))
 
 type NewEntry interface {
-	Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error)
+	Open(now time.Time, ideas []idea.Idea) (OpenEntry, error)
 }
 
 type EditorProcess interface {
@@ -55,9 +55,7 @@ type newEntry struct {
 	directory string
 }
 
-func (e *newEntry) Open(Now func() time.Time, ideas []idea.Idea) (OpenEntry, error) {
-	openedAt := Now()
-
+func (e *newEntry) Open(openedAt time.Time, ideas []idea.Idea) (OpenEntry, error) {
 	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(filenameLayout)), os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
