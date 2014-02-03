@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git/gittest"
 	"io/ioutil"
 	"log"
 	"os"
@@ -72,7 +73,7 @@ func DescribeJournalCommand(c gospec.Context) {
 
 			jc := exec.Command("./journal", "-edit=false", "-init", "-config=_test/config.journal-init.json", "new")
 			c.Expect(jc.Run(), IsNil)
-			c.Expect(td, IsAGitRepository)
+			c.Expect(td, gittest.IsAGitRepository)
 		})
 	})
 }
