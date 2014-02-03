@@ -7,7 +7,62 @@ import (
 )
 
 func DescribeIdea(c gospec.Context) {
-	c.Specify("an Idea", func() {
+	c.Specify("an idea header", func() {
+		c.Specify("can be parsed", func() {
+			c.Specify("w/o an id", func() {
+				headers := []string{
+					"## [status] An Idea w/o an Id",
+					"## [status] [] An Idea w/o an Id",
+					"## [status] An Idea w/o an Id\n",
+					"## [status] [] An Idea w/o an Id\n",
+				}
+
+				for _, header := range headers {
+					status, id, name, err := parseHeader(header)
+					c.Assume(err, IsNil)
+
+					c.Expect(status, Equals, "status")
+					c.Expect(id, Equals, uint(0))
+					c.Expect(name, Equals, "An Idea w/o an Id")
+				}
+			})
+
+			c.Specify("w/ an id", func() {
+				headers := []string{
+					"## [status] [1] An Idea w/ an Id",
+					"## [status] [2] An Idea w/ an Id",
+					"## [status] [3] An Idea w/ an Id\n",
+				}
+
+				for i, header := range headers {
+					status, id, name, err := parseHeader(header)
+					c.Assume(err, IsNil)
+
+					c.Expect(status, Equals, "status")
+					c.Expect(id, Equals, uint(i+1))
+					c.Expect(name, Equals, "An Idea w/ an Id")
+				}
+			})
+		})
+
+		c.Specify("is invalid", func() {
+			c.Specify("if the status isn't wrapped in []", func() {
+				headers := []string{
+					"## status [1] Header w/ an Id",
+					"## status [] Header w/o an Id",
+					"## status Header w/o an Id",
+				}
+
+				for _, header := range headers {
+					_, _, _, err := parseHeader(header)
+					c.Assume(err, Not(IsNil))
+					c.Expect(err.Error(), Equals, "invalid idea header: status must be wrapped w/ []")
+				}
+			})
+		})
+	})
+
+	c.Specify("an idea", func() {
 		const someData = `
 Some other markdowned text.
 Doesn't matter waht it is

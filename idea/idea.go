@@ -18,8 +18,9 @@ const (
 )
 
 type Idea struct {
-	Name   string
 	Status string
+	Id     uint
+	Name   string
 	Body   string
 }
 
@@ -55,6 +56,35 @@ func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	}
 	// Request more data.
 	return 0, nil, nil
+}
+
+func parseHeader(raw string) (status string, id uint, name string, err error) {
+	_, err = fmt.Fscanf(strings.NewReader(raw), "## %s [%d] %s", &status, &id, &name)
+	if err != nil {
+		switch err.Error() {
+		default:
+			return
+		case "expected integer":
+			_, err = fmt.Fscanf(strings.NewReader(raw), "## %s [] %s", &status, &name)
+		case "input does not match format":
+			_, err = fmt.Fscanf(strings.NewReader(raw), "## %s %s", &status, &name)
+		}
+
+		if err != nil {
+			return
+		}
+	}
+
+	if status[0] != '[' && status[len(status)-1] != ']' {
+		err = errors.New("invalid idea header: status must be wrapped w/ []")
+		return
+	}
+
+	status = strings.Trim(status, "[]")
+	name = raw[strings.Index(raw, name):]
+	name = strings.TrimRight(name, "\n")
+
+	return
 }
 
 // Scans through the io.Reader for the next Idea
@@ -112,24 +142,6 @@ scanBody:
 		}
 	}
 
-	// Parse the Status, Name, Body
-	var prelimiter, status, startName string
-
-	numScanned, err := fmt.Fscan(bytes.NewReader(sbuf.Bytes()), &prelimiter, &status, &startName)
-	if err != nil {
-		s.lastError = err
-		return false
-	}
-
-	if numScanned != 3 {
-		s.lastError = errors.New("unkown idea header format")
-		return false
-	}
-
-	// Status
-	// Strip "[" and "]"
-	status = status[1 : len(status)-1]
-
 	pbuf := bufio.NewReader(bytes.NewReader(sbuf.Bytes()))
 
 	// Grab the complete header line as a string
@@ -140,11 +152,14 @@ scanBody:
 	}
 	line := string(lineBytes)
 
-	// Name
-	// Strip beginning of line and the '\n' byte
-	name := line[strings.Index(line, startName) : len(line)-1]
+	// Parse the Status, Id, Name
+	status, id, name, err := parseHeader(line)
+	if err != nil {
+		s.lastError = err
+		return false
+	}
 
-	// Body
+	// Parse the Body
 	bodyBytes, err := ioutil.ReadAll(pbuf)
 	if err != nil {
 		s.lastError = err
@@ -153,9 +168,9 @@ scanBody:
 
 	s.lastIdea = &Idea{
 		Status: status,
-		// Strip beginning of line and the '\n' byte
-		Name: name,
-		Body: string(bytes.TrimSpace(bodyBytes)) + "\n",
+		Id:     id,
+		Name:   name,
+		Body:   string(bytes.TrimSpace(bodyBytes)) + "\n",
 	}
 
 	return true
