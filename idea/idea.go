@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+	"text/template"
 	"time"
 )
 
@@ -22,6 +23,29 @@ type Idea struct {
 	Id     uint
 	Name   string
 	Body   string
+}
+
+var ideaTmpl = template.Must(template.New("idea").Parse(
+	`## [{{.Status}}] {{if .Id}}[{{.Id}}] {{end}}{{.Name}}
+{{.Body}}`))
+
+type IdeaReader struct {
+	buf io.Reader
+}
+
+func NewIdeaReader(idea Idea) (*IdeaReader, error) {
+	b := bytes.NewBuffer(make([]byte, 0, 1024))
+
+	err := ideaTmpl.Execute(b, idea)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IdeaReader{b}, nil
+}
+
+func (r *IdeaReader) Read(b []byte) (n int, err error) {
+	return r.buf.Read(b)
 }
 
 type IdeaScanner struct {

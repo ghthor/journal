@@ -1,8 +1,10 @@
 package idea
 
 import (
+	"bytes"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"io"
 	"strings"
 )
 
@@ -128,6 +130,53 @@ in the body of this Idea.
 
 in the body of this Idea.
 `)
+			})
+		})
+	})
+
+	c.Specify("an idea reader", func() {
+		c.Specify("can read an idea", func() {
+			ideas := []Idea{{
+				"status",
+				0,
+				"An Idea w/o an Id",
+				"An Idea body of text\n",
+			}, {
+				"status",
+				2,
+				"An Idea w/ an Id",
+				"An Idea body of text\n",
+			}}
+
+			c.Specify("without an id", func() {
+				idea := ideas[0]
+				ideaReader, err := NewIdeaReader(idea)
+				c.Assume(err, IsNil)
+
+				dst := bytes.NewBuffer(make([]byte, 0, 1024))
+
+				expected := `## [status] An Idea w/o an Id
+An Idea body of text
+`
+				n, err := io.Copy(dst, ideaReader)
+				c.Expect(err, IsNil)
+				c.Expect(int(n), Equals, len(expected))
+				c.Expect(dst.String(), Equals, expected)
+			})
+
+			c.Specify("with an id", func() {
+				idea := ideas[1]
+				ideaReader, err := NewIdeaReader(idea)
+				c.Assume(err, IsNil)
+
+				dst := bytes.NewBuffer(make([]byte, 0, 1024))
+
+				n, err := io.Copy(dst, ideaReader)
+				c.Expect(err, IsNil)
+
+				expected := "## [status] [2] An Idea w/ an Id\nAn Idea body of text\n"
+				c.Expect(int(n), Equals, len(expected))
+				c.Expect(dst.String(), Equals, expected)
 			})
 		})
 	})
