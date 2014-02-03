@@ -179,7 +179,7 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 		return j, err
 	}
 
-	if err := git.GitCommitAll(dir, commitMsg); err != nil {
+	if err := git.GitCommit(dir, commitMsg); err != nil {
 		return j, err
 	}
 
