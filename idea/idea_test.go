@@ -65,61 +65,68 @@ func DescribeIdea(c gospec.Context) {
 	c.Specify("an idea", func() {
 		const someData = `
 Some other markdowned text.
-Doesn't matter waht it is
+Doesn't matter what it is,
+it will be skipped by the scanner.
 
-## [active] An Idea
-Some text explaining the idea.
+## [active] An Idea w/o an Id
+The newline before the next Idea should not be included
 
-And some more.
+in the body of this Idea.
 
-There isn't a delimiter.
-So this next idea will be the delimiter.
+## [active] [] An Idea w/o an Id
+The newline before the next Idea should not be included
 
-## [active] Another Idea
-And the delimiter for this idea will be the ClosedAt timestamp.
-That is at the end of every entry.
+in the body of this Idea.
 
-The newline before the timestamp should be included.
+## [active] [1] An Idea w/ an Id
+The newline before the timestamp should not be included
+
+in the body of this Idea.
 
 Sun Jan 26 15:03:44 EST 2014
 `
+		c.Specify("can be scanned from some data", func() {
+			iscan := NewIdeaScanner(strings.NewReader(someData))
 
-		c.Specify("will be discovered", func() {
-			scanner := NewIdeaScanner(strings.NewReader(someData))
+			ideas := make([]*Idea, 0, 3)
+			for iscan.Scan() {
+				c.Assume(iscan.Err(), IsNil)
+				ideas = append(ideas, iscan.Idea())
+			}
+			c.Assume(iscan.Err(), IsNil)
+			c.Assume(len(ideas), Equals, 3)
 
-			c.Specify("and will include everything from the header to the next idea", func() {
-				c.Expect(scanner.Scan(), IsTrue)
-				c.Expect(scanner.Err(), IsNil)
+			c.Specify("without an id", func() {
+				for _, idea := range ideas[0:1] {
+					c.Expect(*idea, Equals, Idea{
+						IS_Active,
+						0,
+						"An Idea w/o an Id",
+						`The newline before the next Idea should not be included
 
-				idea := scanner.Idea()
-				c.Expect(idea.Name, Equals, "An Idea")
-				c.Expect(idea.Status, Equals, IS_Active)
-				c.Expect(idea.Body, Equals,
-					`Some text explaining the idea.
-
-And some more.
-
-There isn't a delimiter.
-So this next idea will be the delimiter.
-`)
+in the body of this Idea.
+`,
+					})
+				}
 			})
 
-			c.Specify("and will not include the date from the EOF", func() {
-				// Drop the first idea
-				c.Assume(scanner.Scan(), IsTrue)
+			c.Specify("with an id", func() {
+				c.Expect(*ideas[2], Equals, Idea{
+					IS_Active,
+					1,
+					"An Idea w/ an Id",
+					`The newline before the timestamp should not be included
 
-				// Scan the second idea
-				c.Expect(scanner.Scan(), IsTrue)
-				c.Expect(scanner.Err(), IsNil)
+in the body of this Idea.
+`,
+				})
+			})
 
-				idea := scanner.Idea()
-				c.Expect(idea.Name, Equals, "Another Idea")
-				c.Expect(idea.Status, Equals, IS_Active)
-				c.Expect(idea.Body, Equals,
-					`And the delimiter for this idea will be the ClosedAt timestamp.
-That is at the end of every entry.
+			c.Specify("and will not include a timestamp as the final line", func() {
+				c.Expect(ideas[len(ideas)-1].Body, Equals,
+					`The newline before the timestamp should not be included
 
-The newline before the timestamp should be included.
+in the body of this Idea.
 `)
 			})
 		})
