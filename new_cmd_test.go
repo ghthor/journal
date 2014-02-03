@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"os"
@@ -92,7 +93,7 @@ blah blah blah
 			}, nil, &Command{})
 			c.Assume(err, IsNil)
 
-			o, err := GitCommand(jd, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+			o, err := git.GitCommand(jd, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)
 
 			actualData := bytes.NewBuffer(o)

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ghthor/journal/config"
+	"github.com/ghthor/journal/git"
 	"log"
 	"os"
 	"text/template"
@@ -71,7 +72,7 @@ func main() {
 
 	// If NOT, Create and `git init` Directory
 	if os.IsNotExist(err) && *init {
-		err = GitInit(config.Directory)
+		err = git.GitInit(config.Directory)
 	}
 
 	// Check for `git init` error or Stat error that isn't os.IsNotExist()

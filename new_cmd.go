@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"flag"
+	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"log"
@@ -47,7 +48,7 @@ const filenameLayout = "2006-01-02-1504-MST"
 
 func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
 	if !ignoreDirty {
-		if err := GitIsClean(dir); err != nil {
+		if err := git.GitIsClean(dir); err != nil {
 			return j, err
 		}
 	}
@@ -174,11 +175,11 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 	}
 
 	// Commit the new journal entry to the git repository
-	if err := GitAdd(dir, entryFilepath); err != nil {
+	if err := git.GitAdd(dir, entryFilepath); err != nil {
 		return j, err
 	}
 
-	if err := GitCommitAll(dir, commitMsg); err != nil {
+	if err := git.GitCommitAll(dir, commitMsg); err != nil {
 		return j, err
 	}
 

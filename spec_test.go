@@ -18,8 +18,6 @@ func TestUnitSpecs(t *testing.T) {
 func TestIntegrationSpecs(t *testing.T) {
 	r := gospec.NewRunner()
 
-	r.AddSpec(DescribeGitIntegration)
-
 	gospec.MainGoTest(r, t)
 }
 
