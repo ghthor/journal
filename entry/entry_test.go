@@ -220,14 +220,10 @@ Sun Jan  1 01:10:00 UTC 2006
 				commitable, isCommitable := ce.(git.Commitable)
 				c.Expect(isCommitable, IsTrue)
 
-				files, err := commitable.FilesToAdd()
-				c.Assume(err, IsNil)
-				c.Expect(len(files), Equals, 1)
-				c.Expect(files[0], Equals, filename)
-
-				commitMsg, err := commitable.CommitMsg()
-				c.Assume(err, IsNil)
-				c.Expect(commitMsg, Equals, "ENTRY - Title(will be used as commit message)")
+				changes := commitable.Changes()
+				c.Expect(len(changes), Equals, 1)
+				c.Expect(changes[0].Filepath(), Equals, filename)
+				c.Expect(commitable.CommitMsg(), Equals, "Title(will be used as commit message)")
 			})
 		})
 	})

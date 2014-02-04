@@ -132,7 +132,7 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 	fr := bufio.NewReader(f)
 	buf := bytes.NewBuffer(make([]byte, 0, 1024))
 
-	hasCommitMsg := false
+	commitMsg := ""
 
 	// Find the start of the Idea's list
 	// Collect the Lines up till then
@@ -146,9 +146,7 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 
 		// Is a commit msg header
 		if i := strings.Index(line, "#~"); i != -1 {
-			if len(line) > 3 {
-				hasCommitMsg = true
-			}
+			commitMsg = strings.TrimSpace(strings.TrimPrefix(line, "#~"))
 		}
 
 		// Is the Start of an Idea block
@@ -163,7 +161,7 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 	}
 
 	// Commit Msg Check
-	if !hasCommitMsg {
+	if len(commitMsg) == 0 {
 		return nil, ErrNoCommitMsg
 	}
 
@@ -198,41 +196,23 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 		return nil, err
 	}
 
-	return &closedEntry{e.directory, e.openedAt, closedAt}, nil
+	return &closedEntry{e.directory, commitMsg, e.openedAt, closedAt}, nil
 }
 
 type closedEntry struct {
 	directory string
 
+	commitMsg string
+
 	openedAt time.Time
 	closedAt time.Time
 }
 
-// Implement Commitable
-func (e *closedEntry) FilesToAdd() ([]string, error) {
-	return []string{
-		filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
-	}, nil
+func (e *closedEntry) WorkingDirectory() string { return e.directory }
+func (e *closedEntry) Changes() []git.CommitableChange {
+	return []git.CommitableChange{
+		git.ChangedFile(filepath.Join(e.directory, e.openedAt.Format(filenameLayout))),
+	}
 }
 
-func (e *closedEntry) CommitMsg() (string, error) {
-	f, err := os.OpenFile(filepath.Join(e.directory, e.openedAt.Format(filenameLayout)),
-		os.O_RDONLY, 0600)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			return "", err
-		}
-
-		line := scanner.Text()
-		if i := strings.Index(line, "#~"); i != -1 {
-			return "ENTRY - " + strings.TrimPrefix(line, "#~ "), nil
-		}
-	}
-	return "", ErrNoCommitMsg
-}
+func (e *closedEntry) CommitMsg() string { return e.commitMsg }

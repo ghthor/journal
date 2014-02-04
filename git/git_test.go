@@ -14,6 +14,7 @@ func TestIntegrationSpecs(t *testing.T) {
 	r := gospec.NewRunner()
 
 	r.AddSpec(DescribeGitIntegration)
+	r.AddSpec(DescribeCommit)
 
 	gospec.MainGoTest(r, t)
 }
