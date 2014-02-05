@@ -318,16 +318,11 @@ func InitIdeaDirectory(directory string) (*IdeaDirectory, git.Commitable, error)
 		return nil, nil, err
 	}
 
-	changes := git.NewChangesIn(directory)
-	changes.Add(git.ChangedFile(activeIndex))
-	changes.Add(git.ChangedFile(nextIdCounter))
-	changes.Changes()
-
 	return &IdeaDirectory{directory}, ideaDirectoryInitialized{
 		directory,
 		[]git.CommitableChange{
-			git.ChangedFile(nextIdCounter),
-			git.ChangedFile(activeIndex),
+			git.ChangedFile("nextid"),
+			git.ChangedFile("active"),
 		},
 		"idea directory initialized",
 	}, nil

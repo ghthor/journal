@@ -240,11 +240,32 @@ An Idea body of text
 
 			c.Specify("and is commitable", func() {
 				c.Expect(commitable, Not(IsNil))
+				c.Expect(commitable.WorkingDirectory(), Equals, d)
 				c.Expect(commitable.Changes(), ContainsAll, []git.ChangedFile{
-					git.ChangedFile(filepath.Join(d, "active")),
-					git.ChangedFile(filepath.Join(d, "nextid")),
+					git.ChangedFile("nextid"),
+					git.ChangedFile("active"),
 				})
 				c.Expect(commitable.CommitMsg(), Equals, "idea directory initialized")
+
+				c.Assume(git.Init(d), IsNil)
+				c.Expect(git.Commit(commitable), IsNil)
+
+				o, err := git.Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+				c.Assume(err, IsNil)
+
+				c.Expect(string(o), Equals,
+					`"idea directory initialized"
+diff --git a/active b/active
+new file mode 100644
+index 0000000..e69de29
+diff --git a/nextid b/nextid
+new file mode 100644
+index 0000000..d00491f
+--- /dev/null
++++ b/nextid
+@@ -0,0 +1 @@
++1
+`)
 			})
 		})
 
