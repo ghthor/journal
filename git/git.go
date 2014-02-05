@@ -17,6 +17,7 @@ func init() {
 	}
 }
 
+// Make an *exec.Cmd for `git` with args
 func Command(workingDirectory string, args ...string) *exec.Cmd {
 	c := exec.Command(gitPath, args...)
 	c.Dir = workingDirectory
