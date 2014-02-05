@@ -456,6 +456,12 @@ index 0000000..d00491f
 					}
 				})
 			})
+
+			c.Specify("and returns a commitable change", func() {
+				for _, ni := range newIdeas {
+					c.Expect(ni.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Created", ni.idea.Id))
+				}
+			})
 		})
 
 		c.Specify("can update an existing idea", func() {

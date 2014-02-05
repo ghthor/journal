@@ -407,7 +407,7 @@ func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
 		changes.Add(git.ChangedFile("active"))
 	}
 
-	changes.Msg = "new idea saved"
+	changes.Msg = fmt.Sprintf("IDEA - %d - Created", idea.Id)
 
 	return changes, nil
 }
