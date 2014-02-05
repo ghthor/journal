@@ -235,7 +235,7 @@ An Idea body of text
 
 			c.Specify("only once", func() {
 				_, _, err = InitIdeaDirectory(d)
-				c.Assume(err, Equals, ErrInitOnExistingIdeaDirectory)
+				c.Expect(err, Equals, ErrInitOnExistingIdeaDirectory)
 			})
 
 			c.Specify("and is commitable", func() {
