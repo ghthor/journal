@@ -44,14 +44,14 @@ func DescribeGitIntegration(c gospec.Context) {
 		})
 
 		c.Specify("and will add a file", func() {
-			c.Expect(GitAdd(d, testFile), IsNil)
+			c.Expect(AddFilepath(d, testFile), IsNil)
 			o, err := Command(d, "status", "-s").Output()
 			c.Assume(err, IsNil)
 			c.Expect(string(o), Equals, "A  test_file\n")
 		})
 
 		c.Specify("and will commit all staged changes", func() {
-			c.Assume(GitAdd(d, testFile), IsNil)
+			c.Assume(AddFilepath(d, testFile), IsNil)
 			c.Expect(GitCommit(d, "a commit msg"), IsNil)
 
 			o, err := Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()

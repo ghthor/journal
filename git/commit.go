@@ -47,7 +47,7 @@ func Commit(c Commitable) error {
 	d := c.WorkingDirectory()
 
 	for _, change := range c.Changes() {
-		err := GitAdd(d, change.Filepath())
+		err := AddFilepath(d, change.Filepath())
 		if err != nil {
 			return err
 		}

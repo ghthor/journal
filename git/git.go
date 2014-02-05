@@ -46,8 +46,9 @@ func GitIsClean(dir string) error {
 	return nil
 }
 
-func GitAdd(dir string, filepath string) error {
-	return Command(dir, "add", filepath).Run()
+// `git add` a filepath
+func AddFilepath(workingDirectory string, filepath string) error {
+	return Command(workingDirectory, "add", filepath).Run()
 }
 
 func GitCommit(dir string, msg string) error {

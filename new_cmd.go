@@ -175,7 +175,7 @@ func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mu
 	}
 
 	// Commit the new journal entry to the git repository
-	if err := git.GitAdd(dir, entryFilepath); err != nil {
+	if err := git.AddFilepath(dir, entryFilepath); err != nil {
 		return j, err
 	}
 
