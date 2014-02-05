@@ -180,4 +180,67 @@ An Idea body of text
 			})
 		})
 	})
+
+	c.Specify("an idea directory", func() {
+		c.Specify("contains an index of active ideas", func() {
+		})
+
+		c.Specify("contains an index of the next available id", func() {
+		})
+
+		c.Specify("contains ideas stored in a files", func() {
+			c.Specify("with the id as the filename", func() {
+			})
+		})
+
+		c.Specify("can create a new idea", func() {
+			c.Specify("by assigning the next available id to the idea", func() {
+			})
+
+			c.Specify("by incrementing the next available id", func() {
+			})
+
+			c.Specify("by writing the idea to a file", func() {
+				c.Specify("with the id as the filename", func() {
+				})
+
+				c.Specify("and return a commitable change for the new idea file", func() {
+				})
+			})
+
+			c.Specify("and if the idea's status is active", func() {
+				c.Specify("will add the idea's id to the active index", func() {
+					c.Specify("and will return a commitable change for modifying the index", func() {
+					})
+				})
+			})
+
+			c.Specify("and if the idea's status isn't active", func() {
+				c.Specify("will not add the idea's id to the active index", func() {
+				})
+			})
+		})
+
+		c.Specify("can update an existing idea", func() {
+			c.Specify("by writing the idea to the file", func() {
+				c.Specify("with the id as the filename", func() {
+				})
+
+				c.Specify("and will return a commitable change for the modified idea file", func() {
+				})
+			})
+
+			c.Specify("and if the idea's status is active", func() {
+				c.Specify("will add the idea's id to the active index", func() {
+					c.Specify("and will return a commitable change for modifying the index", func() {
+					})
+				})
+			})
+
+			c.Specify("and if the idea's status isn't active", func() {
+				c.Specify("will not add the idea's id to the active index", func() {
+				})
+			})
+		})
+	})
 }
