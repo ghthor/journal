@@ -17,7 +17,7 @@ func init() {
 	}
 }
 
-func GitCommand(workingDirectory string, args ...string) *exec.Cmd {
+func Command(workingDirectory string, args ...string) *exec.Cmd {
 	c := exec.Command(gitPath, args...)
 	c.Dir = workingDirectory
 	return c
@@ -28,11 +28,11 @@ func GitInit(dir string) error {
 	if err != nil {
 		return err
 	}
-	return GitCommand(wd, "init", dir).Run()
+	return Command(wd, "init", dir).Run()
 }
 
 func GitIsClean(dir string) error {
-	c := GitCommand(dir, "status", "-s")
+	c := Command(dir, "status", "-s")
 
 	o, err := c.Output()
 	if err != nil {
@@ -47,9 +47,9 @@ func GitIsClean(dir string) error {
 }
 
 func GitAdd(dir string, filepath string) error {
-	return GitCommand(dir, "add", filepath).Run()
+	return Command(dir, "add", filepath).Run()
 }
 
 func GitCommit(dir string, msg string) error {
-	return GitCommand(dir, "commit", "-m", msg).Run()
+	return Command(dir, "commit", "-m", msg).Run()
 }

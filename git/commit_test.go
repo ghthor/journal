@@ -63,7 +63,7 @@ func DescribeCommit(c gospec.Context) {
 			}
 
 			// Verify that the directory isn't clean
-			o, err := GitCommand(changes.WorkingDirectory(), "status", "-s").Output()
+			o, err := Command(changes.WorkingDirectory(), "status", "-s").Output()
 			c.Assume(err, IsNil)
 			// And the changes haven't been `git add`ed
 			c.Assume(string(o), Equals,
@@ -74,7 +74,7 @@ func DescribeCommit(c gospec.Context) {
 			c.Expect(changes.Commit("Test Commit"), IsNil)
 			c.Expect(GitIsClean(changes.WorkingDirectory()), IsNil)
 
-			o, err = GitCommand(changes.WorkingDirectory(), "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+			o, err = Command(changes.WorkingDirectory(), "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)
 
 			c.Expect(string(o), Equals,

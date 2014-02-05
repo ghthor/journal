@@ -93,7 +93,7 @@ blah blah blah
 			}, nil, &Command{})
 			c.Assume(err, IsNil)
 
-			o, err := git.GitCommand(jd, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+			o, err := git.Command(jd, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)
 
 			actualData := bytes.NewBuffer(o)

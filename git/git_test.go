@@ -45,7 +45,7 @@ func DescribeGitIntegration(c gospec.Context) {
 
 		c.Specify("and will add a file", func() {
 			c.Expect(GitAdd(d, testFile), IsNil)
-			o, err := GitCommand(d, "status", "-s").Output()
+			o, err := Command(d, "status", "-s").Output()
 			c.Assume(err, IsNil)
 			c.Expect(string(o), Equals, "A  test_file\n")
 		})
@@ -54,7 +54,7 @@ func DescribeGitIntegration(c gospec.Context) {
 			c.Assume(GitAdd(d, testFile), IsNil)
 			c.Expect(GitCommit(d, "a commit msg"), IsNil)
 
-			o, err := GitCommand(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+			o, err := Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)
 
 			c.Expect(string(o), Equals, `"a commit msg"
