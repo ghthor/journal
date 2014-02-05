@@ -72,7 +72,7 @@ func main() {
 
 	// If NOT, Create and `git init` Directory
 	if os.IsNotExist(err) && *init {
-		err = git.GitInit(config.Directory)
+		err = git.Init(config.Directory)
 	}
 
 	// Check for `git init` error or Stat error that isn't os.IsNotExist()

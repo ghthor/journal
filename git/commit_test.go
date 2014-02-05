@@ -28,7 +28,7 @@ func DescribeCommit(c gospec.Context) {
 	newChangesIn := func(d string) *Changes {
 		d, err := ioutil.TempDir("_test/", d+"_")
 		c.Assume(err, IsNil)
-		c.Assume(GitInit(d), IsNil)
+		c.Assume(Init(d), IsNil)
 		return NewChangesIn(d)
 	}
 

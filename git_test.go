@@ -11,5 +11,5 @@ func tmpGitRepository(prefix string) (dir string, err error) {
 		return "", err
 	}
 
-	return dir, git.GitInit(dir)
+	return dir, git.Init(dir)
 }

@@ -29,7 +29,7 @@ func DescribeGitIntegration(c gospec.Context) {
 		}(d)
 
 		d = path.Join(d, "a_git_repo")
-		c.Expect(GitInit(d), IsNil)
+		c.Expect(Init(d), IsNil)
 		c.Expect(d, IsAGitRepository)
 
 		c.Specify("and will be clean", func() {

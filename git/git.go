@@ -24,12 +24,13 @@ func Command(workingDirectory string, args ...string) *exec.Cmd {
 	return c
 }
 
-func GitInit(dir string) error {
+// `git init` a directory
+func Init(directory string) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
-	return Command(wd, "init", dir).Run()
+	return Command(wd, "init", directory).Run()
 }
 
 func GitIsClean(dir string) error {
