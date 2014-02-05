@@ -1,3 +1,7 @@
+// Package Idea implements io.Reader's and a Scanner for
+// reading and writing the raw text Idea format.
+// It also provides a way to create and update Idea's
+// stored in text files within a directory.
 package idea
 
 import (
@@ -13,6 +17,7 @@ import (
 )
 
 const (
+	// Valid Idea.Status values
 	IS_Active    = "active"
 	IS_Inactive  = "inactive"
 	IS_Completed = "completed"
@@ -29,10 +34,12 @@ var ideaTmpl = template.Must(template.New("idea").Parse(
 	`## [{{.Status}}] {{if .Id}}[{{.Id}}] {{end}}{{.Name}}
 {{.Body}}`))
 
+// An implementation of io.Reader for Idea
 type IdeaReader struct {
 	buf io.Reader
 }
 
+// Create an io.Reader with idea
 func NewIdeaReader(idea Idea) (*IdeaReader, error) {
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
@@ -48,6 +55,7 @@ func (r *IdeaReader) Read(b []byte) (n int, err error) {
 	return r.buf.Read(b)
 }
 
+// Used to scan Idea's from an io.Reader
 type IdeaScanner struct {
 	scanner *bufio.Scanner
 
@@ -57,14 +65,15 @@ type IdeaScanner struct {
 	lastError error
 }
 
+// Create an IdeaScanner using an io.Reader
 func NewIdeaScanner(r io.Reader) *IdeaScanner {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(ScanLines)
 	return &IdeaScanner{scanner, nil, nil, nil}
 }
 
-// A ScanLines implementation that leaves the '\n' character in the token
-// ripped from bufio.ScanLines
+// A ScanLines implementation that leaves the '\n' character in the token.
+// Ripped from bufio.ScanLines
 func ScanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -205,6 +214,7 @@ func (s *IdeaScanner) Idea() *Idea {
 	return s.lastIdea
 }
 
+// Returns the last error
 func (s *IdeaScanner) Err() error {
 	return s.lastError
 }
