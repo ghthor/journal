@@ -238,7 +238,7 @@ An Idea body of text
 				c.Expect(err, Equals, ErrInitOnExistingIdeaDirectory)
 			})
 
-			c.Specify("and is commitable", func() {
+			c.Specify("and the modifications made during initialization are commitable", func() {
 				c.Expect(commitable, Not(IsNil))
 				c.Expect(commitable.WorkingDirectory(), Equals, d)
 				c.Expect(commitable.Changes(), ContainsAll, []git.ChangedFile{
