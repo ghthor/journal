@@ -9,22 +9,10 @@ import (
 	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-func init() {
-	var err error
-	if _, err = os.Stat("_test/"); os.IsNotExist(err) {
-		err = os.Mkdir("_test/", 0755)
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 func DescribeIdea(c gospec.Context) {
 	c.Specify("an idea header", func() {
