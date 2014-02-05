@@ -21,7 +21,7 @@ type Changes struct {
 	// The `git` working directory
 	wd      string
 	changes []CommitableChange
-	msg     string
+	Msg     string
 }
 
 func NewChangesIn(workingDirectory string) *Changes {
@@ -32,8 +32,7 @@ func (c *Changes) Add(change CommitableChange) {
 	c.changes = append(c.changes, change)
 }
 
-func (c *Changes) Commit(msg string) error {
-	c.msg = msg
+func (c *Changes) Commit() error {
 	return Commit(c)
 }
 
@@ -41,7 +40,7 @@ func (c *Changes) Commit(msg string) error {
 
 func (c Changes) WorkingDirectory() string    { return c.wd }
 func (c Changes) Changes() []CommitableChange { return c.changes }
-func (c Changes) CommitMsg() string           { return c.msg }
+func (c Changes) CommitMsg() string           { return c.Msg }
 
 // Execute `git add` for all Changes()'s
 // then execute `git commit` with CommitMsg()

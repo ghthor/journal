@@ -71,7 +71,8 @@ func DescribeCommit(c gospec.Context) {
 ?? 8a63191cd06427fd6dfa4684080a5a5d40ae536c
 `)
 
-			c.Expect(changes.Commit("Test Commit"), IsNil)
+			changes.Msg = "Test Commit"
+			c.Expect(changes.Commit(), IsNil)
 			c.Expect(IsClean(changes.WorkingDirectory()), IsNil)
 
 			o, err = Command(changes.WorkingDirectory(), "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
