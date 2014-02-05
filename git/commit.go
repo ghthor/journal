@@ -1,3 +1,4 @@
+// A wrapper using "os/exec" for executing git commands
 package git
 
 type CommitableChange interface {
