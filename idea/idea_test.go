@@ -5,8 +5,23 @@ import (
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
 	"io"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"strings"
 )
+
+func init() {
+	var err error
+	if _, err = os.Stat("_test/"); os.IsNotExist(err) {
+		err = os.Mkdir("_test/", 0755)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func DescribeIdea(c gospec.Context) {
 	c.Specify("an idea header", func() {
@@ -182,10 +197,49 @@ An Idea body of text
 	})
 
 	c.Specify("an idea directory", func() {
-		c.Specify("contains an index of active ideas", func() {
-		})
+		makeEmptyDirectory := func(prefix string) string {
+			d, err := ioutil.TempDir("_test", prefix+"_")
+			c.Assume(err, IsNil)
+			return d
+		}
+
+		makeIdeaDirectory := func(prefix string) (*IdeaDirectory, string) {
+			d := makeEmptyDirectory(prefix)
+
+			// Verify the directory isn't an IdeaDirectory
+			_, err := NewIdeaDirectory(d)
+			c.Assume(IsInvalidIdeaDirectoryError(err), IsTrue)
+
+			// Initialize the directory
+			id, err := InitIdeaDirectory(d)
+			c.Assume(err, IsNil)
+			c.Assume(id, Not(IsNil))
+
+			// Verify the directory cannot be initialized twice
+			_, err = InitIdeaDirectory(d)
+			c.Assume(err, Equals, ErrInitOnExistingIdeaDirectory)
+
+			// Verify the directory has been initialized
+			id, err = NewIdeaDirectory(d)
+			c.Assume(err, IsNil)
+			c.Assume(id, Not(IsNil))
+
+			return id, d
+		}
 
 		c.Specify("contains an index of the next available id", func() {
+			_, d := makeIdeaDirectory("idea_directory_spec")
+
+			data, err := ioutil.ReadFile(filepath.Join(d, "nextid"))
+			c.Expect(err, IsNil)
+			c.Expect(string(data), Equals, "1\n")
+		})
+
+		c.Specify("contains an index of active ideas", func() {
+			_, d := makeIdeaDirectory("idea_directory_spec")
+
+			_, err := os.Stat(filepath.Join(d, "active"))
+			c.Expect(err, IsNil)
 		})
 
 		c.Specify("contains ideas stored in a files", func() {

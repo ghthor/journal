@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
@@ -217,4 +218,84 @@ func (s *IdeaScanner) Idea() *Idea {
 // Returns the last error
 func (s *IdeaScanner) Err() error {
 	return s.lastError
+}
+
+// Used to manage idea storage in a directory
+type IdeaDirectory struct {
+	directory string
+}
+
+// Returned if a directory structure doesn't match
+// the required format of an idea storage directory
+type InvalidIdeaDirectoryError struct {
+	Err error
+}
+
+func (e InvalidIdeaDirectoryError) Error() string {
+	return fmt.Sprintf("invalid idea directory: %v", e.Err)
+}
+
+func IsInvalidIdeaDirectoryError(err error) bool {
+	_, ok := err.(InvalidIdeaDirectoryError)
+	return ok
+}
+
+func isAnIdeaDirectory(d string) error {
+	nextIdPath := filepath.Join(d, "nextid")
+
+	data, err := ioutil.ReadFile(nextIdPath)
+	if err != nil {
+		return InvalidIdeaDirectoryError{err}
+	}
+
+	var nextAvailableId uint
+	n, err := fmt.Fscanf(bytes.NewReader(data), "%d\n", &nextAvailableId)
+	if err != nil {
+		return InvalidIdeaDirectoryError{err}
+	}
+
+	if n != 1 {
+		return InvalidIdeaDirectoryError{errors.New("next available id wasn't found")}
+	}
+
+	return nil
+}
+
+// Checks that the directory contains the correct files
+// to be an IdeaDirectory.
+// If the directory doesn't contain the require  files
+// with the expected format this function will return an ErrInvalidIdeaDirectory.
+func NewIdeaDirectory(directory string) (*IdeaDirectory, error) {
+	err := isAnIdeaDirectory(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IdeaDirectory{directory}, nil
+}
+
+// Returned if InitIdeaDirectory is called on a directory
+// that has already been initialized
+var ErrInitOnExistingIdeaDirectory = errors.New("init on existing idea directory")
+
+// Check that the directory is empty
+// and if it is then it initializes an empty
+// idea directory.
+func InitIdeaDirectory(directory string) (*IdeaDirectory, error) {
+	err := isAnIdeaDirectory(directory)
+	if err == nil {
+		return nil, ErrInitOnExistingIdeaDirectory
+	}
+
+	err = ioutil.WriteFile(filepath.Join(directory, "nextid"), []byte("1\n"), 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(directory, "active"), []byte(""), 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IdeaDirectory{directory}, nil
 }
