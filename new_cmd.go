@@ -48,7 +48,7 @@ const filenameLayout = "2006-01-02-1504-MST"
 
 func newEntry(dir string, entryTmpl *template.Template, Now func() time.Time, mutateIntoEditor func(*exec.Cmd) (Process, error), c *Command, args ...string) (j journalEntry, err error) {
 	if !ignoreDirty {
-		if err := git.GitIsClean(dir); err != nil {
+		if err := git.IsClean(dir); err != nil {
 			return j, err
 		}
 	}

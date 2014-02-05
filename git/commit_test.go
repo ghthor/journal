@@ -47,7 +47,7 @@ func DescribeCommit(c gospec.Context) {
 			changes = append(changes, ChangedFile(filename))
 		}
 
-		c.Assume(GitIsClean(wd), Not(IsNil))
+		c.Assume(IsClean(wd), Not(IsNil))
 		return
 	}
 
@@ -72,7 +72,7 @@ func DescribeCommit(c gospec.Context) {
 `)
 
 			c.Expect(changes.Commit("Test Commit"), IsNil)
-			c.Expect(GitIsClean(changes.WorkingDirectory()), IsNil)
+			c.Expect(IsClean(changes.WorkingDirectory()), IsNil)
 
 			o, err = Command(changes.WorkingDirectory(), "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)

@@ -33,14 +33,14 @@ func DescribeGitIntegration(c gospec.Context) {
 		c.Expect(d, IsAGitRepository)
 
 		c.Specify("and will be clean", func() {
-			c.Expect(GitIsClean(d), IsNil)
+			c.Expect(IsClean(d), IsNil)
 		})
 
 		testFile := path.Join(d, "test_file")
 		c.Assume(ioutil.WriteFile(testFile, []byte("some data\n"), 0666), IsNil)
 
 		c.Specify("and will be dirty", func() {
-			c.Expect(GitIsClean(d).Error(), Equals, "directory is dirty")
+			c.Expect(IsClean(d).Error(), Equals, "directory is dirty")
 		})
 
 		c.Specify("and will add a file", func() {

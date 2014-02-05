@@ -33,8 +33,9 @@ func Init(directory string) error {
 	return Command(wd, "init", directory).Run()
 }
 
-func GitIsClean(dir string) error {
-	c := Command(dir, "status", "-s")
+// Check a directory for staged or un-staged changes
+func IsClean(directory string) error {
+	c := Command(directory, "status", "-s")
 
 	o, err := c.Output()
 	if err != nil {
