@@ -59,3 +59,8 @@ func AddFilepath(workingDirectory string, filepath string) error {
 func CommitWithMessage(workingDirectory string, msg string) error {
 	return Command(workingDirectory, "commit", "-m", msg).Run()
 }
+
+// Execute `git commit --allow-empty -m {msg}` in workingDirectory.
+func CommitEmpty(workingDirectory string, msg string) error {
+	return Command(workingDirectory, "commit", "--allow-empty", "-m", msg).Run()
+}

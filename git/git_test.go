@@ -67,5 +67,14 @@ index 0000000..4268632
 +some data
 `)
 		})
+
+		c.Specify("and will create an empty commit with message", func() {
+			c.Expect(CommitEmpty(d, "an empty commit"), IsNil)
+
+			o, err := Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+			c.Assume(err, IsNil)
+
+			c.Expect(string(o), Equals, `"an empty commit"`)
+		})
 	})
 }
