@@ -9,6 +9,7 @@ func TestUnitSpecs(t *testing.T) {
 	r := gospec.NewRunner()
 
 	r.AddSpec(DescribeIdea)
+	r.AddSpec(DescribeIdeaStore)
 
 	gospec.MainGoTest(r, t)
 }
