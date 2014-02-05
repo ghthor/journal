@@ -52,7 +52,7 @@ func DescribeGitIntegration(c gospec.Context) {
 
 		c.Specify("and will commit all staged changes", func() {
 			c.Assume(AddFilepath(d, testFile), IsNil)
-			c.Expect(GitCommit(d, "a commit msg"), IsNil)
+			c.Expect(CommitWithMessage(d, "a commit msg"), IsNil)
 
 			o, err := Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 			c.Assume(err, IsNil)

@@ -54,6 +54,7 @@ func AddFilepath(workingDirectory string, filepath string) error {
 	return Command(workingDirectory, "add", filepath).Run()
 }
 
-func GitCommit(dir string, msg string) error {
-	return Command(dir, "commit", "-m", msg).Run()
+// `git commit -m {msg}`
+func CommitWithMessage(workingDirectory string, msg string) error {
+	return Command(workingDirectory, "commit", "-m", msg).Run()
 }

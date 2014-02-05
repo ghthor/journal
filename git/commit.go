@@ -53,5 +53,5 @@ func Commit(c Commitable) error {
 		}
 	}
 
-	return GitCommit(d, c.CommitMsg())
+	return CommitWithMessage(d, c.CommitMsg())
 }
