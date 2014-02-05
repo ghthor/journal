@@ -12,6 +12,7 @@ import (
 	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -343,12 +344,72 @@ var ErrIdeaExists = errors.New("cannot save a new idea because it already exists
 // If the idea is already assigned an id this method will
 // return ErrIdeaExists
 func (d IdeaDirectory) SaveNewIdea(idea *Idea) (git.Commitable, error) {
-	return nil, nil
+	return d.saveNewIdea(idea)
 }
 
 // Does not check if the idea has an id
 func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
-	return nil, nil
+	changes := git.NewChangesIn(d.directory)
+
+	// Retrieve nextid
+	data, err := ioutil.ReadFile(filepath.Join(d.directory, "nextid"))
+	if err != nil {
+		return nil, err
+	}
+
+	var nextId uint
+	_, err = fmt.Fscan(bytes.NewReader(data), &nextId)
+	if err != nil {
+		return nil, err
+	}
+
+	idea.Id = nextId
+
+	// Increment nextid
+	nextId++
+
+	err = ioutil.WriteFile(filepath.Join(d.directory, "nextid"), []byte(fmt.Sprintf("%d\n", nextId)), 0600)
+	if err != nil {
+		return nil, err
+	}
+	changes.Add(git.ChangedFile("nextid"))
+
+	// write to file
+	r, err := NewIdeaReader(*idea)
+	if err != nil {
+		return nil, err
+	}
+
+	ideaFile, err := os.OpenFile(filepath.Join(d.directory, fmt.Sprint(idea.Id)), os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return nil, err
+	}
+	defer ideaFile.Close()
+
+	_, err = io.Copy(ideaFile, r)
+	if err != nil {
+		return nil, err
+	}
+	changes.Add(git.ChangedFile(filepath.Base(ideaFile.Name())))
+
+	// If Active, append to active index
+	if idea.Status == IS_Active {
+		activeIndexFile, err := os.OpenFile(filepath.Join(d.directory, "active"), os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			return nil, err
+		}
+		defer activeIndexFile.Close()
+
+		_, err = fmt.Fprintln(activeIndexFile, idea.Id)
+		if err != nil {
+			return nil, err
+		}
+		changes.Add(git.ChangedFile("active"))
+	}
+
+	changes.Msg = "new idea saved"
+
+	return changes, nil
 }
 
 var ErrIdeaNotModified = errors.New("the idea was not modified")
