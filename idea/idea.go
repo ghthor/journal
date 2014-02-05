@@ -327,3 +327,37 @@ func InitIdeaDirectory(directory string) (*IdeaDirectory, git.Commitable, error)
 		"idea directory initialized",
 	}, nil
 }
+
+// Saves an idea to the idea directory and
+// returns a commitable containing all changes.
+// If the idea does not have an id it will be assigned one.
+// If the idea does have an id it will be updated.
+func (d IdeaDirectory) SaveIdea(idea *Idea) (git.Commitable, error) {
+	return nil, nil
+}
+
+var ErrIdeaExists = errors.New("cannot save a new idea because it already exists")
+
+// Saves an idea that doesn't have an id to the directory and
+// returns a commitable containing all changes.
+// If the idea is already assigned an id this method will
+// return ErrIdeaExists
+func (d IdeaDirectory) SaveNewIdea(idea *Idea) (git.Commitable, error) {
+	return nil, nil
+}
+
+// Does not check if the idea has an id
+func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
+	return nil, nil
+}
+
+var ErrIdeaNotModified = errors.New("the idea was not modified")
+
+// Updates an idea that has already been assigned an id and
+// exists in the directory already and
+// returns a commitable containing all changes.
+// If the idea body wasn't modified this method will
+// return ErrIdeaNotModified
+func (d IdeaDirectory) UpdateIdea(idea Idea) (git.Commitable, error) {
+	return nil, nil
+}
