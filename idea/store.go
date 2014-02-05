@@ -13,7 +13,7 @@ import (
 
 // Used to manage idea storage in a directory
 type IdeaDirectory struct {
-	directory string
+	root string
 }
 
 // Returned if a directory structure doesn't match
@@ -138,10 +138,10 @@ func (d IdeaDirectory) SaveNewIdea(idea *Idea) (git.Commitable, error) {
 
 // Does not check if the idea has an id
 func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
-	changes := git.NewChangesIn(d.directory)
+	changes := git.NewChangesIn(d.root)
 
 	// Retrieve nextid
-	data, err := ioutil.ReadFile(filepath.Join(d.directory, "nextid"))
+	data, err := ioutil.ReadFile(filepath.Join(d.root, "nextid"))
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
 	// Increment nextid
 	nextId++
 
-	err = ioutil.WriteFile(filepath.Join(d.directory, "nextid"), []byte(fmt.Sprintf("%d\n", nextId)), 0600)
+	err = ioutil.WriteFile(filepath.Join(d.root, "nextid"), []byte(fmt.Sprintf("%d\n", nextId)), 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
 		return nil, err
 	}
 
-	ideaFile, err := os.OpenFile(filepath.Join(d.directory, fmt.Sprint(idea.Id)), os.O_CREATE|os.O_WRONLY, 0600)
+	ideaFile, err := os.OpenFile(filepath.Join(d.root, fmt.Sprint(idea.Id)), os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +183,7 @@ func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
 
 	// If Active, append to active index
 	if idea.Status == IS_Active {
-		activeIndexFile, err := os.OpenFile(filepath.Join(d.directory, "active"), os.O_APPEND|os.O_WRONLY, 0600)
+		activeIndexFile, err := os.OpenFile(filepath.Join(d.root, "active"), os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
 			return nil, err
 		}

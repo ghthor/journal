@@ -48,7 +48,7 @@ func DescribeIdeaStore(c gospec.Context) {
 			c.Assume(err, IsNil)
 			c.Expect(id, Not(IsNil))
 
-			c.Expect(id.directory, Equals, d)
+			c.Expect(id.root, Equals, d)
 
 			c.Specify("only once", func() {
 				_, _, err = InitIdeaDirectory(d)
