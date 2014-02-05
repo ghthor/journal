@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"log"
@@ -211,13 +212,9 @@ An Idea body of text
 			c.Assume(IsInvalidIdeaDirectoryError(err), IsTrue)
 
 			// Initialize the directory
-			id, err := InitIdeaDirectory(d)
+			id, _, err := InitIdeaDirectory(d)
 			c.Assume(err, IsNil)
 			c.Assume(id, Not(IsNil))
-
-			// Verify the directory cannot be initialized twice
-			_, err = InitIdeaDirectory(d)
-			c.Assume(err, Equals, ErrInitOnExistingIdeaDirectory)
 
 			// Verify the directory has been initialized
 			id, err = NewIdeaDirectory(d)
@@ -226,6 +223,30 @@ An Idea body of text
 
 			return id, d
 		}
+
+		c.Specify("can be initialized", func() {
+			d := makeEmptyDirectory("idea_directory_init")
+
+			id, commitable, err := InitIdeaDirectory(d)
+			c.Assume(err, IsNil)
+			c.Expect(id, Not(IsNil))
+
+			c.Expect(id.directory, Equals, d)
+
+			c.Specify("only once", func() {
+				_, _, err = InitIdeaDirectory(d)
+				c.Assume(err, Equals, ErrInitOnExistingIdeaDirectory)
+			})
+
+			c.Specify("and is commitable", func() {
+				c.Expect(commitable, Not(IsNil))
+				c.Expect(commitable.Changes(), ContainsAll, []git.ChangedFile{
+					git.ChangedFile(filepath.Join(d, "active")),
+					git.ChangedFile(filepath.Join(d, "nextid")),
+				})
+				c.Expect(commitable.CommitMsg(), Equals, "idea directory initialized")
+			})
+		})
 
 		c.Specify("contains an index of the next available id", func() {
 			_, d := makeIdeaDirectory("idea_directory_spec")

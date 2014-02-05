@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"path/filepath"
@@ -278,24 +279,56 @@ func NewIdeaDirectory(directory string) (*IdeaDirectory, error) {
 // that has already been initialized
 var ErrInitOnExistingIdeaDirectory = errors.New("init on existing idea directory")
 
+type ideaDirectoryInitialized struct {
+	dir     string
+	changes []git.CommitableChange
+	msg     string
+}
+
+func (i ideaDirectoryInitialized) WorkingDirectory() string {
+	return i.dir
+}
+
+func (i ideaDirectoryInitialized) Changes() []git.CommitableChange {
+	return i.changes
+}
+
+func (i ideaDirectoryInitialized) CommitMsg() string {
+	return i.msg
+}
+
 // Check that the directory is empty
 // and if it is then it initializes an empty
 // idea directory.
-func InitIdeaDirectory(directory string) (*IdeaDirectory, error) {
+func InitIdeaDirectory(directory string) (*IdeaDirectory, git.Commitable, error) {
 	err := isAnIdeaDirectory(directory)
 	if err == nil {
-		return nil, ErrInitOnExistingIdeaDirectory
+		return nil, nil, ErrInitOnExistingIdeaDirectory
 	}
 
-	err = ioutil.WriteFile(filepath.Join(directory, "nextid"), []byte("1\n"), 0600)
+	nextIdCounter := filepath.Join(directory, "nextid")
+	err = ioutil.WriteFile(nextIdCounter, []byte("1\n"), 0600)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(directory, "active"), []byte(""), 0600)
+	activeIndex := filepath.Join(directory, "active")
+	err = ioutil.WriteFile(activeIndex, []byte(""), 0600)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &IdeaDirectory{directory}, nil
+	changes := git.NewChangesIn(directory)
+	changes.Add(git.ChangedFile(activeIndex))
+	changes.Add(git.ChangedFile(nextIdCounter))
+	changes.Changes()
+
+	return &IdeaDirectory{directory}, ideaDirectoryInitialized{
+		directory,
+		[]git.CommitableChange{
+			git.ChangedFile(nextIdCounter),
+			git.ChangedFile(activeIndex),
+		},
+		"idea directory initialized",
+	}, nil
 }
