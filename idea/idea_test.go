@@ -247,12 +247,13 @@ An Idea body of text
 				})
 				c.Expect(commitable.CommitMsg(), Equals, "idea directory initialized")
 
+				// Initialize and empty repo
 				c.Assume(git.Init(d), IsNil)
+				// Commit the idea directory initialization
 				c.Expect(git.Commit(commitable), IsNil)
 
 				o, err := git.Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 				c.Assume(err, IsNil)
-
 				c.Expect(string(o), Equals,
 					`"idea directory initialized"
 diff --git a/active b/active
