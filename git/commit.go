@@ -42,7 +42,8 @@ func (c Changes) WorkingDirectory() string    { return c.wd }
 func (c Changes) Changes() []CommitableChange { return c.changes }
 func (c Changes) CommitMsg() string           { return c.msg }
 
-// Execute a `git commit` with some commitable changes
+// Execute `git add` for all Changes()'s
+// then execute `git commit` with CommitMsg()
 func Commit(c Commitable) error {
 	d := c.WorkingDirectory()
 
