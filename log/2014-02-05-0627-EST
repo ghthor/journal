@@ -1,0 +1,98 @@
+Wed Feb  5 06:27:57 EST 2014
+
+#~ Finished up package git's expected usage pattern
+First package I've made where I worked on it w/ godoc for it open in the browser.
+Helped me write documentation as I updated the package.
+It might be the most documented package I've made.
+
+I think I will continue writting packages like this.
+Going to move forward with the fix command.
+
+Updated the plan for the fix command with some more in depth steps.
+
+## [completed] git interfaces
+- [X] a CommitableChange can be `git add`'ed to the index
+    - will have a filepath for executing `git add {filepath}`
+- [X] a Commitable can be Commit(c Commitable)'ed to the repository
+    - will have a working directory
+    - will have a list of changes
+    - will have a commit message
+
+- [X] A function to commit an empty commit with a message
+
+
+## [active] `fix` command
+- [ ] Mark fix beginning with an empty git commit
+    - message "FIX - Journal - Begin"
+
+- [ ] fix journal
+    - fix | does NOT store ideas in `idea/` directory
+        - fix ideas
+    - fix | has entries that don't conform to the current feature set
+        - fix entries
+    - fix | does NOT store entries in `entry/` directory
+        - create `entry/` directory and move all entries
+        - message "FIX - Journal - Moved all entries to entry/ directory"
+
+- [ ] fix ideas
+    - [ ] create `idea/` directory structure
+        - message "FIX - Journal - Created idea/ directory structure"
+    - [ ] Parse ideas from entries starting from oldest
+        - If an idea doesn't exist in `idea/' w/ matching name
+            - Create the idea
+            - message "FIX - Idea - Created - {timestamp}"
+        - If an idea exists in `idea/` /w matching name
+            - Update the idea
+            - message "FIX - Idea - Modified - {timestamp}"
+
+- [ ] fix entries
+    - fix | does NOT have a commit message header w/ format "#~ Commit Message\n"
+        - change line format from "# Text\n" -> "#~ Text\n"
+        - message "FIX - Entry - Added commit message header"
+
+    - fix | does NOT have a closed timestamp as the final line
+        - append a closed timestamp for 30secs after opened timestamp
+        - message "FIX - Entry - Added closed timestamp"
+
+    - fix | does have ideas in the body
+        - remove ideas
+        - message "FIX - Entry - Removed ideas from body"
+
+    - [ ] Current Features
+        - should have a timestamp as the first line
+        - should have a commit msg line w/ format "#~ Commit Msg\n"
+        - should NOT have any ideas in the body
+        - should have a timestamp as the final line
+
+- [ ] Mark fix complete with an empty git commit
+    - message "FIX - Journal - Complete"
+
+## [active] `idea/` directory
+- [ ] `idea/nextid` will store the next available id
+- [ ] `idea/active` will index which ideas are active
+    - [ ] 1 id per line
+
+- [ ] Create a new idea
+    - [ ] Retrieve nextid and increment
+        - [ ] Returns a CommitableChange
+    - [ ] Write idea to `idea/{id}`
+        - [ ] Returns a CommitableChange
+    - [ ] If it is active, append id to `idea/active` index
+        - [ ] Returns a CommitableChange
+
+    - [ ] Create a Commitable with all 3 changes and a msg
+        - [ ] commit message format "IDEA - {id} - Created"
+
+- [ ] Update an existing idea
+    - [ ] Write idea to `idea/{id}`
+        - [ ] Returns a CommitableChange
+    - [ ] If it is active, make sure it exists in `idea/active` index
+        - [ ] If modified return a CommitableChange
+    - [ ] If it is inactive, make sure it doesn't exist in `idea/active` index
+        - [ ] If modified return a CommitableChange
+
+    - [ ] Create a Commitable with all 3 changes and a msg
+        - [ ] msg format "IDEA - {id} - Updated"
+
+
+Wed Feb  5 07:19:57 EST 2014
