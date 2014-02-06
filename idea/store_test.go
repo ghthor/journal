@@ -86,19 +86,31 @@ index 0000000..d00491f
 			})
 		})
 
-		c.Specify("contains an index of the next available id", func() {
+		c.Specify("that is empty", func() {
 			_, d := makeDirectoryStore("directory_store_spec")
 
-			data, err := ioutil.ReadFile(filepath.Join(d, "nextid"))
-			c.Expect(err, IsNil)
-			c.Expect(string(data), Equals, "1\n")
-		})
+			c.Specify("has a next available id of 1", func() {
+				data, err := ioutil.ReadFile(filepath.Join(d, "nextid"))
+				c.Expect(err, IsNil)
+				c.Expect(string(data), Equals, "1\n")
+			})
 
-		c.Specify("contains an index of active ideas", func() {
-			_, d := makeDirectoryStore("directory_store_spec")
+			c.Specify("contains an empty index of active ideas", func() {
+				fs, err := os.Stat(filepath.Join(d, "active"))
+				c.Expect(err, IsNil)
+				c.Expect(fs.Size(), Equals, int64(0))
+			})
 
-			_, err := os.Stat(filepath.Join(d, "active"))
-			c.Expect(err, IsNil)
+			c.Specify("contains no ideas", func() {
+				fileCount := 0
+				filepath.Walk(d, func(path string, fi os.FileInfo, err error) error {
+					if path != d {
+						fileCount++
+					}
+					return nil
+				})
+				c.Expect(fileCount, Equals, 2)
+			})
 		})
 
 		c.Specify("contains ideas stored in a files", func() {
