@@ -14,27 +14,27 @@ import (
 )
 
 func DescribeIdeaStore(c gospec.Context) {
-	c.Specify("an idea directory", func() {
+	c.Specify("a directory store", func() {
 		makeEmptyDirectory := func(prefix string) string {
 			d, err := ioutil.TempDir("_test", prefix+"_")
 			c.Assume(err, IsNil)
 			return d
 		}
 
-		makeIdeaDirectory := func(prefix string) (*IdeaDirectory, string) {
+		makeDirectoryStore := func(prefix string) (*DirectoryStore, string) {
 			d := makeEmptyDirectory(prefix)
 
-			// Verify the directory isn't an IdeaDirectory
-			_, err := NewIdeaDirectory(d)
-			c.Assume(IsInvalidIdeaDirectoryError(err), IsTrue)
+			// Verify the directory isn't an DirectoryStore
+			_, err := NewDirectoryStore(d)
+			c.Assume(IsInvalidDirectoryStoreError(err), IsTrue)
 
 			// Initialize the directory
-			id, _, err := InitIdeaDirectory(d)
+			id, _, err := InitDirectoryStore(d)
 			c.Assume(err, IsNil)
 			c.Assume(id, Not(IsNil))
 
 			// Verify the directory has been initialized
-			id, err = NewIdeaDirectory(d)
+			id, err = NewDirectoryStore(d)
 			c.Assume(err, IsNil)
 			c.Assume(id, Not(IsNil))
 
@@ -42,17 +42,17 @@ func DescribeIdeaStore(c gospec.Context) {
 		}
 
 		c.Specify("can be initialized", func() {
-			d := makeEmptyDirectory("idea_directory_init")
+			d := makeEmptyDirectory("directory_store_init")
 
-			id, commitable, err := InitIdeaDirectory(d)
+			id, commitable, err := InitDirectoryStore(d)
 			c.Assume(err, IsNil)
 			c.Expect(id, Not(IsNil))
 
 			c.Expect(id.root, Equals, d)
 
 			c.Specify("only once", func() {
-				_, _, err = InitIdeaDirectory(d)
-				c.Expect(err, Equals, ErrInitOnExistingIdeaDirectory)
+				_, _, err = InitDirectoryStore(d)
+				c.Expect(err, Equals, ErrInitOnExistingDirectoryStore)
 			})
 
 			c.Specify("and the modifications made during initialization are commitable", func() {
@@ -62,17 +62,17 @@ func DescribeIdeaStore(c gospec.Context) {
 					git.ChangedFile("nextid"),
 					git.ChangedFile("active"),
 				})
-				c.Expect(commitable.CommitMsg(), Equals, "idea directory initialized")
+				c.Expect(commitable.CommitMsg(), Equals, "directory store initialized")
 
 				// Initialize and empty repo
 				c.Assume(git.Init(d), IsNil)
-				// Commit the idea directory initialization
+				// Commit the directory store initialization
 				c.Expect(git.Commit(commitable), IsNil)
 
 				o, err := git.Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals,
-					`"idea directory initialized"
+					`"directory store initialized"
 diff --git a/active b/active
 new file mode 100644
 index 0000000..e69de29
@@ -88,7 +88,7 @@ index 0000000..d00491f
 		})
 
 		c.Specify("contains an index of the next available id", func() {
-			_, d := makeIdeaDirectory("idea_directory_spec")
+			_, d := makeDirectoryStore("directory_store_spec")
 
 			data, err := ioutil.ReadFile(filepath.Join(d, "nextid"))
 			c.Expect(err, IsNil)
@@ -96,7 +96,7 @@ index 0000000..d00491f
 		})
 
 		c.Specify("contains an index of active ideas", func() {
-			_, d := makeIdeaDirectory("idea_directory_spec")
+			_, d := makeDirectoryStore("directory_store_spec")
 
 			_, err := os.Stat(filepath.Join(d, "active"))
 			c.Expect(err, IsNil)
@@ -108,7 +108,7 @@ index 0000000..d00491f
 		})
 
 		c.Specify("can create a new idea", func() {
-			id, d := makeIdeaDirectory("idea_directory_create")
+			id, d := makeDirectoryStore("directory_store_create")
 
 			type newIdea struct {
 				changes git.Commitable

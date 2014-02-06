@@ -12,88 +12,88 @@ import (
 )
 
 // Used to manage idea storage in a directory
-type IdeaDirectory struct {
+type DirectoryStore struct {
 	root string
 }
 
 // Returned if a directory structure doesn't match
 // the required format of an idea storage directory
-type InvalidIdeaDirectoryError struct {
+type InvalidDirectoryStoreError struct {
 	Err error
 }
 
-func (e InvalidIdeaDirectoryError) Error() string {
-	return fmt.Sprintf("invalid idea directory: %v", e.Err)
+func (e InvalidDirectoryStoreError) Error() string {
+	return fmt.Sprintf("invalid directory store: %v", e.Err)
 }
 
-func IsInvalidIdeaDirectoryError(err error) bool {
-	_, ok := err.(InvalidIdeaDirectoryError)
+func IsInvalidDirectoryStoreError(err error) bool {
+	_, ok := err.(InvalidDirectoryStoreError)
 	return ok
 }
 
-func isAnIdeaDirectory(d string) error {
+func isAnDirectoryStore(d string) error {
 	nextIdPath := filepath.Join(d, "nextid")
 
 	data, err := ioutil.ReadFile(nextIdPath)
 	if err != nil {
-		return InvalidIdeaDirectoryError{err}
+		return InvalidDirectoryStoreError{err}
 	}
 
 	var nextAvailableId uint
 	n, err := fmt.Fscanf(bytes.NewReader(data), "%d\n", &nextAvailableId)
 	if err != nil {
-		return InvalidIdeaDirectoryError{err}
+		return InvalidDirectoryStoreError{err}
 	}
 
 	if n != 1 {
-		return InvalidIdeaDirectoryError{errors.New("next available id wasn't found")}
+		return InvalidDirectoryStoreError{errors.New("next available id wasn't found")}
 	}
 
 	return nil
 }
 
 // Checks that the directory contains the correct files
-// to be an IdeaDirectory.
-// If the directory doesn't contain the require  files
-// with the expected format this function will return an ErrInvalidIdeaDirectory.
-func NewIdeaDirectory(directory string) (*IdeaDirectory, error) {
-	err := isAnIdeaDirectory(directory)
+// to be a DirectoryStore.
+// If the directory doesn't contain the require files
+// with the expected format this function will return an InvalidDirectoryStoreError.
+func NewDirectoryStore(directory string) (*DirectoryStore, error) {
+	err := isAnDirectoryStore(directory)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IdeaDirectory{directory}, nil
+	return &DirectoryStore{directory}, nil
 }
 
-// Returned if InitIdeaDirectory is called on a directory
+// Returned if InitDirectoryStore is called on a directory
 // that has already been initialized
-var ErrInitOnExistingIdeaDirectory = errors.New("init on existing idea directory")
+var ErrInitOnExistingDirectoryStore = errors.New("init on existing directory store")
 
-type ideaDirectoryInitialized struct {
+type directoryStoreInitialized struct {
 	dir     string
 	changes []git.CommitableChange
 	msg     string
 }
 
-func (i ideaDirectoryInitialized) WorkingDirectory() string {
+func (i directoryStoreInitialized) WorkingDirectory() string {
 	return i.dir
 }
 
-func (i ideaDirectoryInitialized) Changes() []git.CommitableChange {
+func (i directoryStoreInitialized) Changes() []git.CommitableChange {
 	return i.changes
 }
 
-func (i ideaDirectoryInitialized) CommitMsg() string {
+func (i directoryStoreInitialized) CommitMsg() string {
 	return i.msg
 }
 
 // Check that the directory is empty
 // and if it is then it initializes an empty
-// idea directory.
-func InitIdeaDirectory(directory string) (*IdeaDirectory, git.Commitable, error) {
-	err := isAnIdeaDirectory(directory)
+// idea directory store.
+func InitDirectoryStore(directory string) (*DirectoryStore, git.Commitable, error) {
+	err := isAnDirectoryStore(directory)
 	if err == nil {
-		return nil, nil, ErrInitOnExistingIdeaDirectory
+		return nil, nil, ErrInitOnExistingDirectoryStore
 	}
 
 	nextIdCounter := filepath.Join(directory, "nextid")
@@ -108,21 +108,21 @@ func InitIdeaDirectory(directory string) (*IdeaDirectory, git.Commitable, error)
 		return nil, nil, err
 	}
 
-	return &IdeaDirectory{directory}, ideaDirectoryInitialized{
+	return &DirectoryStore{directory}, directoryStoreInitialized{
 		directory,
 		[]git.CommitableChange{
 			git.ChangedFile("nextid"),
 			git.ChangedFile("active"),
 		},
-		"idea directory initialized",
+		"directory store initialized",
 	}, nil
 }
 
-// Saves an idea to the idea directory and
+// Saves an idea to the directory store and
 // returns a commitable containing all changes.
 // If the idea does not have an id it will be assigned one.
 // If the idea does have an id it will be updated.
-func (d IdeaDirectory) SaveIdea(idea *Idea) (git.Commitable, error) {
+func (d DirectoryStore) SaveIdea(idea *Idea) (git.Commitable, error) {
 	return nil, nil
 }
 
@@ -132,12 +132,12 @@ var ErrIdeaExists = errors.New("cannot save a new idea because it already exists
 // returns a commitable containing all changes.
 // If the idea is already assigned an id this method will
 // return ErrIdeaExists
-func (d IdeaDirectory) SaveNewIdea(idea *Idea) (git.Commitable, error) {
+func (d DirectoryStore) SaveNewIdea(idea *Idea) (git.Commitable, error) {
 	return d.saveNewIdea(idea)
 }
 
 // Does not check if the idea has an id
-func (d IdeaDirectory) saveNewIdea(idea *Idea) (git.Commitable, error) {
+func (d DirectoryStore) saveNewIdea(idea *Idea) (git.Commitable, error) {
 	changes := git.NewChangesIn(d.root)
 
 	// Retrieve nextid
@@ -208,6 +208,6 @@ var ErrIdeaNotModified = errors.New("the idea was not modified")
 // returns a commitable containing all changes.
 // If the idea body wasn't modified this method will
 // return ErrIdeaNotModified
-func (d IdeaDirectory) UpdateIdea(idea Idea) (git.Commitable, error) {
+func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
 	return nil, nil
 }
