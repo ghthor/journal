@@ -69,24 +69,6 @@ func NewDirectoryStore(directory string) (*DirectoryStore, error) {
 // that has already been initialized
 var ErrInitOnExistingDirectoryStore = errors.New("init on existing directory store")
 
-type directoryStoreInitialized struct {
-	dir     string
-	changes []git.CommitableChange
-	msg     string
-}
-
-func (i directoryStoreInitialized) WorkingDirectory() string {
-	return i.dir
-}
-
-func (i directoryStoreInitialized) Changes() []git.CommitableChange {
-	return i.changes
-}
-
-func (i directoryStoreInitialized) CommitMsg() string {
-	return i.msg
-}
-
 // Check that the directory is empty
 // and if it is then it initializes an empty
 // idea directory store.
@@ -108,14 +90,12 @@ func InitDirectoryStore(directory string) (*DirectoryStore, git.Commitable, erro
 		return nil, nil, err
 	}
 
-	return &DirectoryStore{directory}, directoryStoreInitialized{
-		directory,
-		[]git.CommitableChange{
-			git.ChangedFile("nextid"),
-			git.ChangedFile("active"),
-		},
-		"directory store initialized",
-	}, nil
+	changes := git.NewChangesIn(directory)
+	changes.Add(git.ChangedFile("nextid"))
+	changes.Add(git.ChangedFile("active"))
+	changes.Msg = "directory store initialized"
+
+	return &DirectoryStore{directory}, changes, nil
 }
 
 // Saves an idea to the directory store and
