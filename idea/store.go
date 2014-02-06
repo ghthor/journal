@@ -297,5 +297,7 @@ func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
 		}
 	}
 
+	changes.Msg = fmt.Sprintf("IDEA - %d - Updated", idea.Id)
+
 	return changes, nil
 }

@@ -383,6 +383,7 @@ The file should be truncated to reflect the shorter body.
 				c.Specify("and will return a commitable change for the modified idea file", func() {
 					for _, iio := range ideas {
 						c.Expect(iio.changes.Changes(), Contains, git.ChangedFile(fmt.Sprint(iio.idea.Id)))
+						c.Expect(iio.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Updated", iio.idea.Id))
 					}
 				})
 			})
@@ -409,6 +410,7 @@ The file should be truncated to reflect the shorter body.
 						c.Specify("and will return a commitable change for modifying the index", func() {
 							for _, iio := range nowActiveIdeas {
 								c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("active"))
+								c.Expect(iio.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Updated", iio.idea.Id))
 							}
 						})
 					})
@@ -435,6 +437,7 @@ The file should be truncated to reflect the shorter body.
 						c.Specify("and will return a commitable change for modifying the index", func() {
 							for _, iio := range nowNotActiveIdeas {
 								c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("active"))
+								c.Expect(iio.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Updated", iio.idea.Id))
 							}
 						})
 					})
@@ -461,6 +464,7 @@ The file should be truncated to reflect the shorter body.
 				c.Specify("will not return a commitable change for the active index", func() {
 					for _, iio := range ideas {
 						c.Expect(iio.changes.Changes(), Not(Contains), git.ChangedFile("active"))
+						c.Expect(iio.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Updated", iio.idea.Id))
 					}
 				})
 			})
