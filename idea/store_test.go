@@ -50,26 +50,26 @@ func DescribeIdeaStore(c gospec.Context) {
 			c.Assume(IsInvalidDirectoryStoreError(err), IsTrue)
 
 			// Initialize the directory
-			id, _, err := InitDirectoryStore(d)
+			ds, _, err := InitDirectoryStore(d)
 			c.Assume(err, IsNil)
-			c.Assume(id, Not(IsNil))
+			c.Assume(ds, Not(IsNil))
 
 			// Verify the directory has been initialized
-			id, err = NewDirectoryStore(d)
+			ds, err = NewDirectoryStore(d)
 			c.Assume(err, IsNil)
-			c.Assume(id, Not(IsNil))
+			c.Assume(ds, Not(IsNil))
 
-			return id, d
+			return ds, d
 		}
 
 		c.Specify("can be initialized", func() {
 			d := makeEmptyDirectory("directory_store_init")
 
-			id, commitable, err := InitDirectoryStore(d)
+			ds, commitable, err := InitDirectoryStore(d)
 			c.Assume(err, IsNil)
-			c.Expect(id, Not(IsNil))
+			c.Expect(ds, Not(IsNil))
 
-			c.Expect(id.root, Equals, d)
+			c.Expect(ds.root, Equals, d)
 
 			c.Specify("only once", func() {
 				_, _, err = InitDirectoryStore(d)
@@ -181,11 +181,11 @@ index 0000000..d00491f
 		}
 
 		c.Specify("can create a new idea", func() {
-			id, d := makeDirectoryStore("directory_store_create")
+			ds, d := makeDirectoryStore("directory_store_create")
 
 			newIdeas, activeIdeas, notActiveIdeas := someIdeas()
 			for _, iio := range newIdeas {
-				c.Expect(SaveNewIn(id, iio), IsNil)
+				c.Expect(SaveNewIn(ds, iio), IsNil)
 				c.Expect(iio.changes, Not(IsNil))
 			}
 
