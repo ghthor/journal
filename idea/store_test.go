@@ -7,7 +7,6 @@ import (
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
 	"github.com/ghthor/journal/git"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -138,12 +137,21 @@ index 0000000..d00491f
 				},
 			}}
 
+			activeIdeas := make([]*newIdea, 0, 2)
+
 			for _, ni := range newIdeas {
+				// Build a parallel slice of active ideas
+				if ni.idea.Status == IS_Active {
+					activeIdeas = append(activeIdeas, ni)
+				}
+
 				changes, err := id.SaveNewIdea(ni.idea)
 				c.Assume(err, IsNil)
 				c.Assume(changes, Not(IsNil))
 				ni.changes = changes
 			}
+
+			c.Assume(len(activeIdeas), Equals, 2)
 
 			c.Specify("by assigning the next available id to the idea", func() {
 				c.Expect(newIdeas[0].idea.Id, Equals, uint(1))
@@ -200,33 +208,27 @@ index 0000000..d00491f
 			})
 
 			c.Specify("and if the idea's status is active", func() {
-				activeIdeas := make([]*Idea, 0, 2)
-				for _, ni := range newIdeas {
-					if ni.idea.Status == IS_Active {
-						activeIdeas = append(activeIdeas, ni.idea)
-					}
-				}
-				c.Assume(len(activeIdeas), Equals, 2)
-
 				c.Specify("will add the idea's id to the active index", func() {
 					data, err := ioutil.ReadFile(filepath.Join(d, "active"))
 					c.Assume(err, IsNil)
 
-					r := bytes.NewReader(data)
+					actualActiveIds := make([]uint, 0, len(activeIdeas))
+					scanner := bufio.NewScanner(bytes.NewReader(data))
 
-					var id uint
-					activeIdeaIds := make([]uint, 0, len(activeIdeas))
-
-					// Can just use fmt.Fscan because we know how many lines there are
-					for i := 0; i < len(activeIdeas); i++ {
-						_, err := fmt.Fscan(r, &id)
+					for scanner.Scan() {
+						var id uint
+						_, err := fmt.Fscan(bytes.NewReader(scanner.Bytes()), &id)
 						c.Assume(err, IsNil)
 
-						activeIdeaIds = append(activeIdeaIds, id)
+						actualActiveIds = append(actualActiveIds, id)
 					}
 
-					_, err = fmt.Fscan(r, &id)
-					c.Assume(err, Equals, io.EOF)
+					expectedActiveIds := make([]uint, 0, len(activeIdeas))
+					for _, ni := range activeIdeas {
+						expectedActiveIds = append(expectedActiveIds, ni.idea.Id)
+					}
+
+					c.Expect(actualActiveIds, ContainsExactly, expectedActiveIds)
 
 					c.Specify("and will return a commitable change for modifying the index", func() {
 						for _, ni := range newIdeas {
