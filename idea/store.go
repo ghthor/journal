@@ -1,6 +1,7 @@
 package idea
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -196,5 +197,105 @@ var ErrIdeaNotModified = errors.New("the idea was not modified")
 // If the idea body wasn't modified this method will
 // return ErrIdeaNotModified
 func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
-	return nil, nil
+	changes := git.NewChangesIn(d.root)
+
+	data, err := ioutil.ReadFile(filepath.Join(d.root, fmt.Sprint(idea.Id)))
+	if err != nil {
+		return nil, err
+	}
+
+	scanner := NewIdeaScanner(bytes.NewReader(data))
+
+	var ideaOnDisk *Idea
+	for scanner.Scan() {
+		ideaOnDisk = scanner.Idea()
+	}
+
+	if scanner.Err() != nil {
+		return nil, scanner.Err()
+	}
+
+	if idea == *ideaOnDisk {
+		// No change
+		return nil, nil
+	}
+
+	// Write to new idea data to file
+	ir, err := NewIdeaReader(idea)
+	if err != nil {
+		return nil, err
+	}
+
+	ideaFile, err := os.OpenFile(filepath.Join(d.root, fmt.Sprint(idea.Id)), os.O_WRONLY|os.O_TRUNC, 0600)
+	if err != nil {
+		return nil, err
+	}
+	defer ideaFile.Close()
+
+	_, err = io.Copy(ideaFile, ir)
+	if err != nil {
+		return nil, err
+	}
+
+	changes.Add(git.ChangedFile(fmt.Sprint(idea.Id)))
+
+	if idea.Status != ideaOnDisk.Status {
+		if idea.Status == IS_Active {
+			// add the id to the active index
+			activeIndex, err := os.OpenFile(filepath.Join(d.root, "active"), os.O_APPEND|os.O_WRONLY, 0600)
+			if err != nil {
+				return nil, err
+			}
+			defer activeIndex.Close()
+
+			_, err = fmt.Fprintln(activeIndex, idea.Id)
+			if err != nil {
+				return nil, err
+			}
+			changes.Add(git.ChangedFile("active"))
+
+		} else if ideaOnDisk.Status == IS_Active {
+			// remove the id from the active index
+			activeIndex_RDONLY, err := os.OpenFile(filepath.Join(d.root, "active"), os.O_RDONLY, 0600)
+			if err != nil {
+				return nil, err
+			}
+			defer activeIndex_RDONLY.Close()
+
+			// Filled with the unremoved ids
+			newIndexBuf := bytes.NewBuffer(make([]byte, 0, 256))
+
+			scanner := bufio.NewScanner(activeIndex_RDONLY)
+			for scanner.Scan() {
+				var id uint
+				_, err := fmt.Fscan(bytes.NewReader(scanner.Bytes()), &id)
+				if err != nil {
+					return nil, err
+				}
+
+				// Filter out the id
+				if id != idea.Id {
+					_, err := fmt.Fprintln(newIndexBuf, scanner.Text())
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+
+			// Write the new index back to the file
+			activeIndex_WRONLY, err := os.OpenFile(filepath.Join(d.root, "active"), os.O_WRONLY|os.O_TRUNC, 0600)
+			if err != nil {
+				return nil, err
+			}
+			defer activeIndex_WRONLY.Close()
+
+			_, err = io.Copy(activeIndex_WRONLY, newIndexBuf)
+			if err != nil {
+				return nil, err
+			}
+			changes.Add(git.ChangedFile("active"))
+		}
+	}
+
+	return changes, nil
 }

@@ -62,6 +62,25 @@ func DescribeIdeaStore(c gospec.Context) {
 			return ds, d
 		}
 
+		activeIdeasIn := func(d *DirectoryStore) (activeIds []uint) {
+			// Scan in the id's from the index file
+			data, err := ioutil.ReadFile(filepath.Join(d.root, "active"))
+			c.Assume(err, IsNil)
+
+			scanner := bufio.NewScanner(bytes.NewReader(data))
+			activeIds = make([]uint, 0, 3)
+
+			for scanner.Scan() {
+				var id uint
+				n, err := fmt.Fscan(bytes.NewReader(scanner.Bytes()), &id)
+				c.Assume(err, IsNil)
+				c.Assume(n, Equals, 1)
+
+				activeIds = append(activeIds, id)
+			}
+			return
+		}
+
 		c.Specify("can be initialized", func() {
 			d := makeEmptyDirectory("directory_store_init")
 
@@ -161,6 +180,18 @@ index 0000000..d00491f
 					0,
 					"A New Idea 3",
 					"New Idea Body 3\nThis Idea is active\n",
+				},
+			}, {
+				idea: &Idea{
+					IS_Completed,
+					0,
+					"A Completed Idea",
+					`This Idea has a really long body.
+It is like this because I want to make sure the Update method works correctly
+with extremely long bodies when the update is shorter.
+
+The file should be truncated to reflect the shorter body.
+`,
 				},
 			}}
 
@@ -310,25 +341,101 @@ index 0000000..d00491f
 		})
 
 		c.Specify("can update an existing idea", func() {
+			ds, d := makeDirectoryStore("directory_store_update")
+
+			newIdeas, activeIdeas, notActiveIdeas := someIdeas()
+
+			ideas := make([]*IdeaIO, 0, len(newIdeas))
+			for _, iio := range newIdeas {
+				// Fill the store w/ some ideas we can update
+				c.Assume(SaveIn(ds, iio), IsNil)
+				ideas = append(ideas, &IdeaIO{idea: iio.idea})
+			}
+
+			c.Specify("unless it hasn't been modified", func() {
+				for _, iio := range ideas {
+					c.Assume(UpdateIn(ds, iio), IsNil)
+					c.Assume(iio.changes, IsNil)
+				}
+			})
+
 			c.Specify("by writing the idea to the file", func() {
+				for _, iio := range ideas {
+					iio.idea.Body = fmt.Sprintf("Idea %d body has been modified\n", iio.idea.Id)
+					c.Expect(UpdateIn(ds, iio), IsNil)
+					c.Expect(iio.changes, Not(IsNil))
+				}
+
 				c.Specify("with the id as the filename", func() {
+					for _, iio := range ideas {
+						r, err := NewIdeaReader(*iio.idea)
+						c.Assume(err, IsNil)
+
+						expectedBytes, err := ioutil.ReadAll(r)
+						c.Assume(err, IsNil)
+
+						actualBytes, err := ioutil.ReadFile(filepath.Join(d, fmt.Sprint(iio.idea.Id)))
+						c.Assume(err, IsNil)
+						c.Expect(string(actualBytes), Equals, string(expectedBytes))
+					}
 				})
 
 				c.Specify("and will return a commitable change for the modified idea file", func() {
+					for _, iio := range ideas {
+						c.Expect(iio.changes.Changes(), Contains, git.ChangedFile(fmt.Sprint(iio.idea.Id)))
+					}
 				})
 			})
 
 			c.Specify("and if the idea's status has changed", func() {
 				c.Specify("to active", func() {
+					nowActiveIdeas := make([]*IdeaIO, 0, len(notActiveIdeas))
+
+					for _, iio := range notActiveIdeas {
+						c.Assume(iio.idea.Status, Not(Equals), IS_Active)
+						iio.idea.Status = IS_Active
+
+						c.Expect(UpdateIn(ds, iio), IsNil)
+						nowActiveIdeas = append(nowActiveIdeas, iio)
+					}
+
 					c.Specify("will add the idea's id to the active index", func() {
+						activeIds := activeIdeasIn(ds)
+
+						for _, iio := range nowActiveIdeas {
+							c.Expect(activeIds, Contains, iio.idea.Id)
+						}
+
 						c.Specify("and will return a commitable change for modifying the index", func() {
+							for _, iio := range nowActiveIdeas {
+								c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("active"))
+							}
 						})
 					})
 				})
 
 				c.Specify("to not active", func() {
+					nowNotActiveIdeas := make([]*IdeaIO, 0, len(activeIdeas))
+
+					for _, iio := range activeIdeas {
+						c.Assume(iio.idea.Status, Equals, IS_Active)
+						iio.idea.Status = IS_Inactive
+
+						c.Expect(UpdateIn(ds, iio), IsNil)
+						nowNotActiveIdeas = append(nowNotActiveIdeas, iio)
+					}
+
 					c.Specify("will not add the idea's id to the active index", func() {
-						c.Specify("and will not return a commitable change for modifying the index", func() {
+						activeIds := activeIdeasIn(ds)
+
+						for _, iio := range nowNotActiveIdeas {
+							c.Expect(activeIds, Not(Contains), iio.idea.Id)
+						}
+
+						c.Specify("and will return a commitable change for modifying the index", func() {
+							for _, iio := range nowNotActiveIdeas {
+								c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("active"))
+							}
 						})
 					})
 				})
