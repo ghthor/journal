@@ -318,15 +318,19 @@ index 0000000..d00491f
 				})
 			})
 
-			c.Specify("and if the idea's status is active", func() {
-				c.Specify("will add the idea's id to the active index", func() {
-					c.Specify("and will return a commitable change for modifying the index", func() {
+			c.Specify("and if the idea's status has changed", func() {
+				c.Specify("to active", func() {
+					c.Specify("will add the idea's id to the active index", func() {
+						c.Specify("and will return a commitable change for modifying the index", func() {
+						})
 					})
 				})
-			})
 
-			c.Specify("and if the idea's status isn't active", func() {
-				c.Specify("will not add the idea's id to the active index", func() {
+				c.Specify("to not active", func() {
+					c.Specify("will not add the idea's id to the active index", func() {
+						c.Specify("and will not return a commitable change for modifying the index", func() {
+						})
+					})
 				})
 			})
 		})
