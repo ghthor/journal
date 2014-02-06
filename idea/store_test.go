@@ -440,6 +440,30 @@ The file should be truncated to reflect the shorter body.
 					})
 				})
 			})
+
+			c.Specify("and If the idea's status has NOT changed", func() {
+				beforeUpdateIndex, err := ioutil.ReadFile(filepath.Join(d, "active"))
+				c.Assume(err, IsNil)
+
+				for _, iio := range ideas {
+					iio.idea.Name = fmt.Sprintf("Idea %d Name", iio.idea.Id)
+					iio.idea.Body = fmt.Sprintf("Idea %d Body\n", iio.idea.Id)
+					c.Assume(UpdateIn(ds, iio), IsNil)
+					c.Assume(iio.changes, Not(IsNil))
+				}
+
+				c.Specify("the active ids index will remain unchanged", func() {
+					afterUpdateIndex, err := ioutil.ReadFile(filepath.Join(d, "active"))
+					c.Assume(err, IsNil)
+					c.Expect(string(afterUpdateIndex), Equals, string(beforeUpdateIndex))
+				})
+
+				c.Specify("will not return a commitable change for the active index", func() {
+					for _, iio := range ideas {
+						c.Expect(iio.changes.Changes(), Not(Contains), git.ChangedFile("active"))
+					}
+				})
+			})
 		})
 	})
 }
