@@ -12,6 +12,28 @@ import (
 	"path/filepath"
 )
 
+type IdeaIO struct {
+	idea *Idea
+
+	changes git.Commitable
+	err     error
+}
+
+func SaveIn(d *DirectoryStore, iio *IdeaIO) error {
+	iio.changes, iio.err = d.SaveIdea(iio.idea)
+	return iio.err
+}
+
+func SaveNewIn(d *DirectoryStore, iio *IdeaIO) error {
+	iio.changes, iio.err = d.SaveNewIdea(iio.idea)
+	return iio.err
+}
+
+func UpdateIn(d *DirectoryStore, iio *IdeaIO) error {
+	iio.changes, iio.err = d.UpdateIdea(*iio.idea)
+	return iio.err
+}
+
 func DescribeIdeaStore(c gospec.Context) {
 	c.Specify("a directory store", func() {
 		makeEmptyDirectory := func(prefix string) string {
@@ -118,52 +140,54 @@ index 0000000..d00491f
 			})
 		})
 
-		c.Specify("can create a new idea", func() {
-			id, d := makeDirectoryStore("directory_store_create")
-
-			type newIdea struct {
-				changes git.Commitable
-				idea    *Idea
-			}
-
-			newIdeas := []*newIdea{{
+		someIdeas := func() (ideas []*IdeaIO, activeIdeas []*IdeaIO, notActiveIdeas []*IdeaIO) {
+			ideas = []*IdeaIO{{
 				idea: &Idea{
 					IS_Active,
 					0,
-					"A New Idea",
-					"Some body text\n",
+					"A New Idea 1",
+					"New Idea Body 1\nThis Idea is active\n",
 				},
 			}, {
 				idea: &Idea{
 					IS_Inactive,
 					0,
-					"Another New Idea",
-					"That isn't active\n",
+					"A New Idea 2",
+					"New Idea Body 2\nThis Idea is inactive\n",
 				},
 			}, {
 				idea: &Idea{
 					IS_Active,
 					0,
-					"Another Active New Idea",
-					"That should be active\n",
+					"A New Idea 3",
+					"New Idea Body 3\nThis Idea is active\n",
 				},
 			}}
 
-			activeIdeas := make([]*newIdea, 0, 2)
+			activeIdeas = make([]*IdeaIO, 0, 2)
+			notActiveIdeas = make([]*IdeaIO, 0, 1)
 
-			for _, ni := range newIdeas {
+			for _, iio := range ideas {
 				// Build a parallel slice of active ideas
-				if ni.idea.Status == IS_Active {
-					activeIdeas = append(activeIdeas, ni)
+				if iio.idea.Status == IS_Active {
+					activeIdeas = append(activeIdeas, iio)
+				} else {
+					notActiveIdeas = append(notActiveIdeas, iio)
 				}
-
-				changes, err := id.SaveNewIdea(ni.idea)
-				c.Assume(err, IsNil)
-				c.Assume(changes, Not(IsNil))
-				ni.changes = changes
 			}
 
 			c.Assume(len(activeIdeas), Equals, 2)
+			return
+		}
+
+		c.Specify("can create a new idea", func() {
+			id, d := makeDirectoryStore("directory_store_create")
+
+			newIdeas, activeIdeas, notActiveIdeas := someIdeas()
+			for _, iio := range newIdeas {
+				c.Expect(SaveNewIn(id, iio), IsNil)
+				c.Expect(iio.changes, Not(IsNil))
+			}
 
 			c.Specify("by assigning the next available id to the idea", func() {
 				c.Expect(newIdeas[0].idea.Id, Equals, uint(1))
@@ -181,8 +205,8 @@ index 0000000..d00491f
 				c.Expect(nextId, Equals, uint(len(newIdeas)+1))
 
 				c.Specify("and will return a commitable change for modifying the next available id", func() {
-					for _, ni := range newIdeas {
-						c.Expect(ni.changes.Changes(), Contains, git.ChangedFile("nextid"))
+					for _, iio := range newIdeas {
+						c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("nextid"))
 					}
 				})
 			})
@@ -194,17 +218,17 @@ index 0000000..d00491f
 
 				c.Specify("with the id as the filename", func() {
 
-					for _, ni := range newIdeas {
-						_, err := os.Stat(pathTo(ni.idea))
+					for _, iio := range newIdeas {
+						_, err := os.Stat(pathTo(iio.idea))
 						c.Expect(!os.IsNotExist(err), IsTrue)
 					}
 				})
 
-				for _, ni := range newIdeas {
-					actualData, err := ioutil.ReadFile(pathTo(ni.idea))
+				for _, iio := range newIdeas {
+					actualData, err := ioutil.ReadFile(pathTo(iio.idea))
 					c.Assume(err, IsNil)
 
-					r, err := NewIdeaReader(*ni.idea)
+					r, err := NewIdeaReader(*iio.idea)
 					c.Assume(err, IsNil)
 					expectedData, err := ioutil.ReadAll(r)
 					c.Assume(err, IsNil)
@@ -213,8 +237,8 @@ index 0000000..d00491f
 				}
 
 				c.Specify("and return a commitable change for the new idea file", func() {
-					for _, ni := range newIdeas {
-						c.Expect(ni.changes.Changes(), Contains, git.ChangedFile(fmt.Sprint(ni.idea.Id)))
+					for _, iio := range newIdeas {
+						c.Expect(iio.changes.Changes(), Contains, git.ChangedFile(fmt.Sprint(iio.idea.Id)))
 					}
 				})
 			})
@@ -236,18 +260,18 @@ index 0000000..d00491f
 					}
 
 					expectedActiveIds := make([]uint, 0, len(activeIdeas))
-					for _, ni := range activeIdeas {
-						expectedActiveIds = append(expectedActiveIds, ni.idea.Id)
+					for _, iio := range activeIdeas {
+						expectedActiveIds = append(expectedActiveIds, iio.idea.Id)
 					}
 
 					c.Expect(actualActiveIds, ContainsExactly, expectedActiveIds)
 
 					c.Specify("and will return a commitable change for modifying the index", func() {
-						for _, ni := range newIdeas {
-							if ni.idea.Status == IS_Active {
-								c.Expect(ni.changes.Changes(), Contains, git.ChangedFile("active"))
+						for _, iio := range newIdeas {
+							if iio.idea.Status == IS_Active {
+								c.Expect(iio.changes.Changes(), Contains, git.ChangedFile("active"))
 							} else {
-								c.Expect(ni.changes.Changes(), Not(Contains), git.ChangedFile("active"))
+								c.Expect(iio.changes.Changes(), Not(Contains), git.ChangedFile("active"))
 							}
 						}
 					})
@@ -255,14 +279,6 @@ index 0000000..d00491f
 			})
 
 			c.Specify("and if the idea's status isn't active", func() {
-				notActiveIdeas := make([]*Idea, 0, 1)
-				for _, ni := range newIdeas {
-					if ni.idea.Status != IS_Active {
-						notActiveIdeas = append(notActiveIdeas, ni.idea)
-					}
-				}
-				c.Assume(len(notActiveIdeas), Equals, 1)
-
 				c.Specify("will not add the idea's id to the active index", func() {
 					// Collect the id's from the index file
 					data, err := ioutil.ReadFile(filepath.Join(d, "active"))
@@ -280,15 +296,15 @@ index 0000000..d00491f
 					}
 					c.Assume(len(activeIds), Equals, 2)
 
-					for _, idea := range notActiveIdeas {
-						c.Expect(activeIds, Not(Contains), idea.Id)
+					for _, iio := range notActiveIdeas {
+						c.Expect(activeIds, Not(Contains), iio.idea.Id)
 					}
 				})
 			})
 
 			c.Specify("and returns a commitable change", func() {
-				for _, ni := range newIdeas {
-					c.Expect(ni.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Created", ni.idea.Id))
+				for _, iio := range newIdeas {
+					c.Expect(iio.changes.CommitMsg(), Equals, fmt.Sprintf("IDEA - %d - Created", iio.idea.Id))
 				}
 			})
 		})
