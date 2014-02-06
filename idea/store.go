@@ -103,7 +103,11 @@ func InitDirectoryStore(directory string) (*DirectoryStore, git.Commitable, erro
 // If the idea does not have an id it will be assigned one.
 // If the idea does have an id it will be updated.
 func (d DirectoryStore) SaveIdea(idea *Idea) (git.Commitable, error) {
-	return nil, nil
+	if idea.Id == 0 {
+		return d.saveNewIdea(idea)
+	}
+
+	return d.UpdateIdea(*idea)
 }
 
 var ErrIdeaExists = errors.New("cannot save a new idea because it already exists")
@@ -113,6 +117,9 @@ var ErrIdeaExists = errors.New("cannot save a new idea because it already exists
 // If the idea is already assigned an id this method will
 // return ErrIdeaExists
 func (d DirectoryStore) SaveNewIdea(idea *Idea) (git.Commitable, error) {
+	if idea.Id != 0 {
+		return nil, ErrIdeaExists
+	}
 	return d.saveNewIdea(idea)
 }
 
