@@ -425,7 +425,7 @@ The file should be truncated to reflect the shorter body.
 						nowNotActiveIdeas = append(nowNotActiveIdeas, iio)
 					}
 
-					c.Specify("will not add the idea's id to the active index", func() {
+					c.Specify("will remove the id from the active index", func() {
 						activeIds := activeIdeasIn(ds)
 
 						for _, iio := range nowNotActiveIdeas {
