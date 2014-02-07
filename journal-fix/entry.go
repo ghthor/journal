@@ -34,7 +34,19 @@ type entryCaseNeedsFixed struct {
 
 func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
 func (e entryCaseNeedsFixed) FixedEntry() (Entry, error) {
-	return nil, nil
+	var (
+		data []byte = e.bytes
+		err  error
+	)
+
+	for _, fix := range e.fixes {
+		data, err = fix.Fix(bytes.NewReader(data))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return entryCaseCurrent{data}, nil
 }
 
 func (e entryCaseNeedsFixed) Bytes() []byte { return e.bytes }
@@ -52,6 +64,15 @@ func (e entryCaseCurrent) Bytes() []byte              { return e.bytes }
 func (e entryCaseCurrent) NewReader() io.Reader       { return bytes.NewReader(e.bytes) }
 
 func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	if !lastLineIsTimestamp(data) {
+		fixes = append(fixes, AddClosedAtTimestamp{})
+	}
+
 	return
 }
 
