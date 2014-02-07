@@ -110,7 +110,7 @@ func DescribeEntry(c gospec.Context) {
 					actualData, err := ioutil.ReadAll(fixedEntry.NewReader())
 					c.Assume(err, IsNil)
 
-					c.Expect(string(actualData), Equals, string("the expected output"))
+					c.Expect(string(actualData), Equals, entry_case_current)
 				}
 			})
 		})
