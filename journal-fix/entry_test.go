@@ -55,7 +55,7 @@ const entry_case_current = entry_case_1
 func DescribeEntry(c gospec.Context) {
 	entryCasesData := []string{
 		entry_case_0,
-		/* entry_case_1, */
+		entry_case_1,
 		/* entry_case_2, */
 		/* entry_case_3, */
 		/* entry_case_4, */
