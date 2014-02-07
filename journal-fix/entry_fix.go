@@ -23,8 +23,6 @@ func lastLineIsTimestamp(data []byte) bool {
 // then append it to the end
 type AddClosedAtTimestamp struct{}
 
-// Parse the opened at timestamp and add 2 mins
-// then append it to the end
 func (AddClosedAtTimestamp) Fix(r io.Reader) ([]byte, error) {
 	// For adding 2 mins and making the closed at timestamp
 	var openedAt time.Time

@@ -21,7 +21,6 @@ type Entry interface {
 	NewReader() io.Reader
 }
 
-// A fix for an entry
 type EntryFix interface {
 	// Returns byte slice that has been fixed
 	Fix(io.Reader) ([]byte, error)
