@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/ghthor/journal/idea"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -18,6 +19,7 @@ func init() {
 		FixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
 		FixCommitMessagePrefixWithTilde{},
+		FixIdeasInBody{},
 	}
 }
 
@@ -223,6 +225,50 @@ func (FixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
 		if _, err := fmt.Fprintln(b, scanner.Text()); err != nil {
 			return nil, err
 		}
+	}
+
+	return b.Bytes(), nil
+}
+
+/*
+	Remove any idea's from the entries body.
+	We assume that the ideas have already been
+	parsed and saved in an earlier fix step.
+*/
+type FixIdeasInBody struct{}
+
+func (FixIdeasInBody) CanFix(r io.Reader) (bool, error) {
+	return idea.NewIdeaScanner(r).Scan(), nil
+}
+
+func (FixIdeasInBody) Execute(r io.Reader) ([]byte, error) {
+	// For storing the fixed output
+	b := bytes.NewBuffer(make([]byte, 0, 1024))
+
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		if strings.HasPrefix(scanner.Text(), "## [") {
+			break
+		}
+
+		if _, err := fmt.Fprintln(b, scanner.Text()); err != nil {
+			return nil, err
+		}
+	}
+
+	var timestampLine string
+
+	// Look for the timestamp
+	for scanner.Scan() {
+		if _, err := time.Parse(time.UnixDate, scanner.Text()); err == nil {
+			timestampLine = scanner.Text()
+		}
+	}
+
+	// Trim what's in the buffer and append the timestamp line
+	b = bytes.NewBuffer(bytes.TrimSpace(b.Bytes()))
+	if _, err := fmt.Fprintf(b, "\n\n%s\n", timestampLine); err != nil {
+		return nil, err
 	}
 
 	return b.Bytes(), nil

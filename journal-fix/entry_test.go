@@ -58,7 +58,7 @@ func DescribeEntry(c gospec.Context) {
 		entry_case_1,
 		entry_case_2,
 		entry_case_3,
-		/* entry_case_4, */
+		entry_case_4,
 		entry_case_current,
 	}
 	entryCases := make([]Entry, 0, len(entryCasesData))
