@@ -102,7 +102,9 @@ func DescribeEntry(c gospec.Context) {
 			entriesFixed := make([]Entry, 0, len(entryCases))
 
 			for _, entryCase := range entryCases {
-				entriesFixed = append(entriesFixed, entryCase.FixedEntry())
+				fixedEntry, err := entryCase.FixedEntry()
+				c.Expect(err, IsNil)
+				entriesFixed = append(entriesFixed, fixedEntry)
 			}
 
 			c.Specify("by returning an entry case for the current standard", func() {

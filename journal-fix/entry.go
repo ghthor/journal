@@ -10,7 +10,7 @@ type Entry interface {
 	NeedsFixed() bool
 
 	// Return an Entry that has been fixed
-	FixedEntry() Entry
+	FixedEntry() (Entry, error)
 
 	// Returns a byte slice of the entry w/o fixes
 	Bytes() []byte
@@ -22,7 +22,7 @@ type Entry interface {
 // A fix for an entry
 type EntryFix interface {
 	// Returns byte slice that has been fixed
-	Fix(io.Reader) []byte
+	Fix(io.Reader) ([]byte, error)
 }
 
 type entryCaseNeedsFixed struct {
@@ -31,8 +31,8 @@ type entryCaseNeedsFixed struct {
 }
 
 func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
-func (e entryCaseNeedsFixed) FixedEntry() Entry {
-	return e
+func (e entryCaseNeedsFixed) FixedEntry() (Entry, error) {
+	return nil, nil
 }
 
 func (e entryCaseNeedsFixed) Bytes() []byte { return e.bytes }
@@ -44,10 +44,10 @@ type entryCaseCurrent struct {
 	bytes []byte
 }
 
-func (e entryCaseCurrent) NeedsFixed() bool     { return false }
-func (e entryCaseCurrent) FixedEntry() Entry    { return e }
-func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
-func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.bytes) }
+func (e entryCaseCurrent) NeedsFixed() bool           { return false }
+func (e entryCaseCurrent) FixedEntry() (Entry, error) { return e, nil }
+func (e entryCaseCurrent) Bytes() []byte              { return e.bytes }
+func (e entryCaseCurrent) NewReader() io.Reader       { return bytes.NewReader(e.bytes) }
 
 func NewEntry(r io.Reader) (Entry, error) {
 	return nil, nil
