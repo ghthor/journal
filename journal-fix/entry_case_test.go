@@ -11,13 +11,13 @@ import (
 
 const entry_case_0 = `Sun Jan 26 14:50:50 EST 2014
 
-# Commit Msg
+# Commit Msg | A little extra
 Body
 `
 
 const entry_case_1 = `Sun Jan 26 14:50:50 EST 2014
 
-# Commit Msg
+# Commit Msg | A little extra
 Body
 
 Sun Jan 26 14:52:50 EST 2014
@@ -25,7 +25,27 @@ Sun Jan 26 14:52:50 EST 2014
 const entry_case_2 = `Sun Jan 26 14:50:50 EST 2014
 
 #~ Commit Msg
+# A little extra
 Body
+
+Sun Jan 26 14:52:50 EST 2014
+`
+
+const entry_case_3 = `Sun Jan 26 14:50:50 EST 2014
+
+#~ Commit Msg | A little extra
+Body
+
+Sun Jan 26 14:52:50 EST 2014
+`
+
+const entry_case_4 = `Sun Jan 26 14:50:50 EST 2014
+
+#~ Commit Msg | A little extra
+Body
+
+## [status] Idea
+Idea Body
 
 Sun Jan 26 14:52:50 EST 2014
 `
@@ -37,6 +57,8 @@ func DescribeEntry(c gospec.Context) {
 		entry_case_0,
 		entry_case_1,
 		entry_case_2,
+		entry_case_3,
+		entry_case_4,
 		entry_case_current,
 	}
 	entryCases := make([]Entry, 0, len(entryCasesData))
