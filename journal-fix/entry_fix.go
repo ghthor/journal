@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,7 @@ var entryFixes []EntryFix
 func init() {
 	entryFixes = []EntryFix{
 		FixAddClosedAtTimestamp{},
+		FixSplitCommitMessage{},
 	}
 }
 
@@ -89,6 +91,68 @@ func (FixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 	closedAt := openedAt.Add(time.Minute * 2)
 	if _, err := fmt.Fprintf(b, "\n%s\n", closedAt.Format(time.UnixDate)); err != nil {
 		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+/*
+	Fix a commit message with the format
+
+		#~ Commit Msg
+		# Additional Msg
+
+	By turning it into this
+
+		# Commit Msg | Additional Msg
+
+*/
+type FixSplitCommitMessage struct{}
+
+func (FixSplitCommitMessage) CanFix(r io.Reader) (bool, error) {
+	return hasSplitCommitMsg(r), nil
+}
+
+func hasSplitCommitMsg(r io.Reader) bool {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		if strings.HasPrefix(scanner.Text(), "#~ ") {
+			if scanner.Scan() {
+				if strings.HasPrefix(scanner.Text(), "# ") {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
+	// For storing the fixed output
+	b := bytes.NewBuffer(make([]byte, 0, 1024))
+
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !strings.HasPrefix(line, "#~ ") {
+			fmt.Fprintln(b, line)
+			continue
+		}
+
+		// We've found line 1 of the split commit message
+		part1 := strings.TrimPrefix(line, "#~ ")
+
+		if scanner.Scan() {
+			// Trim line 2 of the message and put part1 and part2 together
+			part2 := strings.TrimPrefix(scanner.Text(), "# ")
+			fmt.Fprintf(b, "# %s | %s\n", part1, part2)
+			continue
+
+		} else {
+			// Maybe this should be a panic
+			return nil, errors.New("attempt to fix split commit message that doesn't exist")
+		}
 	}
 
 	return b.Bytes(), nil
