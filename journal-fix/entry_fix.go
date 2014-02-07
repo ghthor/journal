@@ -14,7 +14,7 @@ var entryFixes []EntryFix
 
 func init() {
 	entryFixes = []EntryFix{
-		AddClosedAtTimestamp{},
+		FixAddClosedAtTimestamp{},
 	}
 }
 
@@ -28,9 +28,9 @@ type EntryFix interface {
 
 // Parse the opened at timestamp and add 2 mins
 // then append it to the end
-type AddClosedAtTimestamp struct{}
+type FixAddClosedAtTimestamp struct{}
 
-func (AddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
+func (FixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return false, err
@@ -49,7 +49,7 @@ func lastLineIsTimestamp(data []byte) bool {
 	return err == nil
 }
 
-func (AddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
+func (FixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 	// For adding 2 mins and making the closed at timestamp
 	var openedAt time.Time
 
