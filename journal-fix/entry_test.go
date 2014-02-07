@@ -70,7 +70,7 @@ func DescribeEntry(c gospec.Context) {
 		entryCases = append(entryCases, entryCase)
 	}
 
-	c.Specify("an entry case", func() {
+	c.Specify("an entry", func() {
 		c.Specify("can be read", func() {
 			c.Specify("from an io.Reader", func() {
 				for _, data := range entryCasesData {
