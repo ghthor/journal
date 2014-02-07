@@ -17,6 +17,7 @@ func init() {
 	entryFixes = []EntryFix{
 		FixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
+		FixCommitMessagePrefixWithTilde{},
 	}
 }
 
@@ -152,6 +153,64 @@ func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 		} else {
 			// Maybe this should be a panic
 			return nil, errors.New("attempt to fix split commit message that doesn't exist")
+		}
+	}
+
+	return b.Bytes(), nil
+}
+
+/*
+	Fix a commit message line with the #~ format
+
+		#~ Commit Msg
+
+	to
+
+		# Commit Msg
+
+*/
+type FixCommitMessagePrefixWithTilde struct{}
+
+func (FixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		if strings.HasPrefix(scanner.Text(), "#~ ") {
+			if scanner.Scan() {
+				// Make sure this isn't a split commit message
+				if !strings.HasPrefix(scanner.Text(), "# ") {
+					return true, nil
+				}
+			}
+		}
+	}
+	return false, nil
+}
+
+func (FixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
+	// For storing the fixed output
+	b := bytes.NewBuffer(make([]byte, 0, 1024))
+
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if strings.HasPrefix(line, "#~ ") {
+			// Trim out the ~ character and place in the buffer
+			if _, err := fmt.Fprintln(b, strings.Replace(line, "#~", "#", 1)); err != nil {
+				return nil, err
+			}
+			break
+		}
+
+		if _, err := fmt.Fprintln(b, line); err != nil {
+			return nil, err
+		}
+	}
+
+	// Copy the remaining bytes into the buffer
+	for scanner.Scan() {
+		if _, err := fmt.Fprintln(b, scanner.Text()); err != nil {
+			return nil, err
 		}
 	}
 
