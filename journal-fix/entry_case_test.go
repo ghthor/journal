@@ -9,8 +9,36 @@ import (
 	"strings"
 )
 
+const entry_case_0 = `Sun Jan 26 14:50:50 EST 2014
+
+# Commit Msg
+Body
+`
+
+const entry_case_1 = `Sun Jan 26 14:50:50 EST 2014
+
+# Commit Msg
+Body
+
+Sun Jan 26 14:52:50 EST 2014
+`
+const entry_case_2 = `Sun Jan 26 14:50:50 EST 2014
+
+#~ Commit Msg
+Body
+
+Sun Jan 26 14:52:50 EST 2014
+`
+
+const entry_case_current = entry_case_1
+
 func DescribeEntryCase(c gospec.Context) {
-	entryCasesData := []string{}
+	entryCasesData := []string{
+		entry_case_0,
+		entry_case_1,
+		entry_case_2,
+		entry_case_current,
+	}
 	entryCases := make([]EntryCase, 0, len(entryCasesData))
 
 	for _, data := range entryCasesData {
@@ -29,7 +57,7 @@ func DescribeEntryCase(c gospec.Context) {
 
 					actualData, err := ioutil.ReadAll(entryCase.NewReader())
 					c.Assume(err, IsNil)
-					c.Expect(string(actualData), Equals, string(data))
+					c.Expect(string(actualData), Equals, string(entry_case_current))
 				}
 			})
 
