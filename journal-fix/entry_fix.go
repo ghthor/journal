@@ -136,23 +136,34 @@ func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		if !strings.HasPrefix(line, "#~ ") {
-			fmt.Fprintln(b, line)
-			continue
+
+		if strings.HasPrefix(line, "#~ ") {
+			// We've found line 1 of the split commit message
+			part1 := strings.TrimPrefix(line, "#~ ")
+
+			if scanner.Scan() {
+				// Trim line 2 of the message and put part1 and part2 together
+				part2 := strings.TrimPrefix(scanner.Text(), "# ")
+
+				if _, err := fmt.Fprintf(b, "# %s | %s\n", part1, part2); err != nil {
+					return nil, err
+				}
+			} else {
+				// Maybe this should be a panic
+				return nil, errors.New("attempt to fix split commit message that doesn't exist")
+			}
+			break
 		}
 
-		// We've found line 1 of the split commit message
-		part1 := strings.TrimPrefix(line, "#~ ")
+		if _, err := fmt.Fprintln(b, line); err != nil {
+			return nil, err
+		}
+	}
 
-		if scanner.Scan() {
-			// Trim line 2 of the message and put part1 and part2 together
-			part2 := strings.TrimPrefix(scanner.Text(), "# ")
-			fmt.Fprintf(b, "# %s | %s\n", part1, part2)
-			continue
-
-		} else {
-			// Maybe this should be a panic
-			return nil, errors.New("attempt to fix split commit message that doesn't exist")
+	// Copy the remaining bytes into the buffer
+	for scanner.Scan() {
+		if _, err := fmt.Fprintln(b, scanner.Text()); err != nil {
+			return nil, err
 		}
 	}
 
