@@ -1,4 +1,4 @@
-package main
+package fix
 
 import (
 	"github.com/ghthor/gospec"
