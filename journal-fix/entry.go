@@ -21,11 +21,6 @@ type Entry interface {
 	NewReader() io.Reader
 }
 
-type EntryFix interface {
-	// Returns byte slice that has been fixed
-	Fix(io.Reader) ([]byte, error)
-}
-
 type entryCaseNeedsFixed struct {
 	bytes []byte
 	fixes []EntryFix
@@ -39,7 +34,7 @@ func (e entryCaseNeedsFixed) FixedEntry() (Entry, error) {
 	)
 
 	for _, fix := range e.fixes {
-		data, err = fix.Fix(bytes.NewReader(data))
+		data, err = fix.Execute(bytes.NewReader(data))
 		if err != nil {
 			return nil, err
 		}
@@ -68,10 +63,13 @@ func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
 		return nil, err
 	}
 
-	if !lastLineIsTimestamp(data) {
-		fixes = append(fixes, AddClosedAtTimestamp{})
+	for _, fix := range entryFixes {
+		if needsFixed, err := fix.CanFix(bytes.NewReader(data)); err != nil {
+			return nil, err
+		} else if needsFixed {
+			fixes = append(fixes, fix)
+		}
 	}
-
 	return
 }
 

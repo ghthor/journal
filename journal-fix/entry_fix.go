@@ -6,8 +6,38 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"time"
 )
+
+var entryFixes []EntryFix
+
+func init() {
+	entryFixes = []EntryFix{
+		AddClosedAtTimestamp{},
+	}
+}
+
+type EntryFix interface {
+	// Parses io.Reader for the error that can be fixed
+	CanFix(io.Reader) (bool, error)
+
+	// Returns byte slice that has been fixed
+	Execute(io.Reader) ([]byte, error)
+}
+
+// Parse the opened at timestamp and add 2 mins
+// then append it to the end
+type AddClosedAtTimestamp struct{}
+
+func (AddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return false, err
+	}
+
+	return !lastLineIsTimestamp(data), nil
+}
 
 func lastLineIsTimestamp(data []byte) bool {
 	scanner := bufio.NewScanner(bytes.NewReader(data))
@@ -19,11 +49,7 @@ func lastLineIsTimestamp(data []byte) bool {
 	return err == nil
 }
 
-// Parse the opened at timestamp and add 2 mins
-// then append it to the end
-type AddClosedAtTimestamp struct{}
-
-func (AddClosedAtTimestamp) Fix(r io.Reader) ([]byte, error) {
+func (AddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 	// For adding 2 mins and making the closed at timestamp
 	var openedAt time.Time
 
