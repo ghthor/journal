@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -23,6 +24,30 @@ type EntryFix interface {
 	// Returns byte slice that has been fixed
 	Fix(io.Reader) []byte
 }
+
+type entryCaseNeedsFixed struct {
+	bytes []byte
+	fixes []EntryFix
+}
+
+func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
+func (e entryCaseNeedsFixed) FixedEntry() Entry {
+	return e
+}
+
+func (e entryCaseNeedsFixed) Bytes() []byte { return e.bytes }
+func (e entryCaseNeedsFixed) NewReader() io.Reader {
+	return bytes.NewReader(e.bytes)
+}
+
+type entryCaseCurrent struct {
+	bytes []byte
+}
+
+func (e entryCaseCurrent) NeedsFixed() bool     { return false }
+func (e entryCaseCurrent) FixedEntry() Entry    { return e }
+func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
+func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.bytes) }
 
 func NewEntry(r io.Reader) (Entry, error) {
 	return nil, nil
