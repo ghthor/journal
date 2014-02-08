@@ -1,0 +1,69 @@
+Fri Feb  7 22:50:20 EST 2014
+
+#~ Plan to finish up `fix` command
+This shouldn't take more then an hour or so.
+And watch it take 6 hours -.-
+
+Going to do the last task for fixing entries.
+The FixedEntry() method needs to return a commitable with the right message format.
+
+## [active] `fix` command
+- [ ] Mark fix beginning with an empty git commit
+    - message "FIX - Journal - Begin"
+
+- [ ] fix journal
+    - fix | does NOT store ideas in `idea/` directory
+        - fix ideas
+    - fix | has entries that don't conform to the current feature set
+        - fix entries
+    - fix | does NOT store entries in `entry/` directory
+        - create `entry/` directory and move all entries
+        - message "FIX - Journal - Moved all entries to entry/ directory"
+
+- [ ] fix ideas
+    - [ ] create `idea/` directory structure
+        - message "FIX - Journal - Created idea/ directory structure"
+    - [ ] Parse ideas from entries starting from oldest
+        - If an idea doesn't exist in `idea/' w/ matching name
+            - Create the idea
+            - message "FIX - Idea - Created - {timestamp}"
+        - If an idea exists in `idea/` /w matching name
+            - Update the idea
+            - message "FIX - Idea - Modified - {timestamp}"
+
+- [X] fix entries
+    - [X] fix | does NOT have a closed timestamp as the final line
+        - append a closed timestamp for 30secs after opened timestamp
+
+    - [X] fix | does NOT have a commit message header w/ format
+        - format "# Commit Message\n"
+        - change "#~ Text\n" -> "# Text\n"
+        - change
+```
+#~ Text
+#  More Text
+```
+
+to
+
+```
+# Text | More Text
+```
+
+    - [X] fix | does have ideas in the body
+        - remove ideas
+
+    - [X] Current Features
+        - should have a timestamp as the first line
+        - should have a commit msg line w/ format "# Commit Msg\n"
+        - should NOT have any ideas in the body
+        - should have a timestamp as the final line
+
+    - [ ] return a commitable with msg format
+        - format "entry - {filename} - format updated"
+
+- [ ] Mark fix complete with an empty git commit
+    - message "FIX - Journal - Complete"
+
+
+Fri Feb  7 23:26:30 EST 2014
