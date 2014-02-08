@@ -2,6 +2,7 @@ package fix
 
 import (
 	"bytes"
+	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"os"
@@ -12,7 +13,7 @@ type Entry interface {
 	NeedsFixed() bool
 
 	// Return an Entry that has been fixed
-	FixedEntry() (Entry, error)
+	FixedEntry() (Entry, git.Commitable, error)
 
 	// Returns a byte slice of the entry w/o fixes
 	Bytes() []byte
@@ -27,7 +28,7 @@ type entryCaseNeedsFixed struct {
 }
 
 func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
-func (e entryCaseNeedsFixed) FixedEntry() (Entry, error) {
+func (e entryCaseNeedsFixed) FixedEntry() (Entry, git.Commitable, error) {
 	var (
 		data []byte = e.bytes
 		err  error
@@ -36,11 +37,13 @@ func (e entryCaseNeedsFixed) FixedEntry() (Entry, error) {
 	for _, fix := range e.fixes {
 		data, err = fix.Execute(bytes.NewReader(data))
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return entryCaseCurrent{data}, nil
+	return entryCaseCurrent{data}, git.Changes{
+		Msg: "entry - %s - format updated",
+	}, nil
 }
 
 func (e entryCaseNeedsFixed) Bytes() []byte { return e.bytes }
@@ -52,10 +55,12 @@ type entryCaseCurrent struct {
 	bytes []byte
 }
 
-func (e entryCaseCurrent) NeedsFixed() bool           { return false }
-func (e entryCaseCurrent) FixedEntry() (Entry, error) { return e, nil }
-func (e entryCaseCurrent) Bytes() []byte              { return e.bytes }
-func (e entryCaseCurrent) NewReader() io.Reader       { return bytes.NewReader(e.bytes) }
+func (e entryCaseCurrent) NeedsFixed() bool { return false }
+func (e entryCaseCurrent) FixedEntry() (Entry, git.Commitable, error) {
+	return e, nil, nil
+}
+func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
+func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.bytes) }
 
 func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
 	data, err := ioutil.ReadAll(r)

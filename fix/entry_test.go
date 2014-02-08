@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -100,11 +101,13 @@ func DescribeEntry(c gospec.Context) {
 
 		c.Specify("can be fixed", func() {
 			entriesFixed := make([]Entry, 0, len(entryCases))
+			commitables := make([]git.Commitable, 0, len(entryCases))
 
 			for i, entryCase := range entryCases {
-				fixedEntry, err := entryCase.FixedEntry()
+				fixedEntry, changes, err := entryCase.FixedEntry()
 				c.Expect(err, IsNil)
 				entriesFixed = append(entriesFixed, fixedEntry)
+				commitables = append(commitables, changes)
 
 				if i == len(entryCases)-1 {
 					c.Specify("unless there are no errors to be fixed", func() {
@@ -113,12 +116,22 @@ func DescribeEntry(c gospec.Context) {
 				}
 			}
 
-			c.Specify("by returning an entry case for the current standard", func() {
+			c.Specify("by returning an entry conforming current standard", func() {
 				for _, fixedEntry := range entriesFixed {
 					actualData, err := ioutil.ReadAll(fixedEntry.NewReader())
 					c.Assume(err, IsNil)
 
 					c.Expect(string(actualData), Equals, entry_case_current)
+				}
+			})
+
+			c.Specify("returns a commitable with message format", func() {
+				for i, changes := range commitables {
+					if entryCases[i].NeedsFixed() {
+						c.Expect(changes.CommitMsg(), Equals, "entry - %s - format updated")
+					} else {
+						c.Expect(changes, Equals, nil)
+					}
 				}
 			})
 		})
