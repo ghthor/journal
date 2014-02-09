@@ -52,6 +52,8 @@ func entriesIn(directory string) (entries []string, err error) {
 		return nil
 	})
 
+	sort.Sort(entryFilenames(entries))
+
 	return
 }
 
