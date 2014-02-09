@@ -87,10 +87,6 @@ func FixCase0(directory string) error {
 		return err
 	}
 
-	if len(entries) == 0 {
-		return errors.New(fmt.Sprintf("%s contains no entries", directory))
-	}
-
 	entries, err = mvEntriesIn(directory, entries)
 	if err != nil {
 		return err
