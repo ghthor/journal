@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ghthor/journal/entry"
 	"github.com/ghthor/journal/idea"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -154,6 +155,40 @@ func FixCase0(directory string) error {
 	}
 
 	// Fix entries
+	for _, entryFilename := range entries {
+		entryFile, err := os.OpenFile(filepath.Join(directory, entryFilename), os.O_RDWR, 0600)
+		if err != nil {
+			return err
+		}
+		defer entryFile.Close()
+
+		entry, err := NewEntry(entryFile)
+		if err != nil {
+			return err
+		}
+
+		if entry.NeedsFixed() {
+			_, err = entryFile.Seek(0, 0)
+			if err != nil {
+				return err
+			}
+
+			entry, _, err = entry.FixedEntry()
+			if err != nil {
+				return err
+			}
+
+			n, err := io.Copy(entryFile, entry.NewReader())
+			if err != nil {
+				return err
+			}
+
+			err = entryFile.Truncate(n)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }

@@ -150,6 +150,71 @@ func DescribeJournalCase0(c gospec.Context) {
 				c.Assume(err, IsNil)
 				c.Expect(string(active), Equals, "3\n")
 			})
+
+			c.Specify("by fixing formatting differences in all entries", func() {
+				expectEntries := []string{
+					`Wed Jan  1 00:00:00 EST 2014
+
+# Commit Msg | Entry 1
+Entry Body
+
+entry_case_0
+
+Wed Jan  1 00:02:00 EST 2014
+`,
+					`Thu Jan  2 00:00:00 EST 2014
+
+# Commit Msg | Entry 2
+Entry Body
+
+entry_case_1
+
+Thu Jan  2 00:01:00 EST 2014
+`,
+					`Fri Jan  3 00:00:00 EST 2014
+
+# Commit Msg | Entry 3
+Entry Body
+
+entry_case_2
+
+Fri Jan  3 00:01:00 EST 2014
+`,
+					`Sat Jan  4 00:00:00 EST 2014
+
+# Commit Msg | Entry 4
+Entry Body
+
+entry_case_3
+
+Sat Jan  4 00:01:00 EST 2014
+`,
+					`Sun Jan  5 00:00:00 EST 2014
+
+# Commit Msg | Entry 5
+Entry Body
+
+entry_case_4
+
+Sun Jan  5 00:01:00 EST 2014
+`,
+					`Mon Jan  6 00:00:00 EST 2014
+
+# Commit Msg | Entry 6
+Entry Body
+
+entry_case_4
+
+Mon Jan  6 00:01:00 EST 2014
+`}
+
+				for i, entryFilename := range expectedEntries {
+					entry, err := NewEntryFromFile(filepath.Join(d, "entry", entryFilename))
+					c.Assume(err, IsNil)
+					c.Expect(entry.NeedsFixed(), IsFalse)
+					c.Expect(string(entry.Bytes()), Equals, expectEntries[i])
+				}
+			})
 		})
 	})
 }
