@@ -141,6 +141,14 @@ func DescribeJournalCase0(c gospec.Context) {
 
 				_, err = idea.NewDirectoryStore(filepath.Join(d, "idea"))
 				c.Expect(err, IsNil)
+
+				nextid, err := ioutil.ReadFile(filepath.Join(d, "idea/nextid"))
+				c.Assume(err, IsNil)
+				c.Expect(string(nextid), Equals, "4\n")
+
+				active, err := ioutil.ReadFile(filepath.Join(d, "idea/active"))
+				c.Assume(err, IsNil)
+				c.Expect(string(active), Equals, "3\n")
 			})
 		})
 	})

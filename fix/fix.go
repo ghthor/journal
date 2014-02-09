@@ -87,20 +87,73 @@ func FixCase0(directory string) error {
 		return err
 	}
 
+	// Move entries to entry/ directory
 	entries, err = mvEntriesIn(directory, entries)
 	if err != nil {
 		return err
 	}
 
+	// Initialize an idea directory store
 	err = os.Mkdir(filepath.Join(directory, "idea"), 0700)
 	if err != nil {
 		return err
 	}
 
-	_, _, err = idea.InitDirectoryStore(filepath.Join(directory, "idea"))
+	ideaStore, _, err := idea.InitDirectoryStore(filepath.Join(directory, "idea"))
 	if err != nil {
 		return err
 	}
+
+	// Store all existing ideas in the directory store
+	for i := 0; i < len(entries); i++ {
+		entryFile, err := os.OpenFile(filepath.Join(directory, entries[i]), os.O_RDONLY, 0600)
+		if err != nil {
+			return err
+		}
+		defer entryFile.Close()
+
+		scanner := idea.NewIdeaScanner(entryFile)
+		for scanner.Scan() {
+			newIdea := scanner.Idea()
+
+			// Look for an Idea with the same Name
+			err = filepath.Walk(filepath.Join(directory, "idea"), func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				if !info.IsDir() {
+					if info.Name() != "nextid" && info.Name() != "active" {
+						ideaFile, err := os.OpenFile(path, os.O_RDONLY, 0660)
+						if err != nil {
+							return err
+						}
+						defer ideaFile.Close()
+
+						scanner := idea.NewIdeaScanner(ideaFile)
+						if !scanner.Scan() {
+							return errors.New(fmt.Sprintf("unexpected file in idea store %s", path))
+						}
+
+						idea := scanner.Idea()
+
+						if newIdea.Name == idea.Name {
+							newIdea.Id = idea.Id
+						}
+					}
+				}
+
+				return nil
+			})
+
+			_, err = ideaStore.SaveIdea(newIdea)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Fix entries
 
 	return nil
 }
