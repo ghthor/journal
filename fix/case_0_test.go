@@ -1,6 +1,7 @@
 package fix
 
 import (
+	"errors"
 	"fmt"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
@@ -127,6 +128,55 @@ func initCase0() (cleanupFn func(), err error) {
 	}, nil
 }
 
+func mvEntriesIn(directory string, entries []string) (movedEntries []string, err error) {
+	err = os.Mkdir(filepath.Join(directory, "entry"), 0700)
+	if err != nil {
+		return
+	}
+
+	mvArgs := make([]string, 0, len(entries)+1)
+	mvArgs = append(mvArgs, entries...)
+	mvArgs = append(mvArgs, "entry/")
+
+	mvPath, err := exec.LookPath("mv")
+	if err != nil {
+		return
+	}
+
+	mvEntries := exec.Command(mvPath, mvArgs...)
+	mvEntries.Dir = directory
+
+	err = mvEntries.Run()
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), err))
+	}
+
+	// Update filepaths
+	movedEntries = entries
+	for i, entry := range entries {
+		movedEntries[i] = filepath.Join("entry", entry)
+	}
+	return
+}
+
+func FixCase0(directory string) error {
+	entries, err := entriesIn(directory)
+	if err != nil {
+		return err
+	}
+
+	if len(entries) == 0 {
+		return errors.New(fmt.Sprintf("%s contains no entries", directory))
+	}
+
+	entries, err = mvEntriesIn(directory, entries)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func DescribeJournalCase0(c gospec.Context) {
 	c.Specify("case 0", func() {
 		c.Specify("is created as a git repository", func() {
@@ -153,6 +203,24 @@ func DescribeJournalCase0(c gospec.Context) {
 				o, err := git.Command(d, "show", "-s", "--pretty=format:%T").Output()
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals, "eda50d431c6ffed54ad220b15e5451d4c19d2d02")
+			})
+		})
+
+		c.Specify("can be fixed", func() {
+			d, expectedEntries, err := newCase0("case_0_fix")
+			c.Assume(err, IsNil)
+
+			c.Expect(FixCase0(d), IsNil)
+
+			c.Specify("by moving entries into `entry/`", func() {
+				info, err := os.Stat(filepath.Join(d, "entry"))
+				c.Expect(err, IsNil)
+				c.Expect(info.IsDir(), IsTrue)
+
+				actualEntries, err := entriesIn(filepath.Join(d, "entry"))
+				c.Assume(err, IsNil)
+
+				c.Expect(actualEntries, ContainsExactly, expectedEntries)
 			})
 		})
 	})
