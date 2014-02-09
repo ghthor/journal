@@ -67,7 +67,7 @@ func initCase0() (cleanupFn func(), err error) {
 	}
 
 	// commit the entries
-	sort.Sort(entryFilenames(filenames))
+	sort.Sort(EntriesByDate(filenames))
 
 	for i, entryFilename := range filenames {
 		changes := git.NewChangesIn(journal_case_0_directory)

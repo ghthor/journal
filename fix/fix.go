@@ -15,10 +15,10 @@ import (
 //A layout to use as the entry's filename
 const filenameLayout = "2006-01-02-1504-MST"
 
-type entryFilenames []string
+type EntriesByDate []string
 
-func (f entryFilenames) Len() int { return len(f) }
-func (f entryFilenames) Less(i, j int) bool {
+func (f EntriesByDate) Len() int { return len(f) }
+func (f EntriesByDate) Less(i, j int) bool {
 	iTime, err := time.Parse(filenameLayout, f[i])
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func (f entryFilenames) Less(i, j int) bool {
 
 	return jTime.After(iTime)
 }
-func (f entryFilenames) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
+func (f EntriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 func entriesIn(directory string) (entries []string, err error) {
 	err = filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
@@ -47,7 +47,7 @@ func entriesIn(directory string) (entries []string, err error) {
 		return nil
 	})
 
-	sort.Sort(entryFilenames(entries))
+	sort.Sort(EntriesByDate(entries))
 
 	return
 }
