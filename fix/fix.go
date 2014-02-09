@@ -3,6 +3,7 @@ package fix
 import (
 	"errors"
 	"fmt"
+	"github.com/ghthor/journal/entry"
 	"github.com/ghthor/journal/idea"
 	"os"
 	"os/exec"
@@ -12,19 +13,16 @@ import (
 	"time"
 )
 
-//A layout to use as the entry's filename
-const filenameLayout = "2006-01-02-1504-MST"
-
 type EntriesByDate []string
 
 func (f EntriesByDate) Len() int { return len(f) }
 func (f EntriesByDate) Less(i, j int) bool {
-	iTime, err := time.Parse(filenameLayout, f[i])
+	iTime, err := time.Parse(entry.FilenameLayout, f[i])
 	if err != nil {
 		panic(err)
 	}
 
-	jTime, err := time.Parse(filenameLayout, f[j])
+	jTime, err := time.Parse(entry.FilenameLayout, f[j])
 	if err != nil {
 		panic(err)
 	}
