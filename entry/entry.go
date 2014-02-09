@@ -15,7 +15,7 @@ import (
 )
 
 //A layout to use as the entry's filename
-const filenameLayout = "2006-01-02-1504-MST"
+const FilenameLayout = "2006-01-02-1504-MST"
 
 var entryTmpl = template.Must(template.New("entry").Parse(
 	`{{.OpenedAt}}
@@ -57,7 +57,7 @@ type newEntry struct {
 }
 
 func (e *newEntry) Open(openedAt time.Time, ideas []idea.Idea) (OpenEntry, error) {
-	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(filenameLayout)), os.O_WRONLY|os.O_CREATE, 0600)
+	f, err := os.OpenFile(filepath.Join(e.directory, openedAt.Format(FilenameLayout)), os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ type openEntry struct {
 
 func (e *openEntry) OpenedAt() time.Time { return e.openedAt }
 func (e *openEntry) Ideas() ([]idea.Idea, error) {
-	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
+	filename := filepath.Join(e.directory, e.openedAt.Format(FilenameLayout))
 
 	f, err := os.OpenFile(filename, os.O_RDONLY, 0600)
 	if err != nil {
@@ -121,7 +121,7 @@ func (e *openEntry) Edit(proc EditorProcess) (OpenEntry, error) {
 var ErrNoCommitMsg = errors.New("entry has no commit msg")
 
 func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
-	filename := filepath.Join(e.directory, e.openedAt.Format(filenameLayout))
+	filename := filepath.Join(e.directory, e.openedAt.Format(FilenameLayout))
 
 	f, err := os.OpenFile(filename, os.O_RDWR, 0600)
 	if err != nil {
@@ -211,7 +211,7 @@ type closedEntry struct {
 func (e *closedEntry) WorkingDirectory() string { return e.directory }
 func (e *closedEntry) Changes() []git.CommitableChange {
 	return []git.CommitableChange{
-		git.ChangedFile(filepath.Join(e.directory, e.openedAt.Format(filenameLayout))),
+		git.ChangedFile(filepath.Join(e.directory, e.openedAt.Format(FilenameLayout))),
 	}
 }
 

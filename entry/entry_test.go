@@ -79,7 +79,7 @@ func DescribeAnEntry(c gospec.Context) {
 		c.Assume(err, IsNil)
 		c.Assume(oe.OpenedAt(), Equals, openedAt)
 
-		filename := filepath.Join(td, openedAt.Format(filenameLayout))
+		filename := filepath.Join(td, openedAt.Format(FilenameLayout))
 
 		c.Specify("that is open", func() {
 			c.Specify("is a file", func() {
