@@ -121,7 +121,8 @@ func DescribeJournalCase0(c gospec.Context) {
 			d, expectedEntries, err := newCase0("case_0_fix")
 			c.Assume(err, IsNil)
 
-			c.Expect(FixCase0(d), IsNil)
+			refLog, err := FixCase0(d)
+			c.Expect(err, IsNil)
 
 			c.Specify("by moving entries into `entry/`", func() {
 				info, err := os.Stat(filepath.Join(d, "entry"))
@@ -214,6 +215,16 @@ Mon Jan  6 00:01:00 EST 2014
 					c.Expect(entry.NeedsFixed(), IsFalse)
 					c.Expect(string(entry.Bytes()), Equals, expectEntries[i])
 				}
+			})
+
+			c.Specify("and all changes will be commited", func() {
+				o, err := git.Command(d, "show", "-s", "--pretty=format:%s", refLog[0]).Output()
+				c.Assume(err, IsNil)
+				c.Expect(string(o), Equals, "journal - fix - begin")
+
+				o, err = git.Command(d, "show", "-s", "--pretty=format:%s", refLog[len(refLog)-1]).Output()
+				c.Assume(err, IsNil)
+				c.Expect(string(o), Equals, "journal - fix - completed")
 			})
 		})
 	})

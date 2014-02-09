@@ -1,9 +1,11 @@
 package fix
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
@@ -82,34 +84,51 @@ func mvEntriesIn(directory string, entries []string) (movedEntries []string, err
 	return
 }
 
-func FixCase0(directory string) error {
+func lastCommitHashIn(directory string) (string, error) {
+	o, err := git.Command(directory, "rev-parse", "HEAD").Output()
+	return string(bytes.TrimSpace(o)), err
+}
+
+func FixCase0(directory string) (refLog []string, err error) {
+	// Mark the begining of the fix commit log
+	err = git.CommitEmpty(directory, "journal - fix - begin")
+	if err != nil {
+		return nil, err
+	}
+
+	beginHash, err := lastCommitHashIn(directory)
+	if err != nil {
+		return nil, err
+	}
+	refLog = append(make([]string, 0, 2), beginHash)
+
 	entries, err := entriesIn(directory)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Move entries to entry/ directory
 	entries, err = mvEntriesIn(directory, entries)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Initialize an idea directory store
 	err = os.Mkdir(filepath.Join(directory, "idea"), 0700)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	ideaStore, _, err := idea.InitDirectoryStore(filepath.Join(directory, "idea"))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Store all existing ideas in the directory store
 	for i := 0; i < len(entries); i++ {
 		entryFile, err := os.OpenFile(filepath.Join(directory, entries[i]), os.O_RDONLY, 0600)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer entryFile.Close()
 
@@ -149,7 +168,7 @@ func FixCase0(directory string) error {
 
 			_, err = ideaStore.SaveIdea(newIdea)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
@@ -158,37 +177,49 @@ func FixCase0(directory string) error {
 	for _, entryFilename := range entries {
 		entryFile, err := os.OpenFile(filepath.Join(directory, entryFilename), os.O_RDWR, 0600)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		defer entryFile.Close()
 
 		entry, err := NewEntry(entryFile)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if entry.NeedsFixed() {
 			_, err = entryFile.Seek(0, 0)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			entry, _, err = entry.FixedEntry()
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			n, err := io.Copy(entryFile, entry.NewReader())
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			err = entryFile.Truncate(n)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
 
-	return nil
+	// Mark the fix completed in the commit log
+	err = git.CommitEmpty(directory, "journal - fix - completed")
+	if err != nil {
+		return nil, err
+	}
+
+	completedHash, err := lastCommitHashIn(directory)
+	if err != nil {
+		return nil, err
+	}
+	refLog = append(refLog, completedHash)
+
+	return
 }
