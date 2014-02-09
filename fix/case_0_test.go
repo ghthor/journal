@@ -7,6 +7,7 @@ import (
 	. "github.com/ghthor/gospec"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/git/gittest"
+	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -176,6 +177,16 @@ func FixCase0(directory string) error {
 		return err
 	}
 
+	err = os.Mkdir(filepath.Join(directory, "idea"), 0700)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = idea.InitDirectoryStore(filepath.Join(directory, "idea"))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -223,6 +234,15 @@ func DescribeJournalCase0(c gospec.Context) {
 				c.Assume(err, IsNil)
 
 				c.Expect(actualEntries, ContainsExactly, expectedEntries)
+			})
+
+			c.Specify("by storing ideas in `idea/` directory store", func() {
+				info, err := os.Stat(filepath.Join(d, "idea"))
+				c.Expect(err, IsNil)
+				c.Expect(info.IsDir(), IsTrue)
+
+				_, err = idea.NewDirectoryStore(filepath.Join(d, "idea"))
+				c.Expect(err, IsNil)
 			})
 		})
 	})
