@@ -36,68 +36,79 @@ func (f entryFilenames) Less(i, j int) bool {
 }
 func (f entryFilenames) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
-func DescribeJournalCase0(c gospec.Context) {
-	// Copy the journal_cases/case_0/ files to directory
-	copyCase0Files := func(to string) (filenames []string) {
-		err := filepath.Walk("journal_cases/case_0", func(path string, info os.FileInfo, err error) error {
+// Copy the journal_cases/case_0/ files to directory
+func copyCase0Files(to string) (filenames []string, err error) {
+	err = filepath.Walk("journal_cases/case_0", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			fromFile, err := os.OpenFile(path, os.O_RDONLY, 0600)
+			if err != nil {
+				return err
+			}
+			defer fromFile.Close()
+
+			toFile, err := os.OpenFile(filepath.Join(to, info.Name()), os.O_CREATE|os.O_WRONLY, info.Mode().Perm())
+			if err != nil {
+				return err
+			}
+			defer toFile.Close()
+
+			_, err = io.Copy(toFile, fromFile)
 			if err != nil {
 				return err
 			}
 
-			if !info.IsDir() {
-				fromFile, err := os.OpenFile(path, os.O_RDONLY, 0600)
-				if err != nil {
-					return err
-				}
-				defer fromFile.Close()
-
-				toFile, err := os.OpenFile(filepath.Join(to, info.Name()), os.O_CREATE|os.O_WRONLY, info.Mode().Perm())
-				if err != nil {
-					return err
-				}
-				defer toFile.Close()
-
-				_, err = io.Copy(toFile, fromFile)
-				if err != nil {
-					return err
-				}
-
-				filenames = append(filenames, info.Name())
-			}
-			return nil
-		})
-
-		c.Assume(err, IsNil)
-
-		return
-	}
-
-	newCase0 := func(prefix string) (string, []string) {
-		// Create a _test/ directory for case_0/
-		d, err := ioutil.TempDir("_test", prefix+"_")
-		c.Assume(err, IsNil)
-
-		// git init
-		c.Assume(git.Init(d), IsNil)
-
-		// Copy case_0/ files
-		entries := copyCase0Files(d)
-		sort.Sort(entryFilenames(entries))
-
-		// Commit all the entries
-		for i, entryFilename := range entries {
-			changes := git.NewChangesIn(d)
-			changes.Add(git.ChangedFile(entryFilename))
-			changes.Msg = fmt.Sprintf("Commit Msg | Entry %d\n", i+1)
-			c.Assume(changes.Commit(), IsNil)
+			filenames = append(filenames, info.Name())
 		}
+		return nil
+	})
 
-		return d, entries
+	return
+}
+
+func newCase0(prefix string) (string, []string, error) {
+	// Create a _test/ directory for case_0/
+	d, err := ioutil.TempDir("_test", prefix+"_")
+	if err != nil {
+		return d, nil, err
 	}
 
+	// git init
+	err = git.Init(d)
+	if err != nil {
+		return d, nil, err
+	}
+
+	// Copy case_0/ files
+	entries, err := copyCase0Files(d)
+	if err != nil {
+		return d, nil, err
+	}
+
+	sort.Sort(entryFilenames(entries))
+
+	// Commit all the entries
+	for i, entryFilename := range entries {
+		changes := git.NewChangesIn(d)
+		changes.Add(git.ChangedFile(entryFilename))
+		changes.Msg = fmt.Sprintf("Commit Msg | Entry %d\n", i+1)
+		err = changes.Commit()
+		if err != nil {
+			return d, entries, err
+		}
+	}
+
+	return d, entries, nil
+}
+
+func DescribeJournalCase0(c gospec.Context) {
 	c.Specify("case 0", func() {
 		c.Specify("is created as a git repository", func() {
-			d, entries := newCase0("case_0_is_git")
+			d, entries, err := newCase0("case_0_is_git")
+			c.Assume(err, IsNil)
 
 			c.Expect(d, gittest.IsAGitRepository)
 			c.Expect(git.IsClean(d), IsNil)
