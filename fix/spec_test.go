@@ -10,5 +10,7 @@ func TestUnitSpecs(t *testing.T) {
 
 	r.AddSpec(DescribeEntry)
 
+	r.AddSpec(DescribeJournalCase0)
+
 	gospec.MainGoTest(r, t)
 }
