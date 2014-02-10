@@ -53,7 +53,7 @@ func entriesIn(directory string) (entries []string, err error) {
 	return
 }
 
-func mvEntriesIn(directory string, entries []string) (movedEntries []string, err error) {
+func mvEntriesIn(directory string, entries []string) (movedEntries []string, commit git.Commitable, err error) {
 	err = os.Mkdir(filepath.Join(directory, "entry"), 0700)
 	if err != nil {
 		return
@@ -73,20 +73,40 @@ func mvEntriesIn(directory string, entries []string) (movedEntries []string, err
 
 	err = mvEntries.Run()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), err))
+		return nil, nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), err))
 	}
+
+	changes := git.NewChangesIn(directory)
 
 	// Update filepaths
 	movedEntries = entries
-	for i, entry := range entries {
-		movedEntries[i] = filepath.Join("entry", entry)
+	for i, src := range entries {
+
+		dst := filepath.Join("entry", src)
+
+		// will create a rename change in git
+		changes.Add(git.ChangedFile(src))
+		changes.Add(git.ChangedFile(dst))
+
+		movedEntries[i] = dst
 	}
-	return
+
+	changes.Msg = "moved all entries to entry/"
+
+	return movedEntries, changes, nil
 }
 
 func lastCommitHashIn(directory string) (string, error) {
 	o, err := git.Command(directory, "rev-parse", "HEAD").Output()
 	return string(bytes.TrimSpace(o)), err
+}
+
+type JournalFixCommit struct {
+	git.Commitable
+}
+
+func (c JournalFixCommit) CommitMsg() string {
+	return "journal - fix - " + c.Commitable.CommitMsg()
 }
 
 func FixCase0(directory string) (refLog []string, err error) {
@@ -108,10 +128,21 @@ func FixCase0(directory string) (refLog []string, err error) {
 	}
 
 	// Move entries to entry/ directory
-	entries, err = mvEntriesIn(directory, entries)
+	entries, changes, err := mvEntriesIn(directory, entries)
 	if err != nil {
 		return nil, err
 	}
+
+	err = git.Commit(JournalFixCommit{changes})
+	if err != nil {
+		return nil, err
+	}
+
+	commitHash, err := lastCommitHashIn(directory)
+	if err != nil {
+		return nil, err
+	}
+	refLog = append(refLog, commitHash)
 
 	// Initialize an idea directory store
 	err = os.Mkdir(filepath.Join(directory, "idea"), 0700)
