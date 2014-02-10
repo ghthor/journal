@@ -10,7 +10,6 @@ func TestUnitSpecs(t *testing.T) {
 
 	r.AddSpec(DescribeNewCmd)
 	r.AddSpec(DescribeLastCmd)
-	r.AddSpec(DescribeWatchCmd)
 
 	gospec.MainGoTest(r, t)
 }
