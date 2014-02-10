@@ -50,9 +50,9 @@ func IsClean(directory string) error {
 	return nil
 }
 
-// Execute `git add {filepath}` in workingDirectory
+// Execute `git add --all {filepath}` in workingDirectory
 func AddFilepath(workingDirectory string, filepath string) error {
-	return Command(workingDirectory, "add", filepath).Run()
+	return Command(workingDirectory, "add", "--all", filepath).Run()
 }
 
 // Execute `git commit -m {msg}` in workingDirectory
