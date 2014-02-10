@@ -67,7 +67,7 @@ func DescribeJournalCommand(c gospec.Context) {
 			})
 		})
 
-		c.Specify("will create a directory intialize an empty go repository", func() {
+		c.Specify("will create a directory and intialize an empty go repository", func() {
 			td := "_test/journal-init"
 			c.Assume(ioutil.WriteFile("_test/config.journal-init.json", []byte(`{"directory":"`+td+`"}`), 0666), IsNil)
 
