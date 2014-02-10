@@ -102,17 +102,17 @@ func DescribeIdeaStore(c gospec.Context) {
 					git.ChangedFile("nextid"),
 					git.ChangedFile("active"),
 				})
-				c.Expect(commitable.CommitMsg(), Equals, "directory store initialized")
+				c.Expect(commitable.CommitMsg(), Equals, "idea directory store initialized")
 
 				// Initialize and empty repo
 				c.Assume(git.Init(d), IsNil)
 				// Commit the directory store initialization
 				c.Expect(git.Commit(commitable), IsNil)
 
-				o, err := git.Command(d, "show", "--no-color", "--pretty=format:\"%s%b\"").Output()
+				o, err := git.Command(d, "show", "--no-color", "--pretty=format:\"%s\"").Output()
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals,
-					`"directory store initialized"
+					`"idea directory store initialized"
 diff --git a/active b/active
 new file mode 100644
 index 0000000..e69de29

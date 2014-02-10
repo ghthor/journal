@@ -94,7 +94,7 @@ func InitDirectoryStore(directory string) (*DirectoryStore, git.Commitable, erro
 	changes := git.NewChangesIn(directory)
 	changes.Add(git.ChangedFile("nextid"))
 	changes.Add(git.ChangedFile("active"))
-	changes.Msg = "directory store initialized"
+	changes.Msg = "idea directory store initialized"
 
 	return &DirectoryStore{directory}, changes, nil
 }
