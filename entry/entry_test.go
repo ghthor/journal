@@ -91,7 +91,7 @@ func DescribeAnEntry(c gospec.Context) {
 				c.Expect(string(actualBytes), Equals,
 					`Sun Jan  1 01:00:00 UTC 2006
 
-#~ Title(will be used as commit message)
+# Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 
 ## [active] Active Idea
@@ -195,7 +195,7 @@ A file without a commit message
 				c.Expect(string(actualBytes), Equals,
 					`Sun Jan  1 01:00:00 UTC 2006
 
-#~ Title(will be used as commit message)
+# Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 
 Sun Jan  1 01:10:00 UTC 2006
@@ -209,7 +209,7 @@ Sun Jan  1 01:10:00 UTC 2006
 				c.Expect(string(actualBytes), Equals,
 					`Sun Jan  1 01:00:00 UTC 2006
 
-#~ Title(will be used as commit message)
+# Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 
 Sun Jan  1 01:10:00 UTC 2006
