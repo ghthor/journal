@@ -222,7 +222,7 @@ Mon Jan  6 00:01:00 EST 2014
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals, "journal - fix - begin")
 
-				o, err = git.Command(d, "show", "--name-only", "--pretty=format:%s%b", refLog[1]).Output()
+				o, err = git.Command(d, "show", "--name-only", "--pretty=format:%s", refLog[1]).Output()
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals,
 					`journal - fix - moved all entries to entry/
@@ -239,7 +239,7 @@ entry/2014-01-04-0000-EST
 entry/2014-01-05-0000-EST
 entry/2014-01-06-0000-EST
 `)
-				o, err = git.Command(d, "show", "--pretty=format:%s%b", refLog[2]).Output()
+				o, err = git.Command(d, "show", "--pretty=format:%s", refLog[2]).Output()
 				c.Assume(err, IsNil)
 				c.Expect(string(o), Equals,
 					`journal - fix - idea directory store initialized
