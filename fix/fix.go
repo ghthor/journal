@@ -257,7 +257,7 @@ func FixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
-			entry, _, err = entry.FixedEntry()
+			entry, commitable, err := entry.FixedEntry()
 			if err != nil {
 				return nil, err
 			}
@@ -271,6 +271,24 @@ func FixCase0(directory string) (refLog []string, err error) {
 			if err != nil {
 				return nil, err
 			}
+
+			changes := commitable.(git.Changes)
+			changes.Dir = directory
+			changes.Add(git.ChangedFile(entryFilename))
+
+			err = git.Commit(JournalFixCommitWithSuffix{
+				changes,
+				entryFilename,
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			commitHash, err = lastCommitHashIn(directory)
+			if err != nil {
+				return nil, err
+			}
+			refLog = append(refLog, commitHash)
 		}
 	}
 

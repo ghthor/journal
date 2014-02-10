@@ -1,0 +1,14 @@
+journal - fix - entry - format updated - entry/2014-01-04-0000-EST
+
+diff --git a/entry/2014-01-04-0000-EST b/entry/2014-01-04-0000-EST
+index bc52ce1..6b21e8d 100644
+--- a/entry/2014-01-04-0000-EST
++++ b/entry/2014-01-04-0000-EST
+@@ -1,6 +1,6 @@
+ Sat Jan  4 00:00:00 EST 2014
+ 
+-#~ Commit Msg | Entry 4
++# Commit Msg | Entry 4
+ Entry Body
+ 
+ entry_case_3

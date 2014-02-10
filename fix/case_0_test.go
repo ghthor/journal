@@ -218,73 +218,18 @@ Mon Jan  6 00:01:00 EST 2014
 			})
 
 			c.Specify("and all changes will be commited", func() {
-				o, err := git.Command(d, "show", "-s", "--pretty=format:%s", refLog[0]).Output()
-				c.Assume(err, IsNil)
-				c.Expect(string(o), Equals, "journal - fix - begin")
+				c.Expect(git.IsClean(d), IsNil)
 
-				o, err = git.Command(d, "show", "--name-only", "--pretty=format:%s", refLog[1]).Output()
-				c.Assume(err, IsNil)
-				c.Expect(string(o), Equals,
-					`journal - fix - moved all entries to entry/
-2014-01-01-0000-EST
-2014-01-02-0000-EST
-2014-01-03-0000-EST
-2014-01-04-0000-EST
-2014-01-05-0000-EST
-2014-01-06-0000-EST
-entry/2014-01-01-0000-EST
-entry/2014-01-02-0000-EST
-entry/2014-01-03-0000-EST
-entry/2014-01-04-0000-EST
-entry/2014-01-05-0000-EST
-entry/2014-01-06-0000-EST
-`)
-				o, err = git.Command(d, "show", "--pretty=format:%s", refLog[2]).Output()
-				c.Assume(err, IsNil)
-				c.Expect(string(o), Equals,
-					`journal - fix - idea directory store initialized
-diff --git a/idea/active b/idea/active
-new file mode 100644
-index 0000000..e69de29
-diff --git a/idea/nextid b/idea/nextid
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/idea/nextid
-@@ -0,0 +1 @@
-+1
-`)
+				for i, ref := range refLog {
+					actual, err := git.Command(d, "show", "--pretty=format:%s%n", ref).Output()
+					c.Assume(err, IsNil)
 
-				o, err = git.Command(d, "show", "--pretty=format:%s", refLog[3]).Output()
-				c.Assume(err, IsNil)
-				c.Expect(string(o), Equals,
-					`journal - fix - idea - created - 1 - src:entry/2014-01-05-0000-EST
-diff --git a/idea/1 b/idea/1
-new file mode 100644
-index 0000000..a12bab8
---- /dev/null
-+++ b/idea/1
-@@ -0,0 +1,2 @@
-+## [active] [1] Active Idea
-+Idea Body
-diff --git a/idea/active b/idea/active
-index e69de29..d00491f 100644
---- a/idea/active
-+++ b/idea/active
-@@ -0,0 +1 @@
-+1
-diff --git a/idea/nextid b/idea/nextid
-index d00491f..0cfbf08 100644
---- a/idea/nextid
-+++ b/idea/nextid
-@@ -1 +1 @@
--1
-+2
-`)
+					expectedOutputFilename := filepath.Join("journal_cases/case_0_fix_reflog", fmt.Sprint(i))
+					expected, err := ioutil.ReadFile(expectedOutputFilename)
+					c.Assume(err, IsNil)
 
-				o, err = git.Command(d, "show", "-s", "--pretty=format:%s", refLog[len(refLog)-1]).Output()
-				c.Assume(err, IsNil)
-				c.Expect(string(o), Equals, "journal - fix - completed")
+					c.Expect(string(actual), Equals, string(expected))
+				}
 			})
 		})
 	})
