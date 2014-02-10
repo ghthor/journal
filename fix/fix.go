@@ -150,10 +150,21 @@ func FixCase0(directory string) (refLog []string, err error) {
 		return nil, err
 	}
 
-	ideaStore, _, err := idea.InitDirectoryStore(filepath.Join(directory, "idea"))
+	ideaStore, changes, err := idea.InitDirectoryStore(filepath.Join(directory, "idea"))
 	if err != nil {
 		return nil, err
 	}
+
+	err = git.Commit(JournalFixCommit{changes})
+	if err != nil {
+		return nil, err
+	}
+
+	commitHash, err = lastCommitHashIn(directory)
+	if err != nil {
+		return nil, err
+	}
+	refLog = append(refLog, commitHash)
 
 	// Store all existing ideas in the directory store
 	for i := 0; i < len(entries); i++ {

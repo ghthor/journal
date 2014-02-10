@@ -239,6 +239,21 @@ entry/2014-01-04-0000-EST
 entry/2014-01-05-0000-EST
 entry/2014-01-06-0000-EST
 `)
+				o, err = git.Command(d, "show", "--pretty=format:%s%b", refLog[2]).Output()
+				c.Assume(err, IsNil)
+				c.Expect(string(o), Equals,
+					`journal - fix - idea directory store initialized
+diff --git a/idea/active b/idea/active
+new file mode 100644
+index 0000000..e69de29
+diff --git a/idea/nextid b/idea/nextid
+new file mode 100644
+index 0000000..d00491f
+--- /dev/null
++++ b/idea/nextid
+@@ -0,0 +1 @@
++1
+`)
 
 				o, err = git.Command(d, "show", "-s", "--pretty=format:%s", refLog[len(refLog)-1]).Output()
 				c.Assume(err, IsNil)
