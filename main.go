@@ -85,13 +85,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var cmd *Command
 	args := flag.Args()
 
 	if len(args) == 0 {
 		showUsageAndExit(EC_NO_CMD)
 	}
 
+	var cmd *Command
 	name := args[0]
 
 	for _, c := range commands {
@@ -106,5 +106,8 @@ func main() {
 		showUsageAndExit(EC_UNKNOWN_COMMAND)
 	}
 
-	cmd.Exec(args[1:])
+	err = cmd.Exec(args[1:])
+	if err != nil {
+		log.Fatal(err)
+	}
 }

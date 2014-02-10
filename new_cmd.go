@@ -8,7 +8,6 @@ import (
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -27,19 +26,19 @@ func init() {
 
 var newEntryCmd = &Command{
 	Name:    "new",
-	Usage:   "",
 	Summary: "Create a new journal entry",
-	Help:    "TODO",
-	Run: func(c *Command, args ...string) {
+	Run: func(c *Command, args ...string) error {
 		wd, err := os.Getwd()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		_, err = newEntry(wd, entryTmpl, nil, MutateInto, c, args...)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
+
+		return nil
 	},
 }
 
