@@ -2,6 +2,7 @@ package git
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -52,12 +53,21 @@ func IsClean(directory string) error {
 
 // Execute `git add --all {filepath}` in workingDirectory
 func AddFilepath(workingDirectory string, filepath string) error {
-	return Command(workingDirectory, "add", "--all", filepath).Run()
+	o, err := Command(workingDirectory, "add", "--all", filepath).CombinedOutput()
+	if err != nil {
+		return errors.New(fmt.Sprintf("error during `git add`: %s\n%s", err.Error(), string(o)))
+	}
+	return nil
 }
 
 // Execute `git commit -m {msg}` in workingDirectory
 func CommitWithMessage(workingDirectory string, msg string) error {
-	return Command(workingDirectory, "commit", "-m", msg).Run()
+	o, err := Command(workingDirectory, "commit", "-m", msg).CombinedOutput()
+	if err != nil {
+		return errors.New(fmt.Sprintf("error during `git commit`: %s\n%s", err.Error(), string(o)))
+	}
+
+	return nil
 }
 
 // Execute `git commit --allow-empty -m {msg}` in workingDirectory.
