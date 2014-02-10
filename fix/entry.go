@@ -42,7 +42,7 @@ func (e entryCaseNeedsFixed) FixedEntry() (Entry, git.Commitable, error) {
 	}
 
 	return entryCaseCurrent{data}, git.Changes{
-		Msg: "entry - %s - format updated",
+		Msg: "entry - format updated",
 	}, nil
 }
 
