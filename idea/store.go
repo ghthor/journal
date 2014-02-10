@@ -94,7 +94,7 @@ func InitDirectoryStore(directory string) (*DirectoryStore, git.Commitable, erro
 	changes := git.NewChangesIn(directory)
 	changes.Add(git.ChangedFile("nextid"))
 	changes.Add(git.ChangedFile("active"))
-	changes.Msg = "directory store initialized"
+	changes.Msg = "idea directory store initialized"
 
 	return &DirectoryStore{directory}, changes, nil
 }
@@ -184,7 +184,7 @@ func (d DirectoryStore) saveNewIdea(idea *Idea) (git.Commitable, error) {
 		changes.Add(git.ChangedFile("active"))
 	}
 
-	changes.Msg = fmt.Sprintf("IDEA - %d - Created", idea.Id)
+	changes.Msg = fmt.Sprintf("idea - created - %d", idea.Id)
 
 	return changes, nil
 }
@@ -297,7 +297,7 @@ func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
 		}
 	}
 
-	changes.Msg = fmt.Sprintf("IDEA - %d - Updated", idea.Id)
+	changes.Msg = fmt.Sprintf("idea - updated - %d", idea.Id)
 
 	return changes, nil
 }

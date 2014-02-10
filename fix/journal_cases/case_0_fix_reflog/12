@@ -1,0 +1,22 @@
+journal - fix - entry - format updated - entry/2014-01-06-0000-EST
+
+diff --git a/entry/2014-01-06-0000-EST b/entry/2014-01-06-0000-EST
+index ca4acf0..f55fe5f 100644
+--- a/entry/2014-01-06-0000-EST
++++ b/entry/2014-01-06-0000-EST
+@@ -1,14 +1,8 @@
+ Mon Jan  6 00:00:00 EST 2014
+ 
+-#~ Commit Msg | Entry 6
++# Commit Msg | Entry 6
+ Entry Body
+ 
+ entry_case_4
+ 
+-## [inactive] Active Idea
+-Idea Body Updated
+-
+-## [active] An Idea
+-Idea Body
+-
+ Mon Jan  6 00:01:00 EST 2014

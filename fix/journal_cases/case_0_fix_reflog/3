@@ -1,0 +1,23 @@
+journal - fix - idea - created - 1 - src:entry/2014-01-05-0000-EST
+
+diff --git a/idea/1 b/idea/1
+new file mode 100644
+index 0000000..a12bab8
+--- /dev/null
++++ b/idea/1
+@@ -0,0 +1,2 @@
++## [active] [1] Active Idea
++Idea Body
+diff --git a/idea/active b/idea/active
+index e69de29..d00491f 100644
+--- a/idea/active
++++ b/idea/active
+@@ -0,0 +1 @@
++1
+diff --git a/idea/nextid b/idea/nextid
+index d00491f..0cfbf08 100644
+--- a/idea/nextid
++++ b/idea/nextid
+@@ -1 +1 @@
+-1
++2

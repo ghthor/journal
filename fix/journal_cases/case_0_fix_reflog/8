@@ -1,0 +1,12 @@
+journal - fix - entry - format updated - entry/2014-01-01-0000-EST
+
+diff --git a/entry/2014-01-01-0000-EST b/entry/2014-01-01-0000-EST
+index d824b23..90b0f8c 100644
+--- a/entry/2014-01-01-0000-EST
++++ b/entry/2014-01-01-0000-EST
+@@ -4,3 +4,5 @@ Wed Jan  1 00:00:00 EST 2014
+ Entry Body
+ 
+ entry_case_0
++
++Wed Jan  1 00:02:00 EST 2014

@@ -1,0 +1,138 @@
+Sun Feb  9 20:58:42 EST 2014
+
+#~ Completed fix algorithm for journal case 0
+Had a pretty productive day.
+Decided I wasn't going to finish till the commit sequence for case 0 was correct.
+
+This is want it looks like.
+Entry filename's lining up was not planned.
+
+```
+┌ journal - fix - completed──(4b4a936)
+├ journal - fix - entry - format updated - entry/2014-01-06-0000-EST──(c102d5c)
+├ journal - fix - entry - format updated - entry/2014-01-05-0000-EST──(ad9c636)
+├ journal - fix - entry - format updated - entry/2014-01-04-0000-EST──(cff28de)
+├ journal - fix - entry - format updated - entry/2014-01-03-0000-EST──(93c92a9)
+├ journal - fix - entry - format updated - entry/2014-01-01-0000-EST──(1425134)
+├ journal - fix - idea - updated - 3 - src:entry/2014-01-06-0000-EST──(7c2a8ec)
+├ journal - fix - idea - updated - 1 - src:entry/2014-01-06-0000-EST──(41902ef)
+├ journal - fix - idea - created - 3 - src:entry/2014-01-05-0000-EST──(f76f865)
+├ journal - fix - idea - created - 2 - src:entry/2014-01-05-0000-EST──(201094e)
+├ journal - fix - idea - created - 1 - src:entry/2014-01-05-0000-EST──(d5d29fb)
+├ journal - fix - idea directory store initialized──(7d259d0)
+├ journal - fix - moved all entries to entry/──(17a544f)
+├ journal - fix - begin──(437e273)
+├ Commit Msg | Entry 6──(ed7d8f3)
+├ Commit Msg | Entry 5──(d404edc)
+├ Commit Msg | Entry 4──(4c4c31c)
+├ Commit Msg | Entry 3──(8099e84)
+├ Commit Msg | Entry 2──(1589e95)
+└ Commit Msg | Entry 1──(9dd0649)
+```
+
+As usual I learned a lot about git during this process.
+Mostly about the formating options and params to `git show`.
+Also dealt with some `git add` issues concerning deleted files.
+The `git add` issue should probly be fixed with some additions to the git package.
+Opening an idea for these changes.
+
+Version 1 of journal is close once I get fix command added to the executable.
+Also need to update the new and init commands for the new format and to use the idea directory store.
+
+Overall a good productive day, signing out for now.
+
+## [inactive] `git add` and deleted files
+It might be nice to experiment with using types to solve the `git add` issue.
+The current solution is a hack that adds `--all` to the args list to `git add`.
+Would be be to use interfacing and types to determine what `git index` modification takes place.
+
+These 3 types are what I have in mind.
+
+```go
+type DeletedFile string
+
+type NewFile string
+
+type ModifiedFile string
+```
+
+They should satisfy an interface like this.
+
+```go
+type IndexModification interface {
+    ModifyIndex() error
+}
+```
+
+Then each respective type can `git add` or `git rm` or whatever it needs to get the change it represents into the index before a commit takes place.
+
+## [active] `fix` command
+- [ ] Incorporate this command into journal
+- [ ] Update the new command to use the new format for entries
+    - [ ] Store removed ideas in the idea directory store
+    - [ ] Commit an entry file with ideas removed
+
+- [ ] Reimplement init to create the required subdirectories and files
+
+- [X] Mark fix beginning with an empty git commit
+    - message "journal - fix - begin"
+
+- [X] fix journal case 0
+    - [X] fix | does NOT store entries in `entry/` directory
+        - create `entry/` directory and move all entries
+        - message "journal - fix - moved all entries to entry/"
+
+    - [X] fix | does NOT store ideas in `idea/` directory
+        - fix ideas
+
+    - [X] fix | has entries that don't conform to the current feature set
+        - [X] fix entries
+
+- [X] fix ideas
+    - [X] create `idea/` directory structure
+        - message "journal - fix - idea directory store initialized"
+    - [X] Parse ideas from entries starting from oldest
+        - If an idea doesn't exist in `idea/' w/ matching name
+            - create the idea
+            - message "idea - created - {id} - {origin entry filename}"
+        - If an idea exists in `idea/` /w matching name
+            - update the idea
+            - message "idea - modified - {id} - {origin entry filename}"
+
+- [X] fix entries
+    - [X] fix | does NOT have a closed timestamp as the final line
+        - append a closed timestamp for 30secs after opened timestamp
+
+    - [X] fix | does NOT have a commit message header w/ format
+        - format "# Commit Message\n"
+        - change "#~ Text\n" -> "# Text\n"
+        - change
+
+            ```
+            #~ Text
+            #  More Text
+            ```
+
+            to
+
+            ```
+            # Text | More Text
+            ```
+
+    - [X] fix | does have ideas in the body
+        - remove ideas
+
+    - [X] Current Features
+        - should have a timestamp as the first line
+        - should have a commit msg line w/ format "# Commit Msg\n"
+        - should NOT have any ideas in the body
+        - should have a timestamp as the final line
+
+    - [X] return a commitable with msg format
+        - format "entry - format updated - {filename}"
+
+- [X] Mark fix complete with an empty git commit
+    - message "journal - fix - complete"
+
+
+Sun Feb  9 21:18:41 EST 2014

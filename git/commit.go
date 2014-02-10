@@ -19,13 +19,14 @@ func (filename ChangedFile) Filepath() string { return string(filename) }
 // An convenient implementation of the Commitable interface
 type Changes struct {
 	// The `git` working directory
-	wd      string
+	Dir string
+	Msg string
+
 	changes []CommitableChange
-	Msg     string
 }
 
 func NewChangesIn(workingDirectory string) *Changes {
-	return &Changes{wd: workingDirectory}
+	return &Changes{Dir: workingDirectory}
 }
 
 func (c *Changes) Add(change CommitableChange) {
@@ -38,7 +39,7 @@ func (c *Changes) Commit() error {
 
 // implement Commitable Interface
 
-func (c Changes) WorkingDirectory() string    { return c.wd }
+func (c Changes) WorkingDirectory() string    { return c.Dir }
 func (c Changes) Changes() []CommitableChange { return c.changes }
 func (c Changes) CommitMsg() string           { return c.Msg }
 
