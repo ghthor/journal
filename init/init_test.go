@@ -1,6 +1,8 @@
 package init_test
 
 import (
+	"errors"
+	"fmt"
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
 	"github.com/ghthor/journal/entry"
@@ -13,12 +15,28 @@ import (
 	"time"
 )
 
+func HasBeenInitialized(actual, ignoredParam interface{}) (hasBeenInitialized bool, pos gospec.Message, neg gospec.Message, err error) {
+	jd, isString := actual.(string)
+	if !isString {
+		err = errors.New(fmt.Sprintf("%v isn't a string", actual))
+		return
+	}
+
+	hasBeenInitialized = jinit.HasBeenInitialized(jd)
+
+	pos = gospec.Messagef(hasBeenInitialized, "%v has been initialized", actual)
+	neg = gospec.Messagef(hasBeenInitialized, "%v has not been initialized", actual)
+
+	return
+}
+
 func DescribeInit(c gospec.Context) {
 	c.Specify("a journal", func() {
 		tmpJournal := func() (directory string, cleanUp func()) {
 			directory, err := ioutil.TempDir("", "journal_init_")
 			c.Assume(err, IsNil)
 
+			c.Assume(directory, Not(HasBeenInitialized))
 			c.Assume(jinit.Journal(directory), IsNil)
 
 			cleanUp = func() {
@@ -32,7 +50,7 @@ func DescribeInit(c gospec.Context) {
 			jd, cleanUp := tmpJournal()
 			defer cleanUp()
 
-			c.Assume(jinit.HasBeenInitialized(jd), IsTrue)
+			c.Assume(jd, HasBeenInitialized)
 
 			c.Specify("is a git repository", func() {
 				c.Expect(jd, gittest.IsAGitRepository)
@@ -44,7 +62,7 @@ func DescribeInit(c gospec.Context) {
 						c.Expect(info.IsDir(), IsTrue)
 
 						c.Specify("that can have entries", func() {
-							c.Expect(jinit.HasBeenInitialized(jd), IsTrue)
+							c.Expect(jd, HasBeenInitialized)
 
 							ne := entry.New(filepath.Join(jd, "entry/"))
 							oe, err := ne.Open(time.Now(), nil)
@@ -53,7 +71,7 @@ func DescribeInit(c gospec.Context) {
 							_, err = oe.Close(time.Now())
 							c.Assume(err, IsNil)
 
-							c.Expect(jinit.HasBeenInitialized(jd), IsTrue)
+							c.Expect(jd, HasBeenInitialized)
 						})
 					})
 
@@ -62,14 +80,14 @@ func DescribeInit(c gospec.Context) {
 						c.Assume(err, IsNil)
 
 						c.Specify("that can have ideas", func() {
-							c.Expect(jinit.HasBeenInitialized(jd), IsTrue)
+							c.Expect(jd, HasBeenInitialized)
 
 							ids.SaveIdea(&idea.Idea{
 								Name: "An Idea",
 								Body: "A Body\n",
 							})
 
-							c.Expect(jinit.HasBeenInitialized(jd), IsTrue)
+							c.Expect(jd, HasBeenInitialized)
 						})
 					})
 				})
