@@ -1,6 +1,15 @@
 package init
 
+import (
+	"os"
+)
+
 func CanBeInitialized(directory string) bool {
+	_, err := os.Stat(directory)
+	if err != nil && os.IsNotExist(err) {
+		return true
+	}
+
 	return false
 }
 
