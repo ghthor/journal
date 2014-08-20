@@ -119,6 +119,12 @@ func DescribeInit(c gospec.Context) {
 			})
 
 			c.Specify("is a directory that doesn't exist", func() {
+				d := filepath.Join(os.TempDir(), "doesnotexist")
+
+				_, err := os.Stat(d)
+				c.Assume(os.IsNotExist(err), IsTrue)
+
+				c.Expect(d, CanBeInitialized)
 			})
 		})
 
