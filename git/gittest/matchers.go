@@ -17,13 +17,13 @@ func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Me
 		return false, pos, neg, errors.New("directory is not a string")
 	}
 
-	// Check if jd exists and is a Directory
+	// Check if d exists and is a Directory
 	if info, err := os.Stat(d); !os.IsNotExist(err) {
 		if !info.IsDir() {
 			return false, pos, neg, errors.New(fmt.Sprintf("%s is not a directory", d))
 		}
 	} else {
-		// jd doesn't exist
+		// d doesn't exist
 		return false, pos, neg, err
 	}
 
