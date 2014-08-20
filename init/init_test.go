@@ -15,6 +15,21 @@ import (
 	"time"
 )
 
+func CanBeInitialized(actual, ignoredParam interface{}) (canBeInitialized bool, pos gospec.Message, neg gospec.Message, err error) {
+	jd, isString := actual.(string)
+	if !isString {
+		err = errors.New(fmt.Sprintf("%v isn't a string", actual))
+		return
+	}
+
+	canBeInitialized = jinit.CanBeInitialized(jd)
+
+	pos = gospec.Messagef(canBeInitialized, "%v can be initialized", actual)
+	neg = gospec.Messagef(canBeInitialized, "%v cannot be initialized", actual)
+
+	return
+}
+
 func HasBeenInitialized(actual, ignoredParam interface{}) (hasBeenInitialized bool, pos gospec.Message, neg gospec.Message, err error) {
 	jd, isString := actual.(string)
 	if !isString {
