@@ -91,6 +91,25 @@ func HasBeenInitialized(directory string) bool {
 }
 
 func Journal(directory string) error {
+	_, err := CanBeInitialized(directory)
+	if err != nil {
+		return err
+	}
+
+	// Check if the directory exists
+	_, err = os.Stat(directory)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+
+		// Make the directory tree
+		err = os.MkdirAll(directory, 0755)
+		if err != nil {
+			return err
+		}
+	}
+
 	// Check if we need to `git init` the directory
 	if !isAGitRepository(directory) {
 		err := git.Init(directory)
@@ -101,7 +120,7 @@ func Journal(directory string) error {
 	}
 
 	// Create the Entry Store
-	err := os.Mkdir(filepath.Join(directory, "entry"), 0755)
+	err = os.Mkdir(filepath.Join(directory, "entry"), 0755)
 	if err != nil {
 		return err
 	}
