@@ -1,6 +1,8 @@
 package init
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,17 +22,17 @@ func isAGitRepository(directory string) bool {
 	return true
 }
 
-func CanBeInitialized(directory string) bool {
+func CanBeInitialized(directory string) (bool, error) {
 	di, err := os.Stat(directory)
 
 	// If the directory doesn't exist
 	if err != nil && os.IsNotExist(err) {
-		return true
+		return true, nil
 	}
 
 	// If the directory exists and is empty
 	if !di.IsDir() {
-		return false
+		return false, errors.New(fmt.Sprintf("\"%s\" isn't a directory", directory))
 	}
 
 	numChildren := 0
@@ -55,10 +57,10 @@ func CanBeInitialized(directory string) bool {
 	})
 
 	if numChildren > 0 {
-		return false
+		return false, errors.New(fmt.Sprintf("\"%s\" isn't an empty directory", directory))
 	}
 
-	return true
+	return true, nil
 }
 
 func entryStoreIsWithin(directory string) bool {

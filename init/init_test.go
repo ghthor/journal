@@ -23,7 +23,7 @@ func CanBeInitialized(actual, ignoredParam interface{}) (canBeInitialized bool, 
 		return
 	}
 
-	canBeInitialized = jinit.CanBeInitialized(jd)
+	canBeInitialized, _ = jinit.CanBeInitialized(jd)
 
 	pos = gospec.Messagef(canBeInitialized, "%v can be initialized", actual)
 	neg = gospec.Messagef(canBeInitialized, "%v cannot be initialized", actual)
