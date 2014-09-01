@@ -37,6 +37,14 @@ func (c *cmd) SetWd(directory string) {
 	c.wd = directory
 }
 
+type journalInitCommit struct {
+	git.Commitable
+}
+
+func (c journalInitCommit) CommitMsg() string {
+	return "journal - init - " + c.Commitable.CommitMsg()
+}
+
 func (c *cmd) Exec(args []string) error {
 	c.flagSet.Parse(args)
 
@@ -63,7 +71,20 @@ func (c *cmd) Exec(args []string) error {
 	}
 
 	if !c.noCommit {
-		git.Commit(commitable)
+		err := git.CommitEmpty(path, "journal - init - begin")
+		if err != nil {
+			return err
+		}
+
+		err = git.Commit(journalInitCommit{commitable})
+		if err != nil {
+			return err
+		}
+
+		err = git.CommitEmpty(path, "journal - init - completed")
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
