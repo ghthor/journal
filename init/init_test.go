@@ -48,12 +48,14 @@ func HasBeenInitialized(actual, ignoredParam interface{}) (hasBeenInitialized bo
 
 func DescribeInit(c gospec.Context) {
 	c.Specify("a journal", func() {
-		tmpJournal := func() (directory string, cleanUp func()) {
+		tmpJournal := func() (directory string, commitable git.Commitable, cleanUp func()) {
 			directory, err := ioutil.TempDir("", "journal_init_")
 			c.Assume(err, IsNil)
 
 			c.Assume(directory, Not(HasBeenInitialized))
-			c.Assume(jinit.Journal(directory), IsNil)
+
+			commitable, err = jinit.Journal(directory)
+			c.Assume(err, IsNil)
 
 			cleanUp = func() {
 				c.Assume(os.RemoveAll(directory), IsNil)
@@ -63,7 +65,7 @@ func DescribeInit(c gospec.Context) {
 		}
 
 		c.Specify("that is initialized", func() {
-			jd, cleanUp := tmpJournal()
+			jd, commitable, cleanUp := tmpJournal()
 			defer cleanUp()
 
 			c.Assume(jd, HasBeenInitialized)
@@ -108,6 +110,13 @@ func DescribeInit(c gospec.Context) {
 					})
 				})
 			})
+
+			c.Specify("has commitable changes", func() {
+				c.Assume(git.IsClean(jd), Not(IsNil))
+
+				c.Expect(git.Commit(commitable), IsNil)
+				c.Expect(git.IsClean(jd), IsNil)
+			})
 		})
 
 		tmpDir := func() (directory string, cleanUp func()) {
@@ -134,14 +143,18 @@ func DescribeInit(c gospec.Context) {
 					c.Assume(git.Init(directory), IsNil)
 
 					c.Expect(jd, CanBeInitialized)
-					c.Assume(jinit.Journal(jd), IsNil)
+
+					_, err := jinit.Journal(jd)
+					c.Assume(err, IsNil)
 					c.Expect(jd, HasBeenInitialized)
 					c.Expect(jd, Not(gittest.IsAGitRepository))
 				})
 
 				c.Specify("NOT inside a git repository", func() {
 					c.Expect(directory, CanBeInitialized)
-					c.Assume(jinit.Journal(directory), IsNil)
+
+					_, err := jinit.Journal(directory)
+					c.Assume(err, IsNil)
 					c.Expect(directory, HasBeenInitialized)
 					c.Expect(directory, gittest.IsAGitRepository)
 				})
@@ -154,7 +167,9 @@ func DescribeInit(c gospec.Context) {
 				c.Assume(git.Init(directory), IsNil)
 
 				c.Expect(directory, CanBeInitialized)
-				c.Assume(jinit.Journal(directory), IsNil)
+
+				_, err := jinit.Journal(directory)
+				c.Assume(err, IsNil)
 				c.Expect(directory, HasBeenInitialized)
 			})
 
@@ -176,7 +191,9 @@ func DescribeInit(c gospec.Context) {
 
 					jd := filepath.Join(base, "doesntexistyet")
 					c.Expect(jd, CanBeInitialized)
-					c.Assume(jinit.Journal(jd), IsNil)
+
+					_, err := jinit.Journal(jd)
+					c.Assume(err, IsNil)
 					c.Expect(jd, HasBeenInitialized)
 					c.Expect(jd, Not(gittest.IsAGitRepository))
 				})
@@ -193,7 +210,7 @@ func DescribeInit(c gospec.Context) {
 
 				c.Expect(f.Name(), Not(CanBeInitialized))
 
-				err = jinit.Journal(f.Name())
+				_, err = jinit.Journal(f.Name())
 				c.Assume(err, Not(IsNil))
 				c.Expect(err.Error(), Equals, fmt.Sprintf("\"%s\" isn't a directory", f.Name()))
 			})
@@ -208,7 +225,7 @@ func DescribeInit(c gospec.Context) {
 
 						c.Expect(directory, Not(CanBeInitialized))
 
-						err := jinit.Journal(directory)
+						_, err := jinit.Journal(directory)
 						c.Assume(err, Not(IsNil))
 						c.Expect(err.Error(), Equals, fmt.Sprintf("\"%s\" isn't an empty directory", directory))
 					})
@@ -222,7 +239,7 @@ func DescribeInit(c gospec.Context) {
 
 						c.Expect(directory, Not(CanBeInitialized))
 
-						err = jinit.Journal(directory)
+						_, err = jinit.Journal(directory)
 						c.Assume(err, Not(IsNil))
 						c.Expect(err.Error(), Equals, fmt.Sprintf("\"%s\" isn't an empty directory", directory))
 					})

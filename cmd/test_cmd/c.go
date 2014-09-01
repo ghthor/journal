@@ -4,6 +4,8 @@ type Cmd struct {
 	wasExecuted bool
 }
 
+func (c *Cmd) SetWd(string) {}
+
 func (c *Cmd) Exec([]string) error {
 	c.wasExecuted = true
 	return nil
