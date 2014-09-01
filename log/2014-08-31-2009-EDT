@@ -1,0 +1,93 @@
+Sun Aug 31 20:09:46 EDT 2014
+
+#~ LOG | Mostly finished the journal/init package
+Completed the specification and implementation of the functions provided by the `journal/init` package.
+I believe the specifications cover all the use cases.
+When I'm implementing the command I believe I will have to bubble a git.Commitable object from the `init.Journal(directory)` function.
+
+I'm going to move forward and implement the `journal init` command.
+I've modified the proposed flags for `journal init` to align with the immediate uses of the command.
+
+## [active] journal version 1
+- [ ] idea "package journal/cmd" completed
+- [ ] commands implemented
+    - [ ] journal init - WIP
+    - [ ] journal fix
+    - [ ] journal new
+    - [ ] journal help
+
+## [active] package journal/cmd
+This is package is routines shared by all command packages.
+I expect this package can be extracted into it's own project in the future.
+
+- [ ] journal/cmd
+    - [ ] ALL commands MUST accept the -h flag
+
+- [ ] package journal/cmd_verbs/init
+    - [ ] options
+        - [ ] -no-commit | Will not commit an changes in the directory to git repository.
+
+- [ ] package journal/cmd_verbs/fix
+    - [ ] options
+        - [ ] -ignore-git     | Will not commit any fixes or modifications to git
+        - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
+
+- [ ] package journal/cmd_verbs/new
+    - [ ] options
+        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
+        - [ ] -no-edit    | Will not open the entry in an interactive editor
+                          | This options implies -ignoregit because the entry created will not be committed.
+
+- [ ] package journal/cmd_verbs/help
+    - example usage
+```
+>$ journal help init
+Print formatted usage and options for `init` command.
+>$ journal help new
+Print formatted usage and options for `new` command.
+```
+    - [ ] will only accept registered commands as an argument
+    - [ ] will execute the registered command with -h flag as the only argument
+
+
+## [completed] package journal/init
+- [x] A function to check if journal directory can be initialized
+    - [x] Create specification
+        - does directory exist?
+            - yes - is directory empty?
+                - yes - directory can be initialized
+                - no  - directory can NOT be initialized
+            - no  - directory can be initialized
+
+- [x] A function to check if a directory has been initialized
+    - [x] Create specification
+        - is directory in a git repository?
+            - yes - If entry directory exists and idea directory store exists
+                - yes - journal has been initialized
+                - no  - journal has not been initialized
+            - no  - journal has not been initialized
+
+- [x] A function to initialize a journal directory
+    - [x] Create specification
+        - create entry directory
+        - create idea directory store
+
+
+## [active] package journal/fix
+- [ ] A function to check if a journal directory can be fixed
+    - is directory initialized?
+        - yes - can NOT be fixed
+        - no  - does directory contain entries?
+            - yes - can be fixed
+            - no  - can NOT be fixed
+
+- [ ] A function to check if a journal directory needs to be fixed
+    - is directory initialized?
+        - yes - does not need fixed
+        - no  - does directory contain entries?
+            - yes - needs fixed
+            - no  - needs initialized
+
+
+
+Sun Aug 31 20:24:02 EDT 2014
