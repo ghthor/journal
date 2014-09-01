@@ -10,6 +10,7 @@ import (
 
 	"github.com/ghthor/journal/cmd"
 	initVerb "github.com/ghthor/journal/cmd_verbs/init"
+	"github.com/ghthor/journal/git"
 	initialize "github.com/ghthor/journal/init"
 )
 
@@ -31,6 +32,7 @@ func DescribeInitCmd(c gospec.Context) {
 		c.Specify("and commit the modifications to git", func() {
 			c.Expect(cmd.Exec(args), IsNil)
 			c.Expect(initialize.HasBeenInitialized(directory), IsTrue)
+			c.Expect(git.IsClean(directory), IsNil)
 			// TODO check commit messages
 		})
 
@@ -41,7 +43,7 @@ func DescribeInitCmd(c gospec.Context) {
 
 			c.Expect(cmd.Exec(gitargs), IsNil)
 			c.Expect(initialize.HasBeenInitialized(directory), IsTrue)
-			// TODO check for no new commit messages
+			c.Expect(git.IsClean(directory), Not(IsNil))
 		})
 	}
 

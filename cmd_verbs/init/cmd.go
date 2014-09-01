@@ -5,6 +5,7 @@ import (
 	"flag"
 	"path/filepath"
 
+	"github.com/ghthor/journal/git"
 	initialize "github.com/ghthor/journal/init"
 )
 
@@ -56,9 +57,13 @@ func (c *cmd) Exec(args []string) error {
 		return errors.New("too many arguments")
 	}
 
-	err := initialize.Journal(path)
+	commitable, err := initialize.Journal(path)
 	if err != nil {
 		return err
+	}
+
+	if !c.noCommit {
+		git.Commit(commitable)
 	}
 
 	return nil

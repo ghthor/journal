@@ -90,23 +90,23 @@ func HasBeenInitialized(directory string) bool {
 	return isGit && containsEntryStore && containsIdeaStore
 }
 
-func Journal(directory string) error {
+func Journal(directory string) (git.Commitable, error) {
 	_, err := CanBeInitialized(directory)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Check if the directory exists
 	_, err = os.Stat(directory)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			return err
+			return nil, err
 		}
 
 		// Make the directory tree
 		err = os.MkdirAll(directory, 0755)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
@@ -115,26 +115,26 @@ func Journal(directory string) error {
 		err := git.Init(directory)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	// Create the Entry Store
 	err = os.Mkdir(filepath.Join(directory, "entry"), 0755)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create the Idea Store
 	err = os.Mkdir(filepath.Join(directory, "idea"), 0755)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, _, err = idea.InitDirectoryStore(filepath.Join(directory, "idea"))
+	_, commitable, err := idea.InitDirectoryStore(filepath.Join(directory, "idea"))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return commitable, nil
 }
