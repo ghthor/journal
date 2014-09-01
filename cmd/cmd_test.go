@@ -10,6 +10,8 @@ import (
 // A basic implementation of the Cmd interface
 type C struct{}
 
+func (c *C) SetWd(string) {}
+
 func (c *C) Exec(args []string) error {
 	return nil
 }

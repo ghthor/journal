@@ -9,6 +9,7 @@ import (
 
 // An interface to an executable command
 type Cmd interface {
+	SetWd(directory string)
 	Exec(args []string) error
 	Summary() string
 }

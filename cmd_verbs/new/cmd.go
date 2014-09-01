@@ -7,6 +7,8 @@ import (
 type cmd struct {
 }
 
+func (c cmd) SetWd(string) {}
+
 func (c cmd) Exec([]string) error {
 	fmt.Println("Executing the command bound to `new` verb")
 	return nil
