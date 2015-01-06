@@ -46,10 +46,13 @@ func (FixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
 
 func lastLineIsTimestamp(data []byte) bool {
 	scanner := bufio.NewScanner(bytes.NewReader(data))
+
 	// Scan to the last line
+	var prevLine string
 	for scanner.Scan() {
+		prevLine = scanner.Text()
 	}
-	_, err := time.Parse(time.UnixDate, scanner.Text())
+	_, err := time.Parse(time.UnixDate, prevLine)
 
 	return err == nil
 }
