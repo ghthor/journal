@@ -65,7 +65,7 @@ func DescribeEntry(c gospec.Context) {
 	entryCases := make([]entry, 0, len(entryCasesData))
 
 	for _, data := range entryCasesData {
-		entryCase, err := NewEntry(strings.NewReader(data))
+		entryCase, err := newEntry(strings.NewReader(data))
 		c.Assume(err, IsNil)
 
 		entryCases = append(entryCases, entryCase)
@@ -75,7 +75,7 @@ func DescribeEntry(c gospec.Context) {
 		c.Specify("can be read", func() {
 			c.Specify("from an io.Reader", func() {
 				for _, data := range entryCasesData {
-					entryCase, err := NewEntry(strings.NewReader(data))
+					entryCase, err := newEntry(strings.NewReader(data))
 					c.Expect(err, IsNil)
 					c.Expect(string(entryCase.Bytes()), Equals, string(data))
 				}

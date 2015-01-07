@@ -247,7 +247,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 		}
 		defer entryFile.Close()
 
-		entry, err := NewEntry(entryFile)
+		entry, err := newEntry(entryFile)
 		if err != nil {
 			return nil, err
 		}

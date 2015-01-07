@@ -78,7 +78,7 @@ func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
 	return
 }
 
-func NewEntry(r io.Reader) (entry, error) {
+func newEntry(r io.Reader) (entry, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -99,5 +99,5 @@ func NewEntryFromFile(filepath string) (entry, error) {
 		return nil, err
 	}
 	defer f.Close()
-	return NewEntry(f)
+	return newEntry(f)
 }
