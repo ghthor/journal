@@ -19,5 +19,7 @@ func TestUnitSpecs(t *testing.T) {
 	defer cleanupFn()
 	r.AddSpec(DescribeJournalCase0)
 
+	r.AddSpec(DescribeAFixableJournal)
+
 	gospec.MainGoTest(r, t)
 }
