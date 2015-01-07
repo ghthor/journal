@@ -118,7 +118,7 @@ func (c JournalFixCommitWithSuffix) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg() + " - " + c.suffix
 }
 
-func FixCase0(directory string) (refLog []string, err error) {
+func fixCase0(directory string) (refLog []string, err error) {
 	// Mark the begining of the fix commit log
 	err = git.CommitEmpty(directory, "journal - fix - begin")
 	if err != nil {

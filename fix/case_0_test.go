@@ -121,7 +121,7 @@ func DescribeJournalCase0(c gospec.Context) {
 			d, expectedEntries, err := newCase0("case_0_fix")
 			c.Assume(err, IsNil)
 
-			refLog, err := FixCase0(d)
+			refLog, err := fixCase0(d)
 			c.Assume(err, IsNil)
 
 			c.Specify("by moving entries into `entry/`", func() {
