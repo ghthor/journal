@@ -104,7 +104,7 @@ func DescribeEntry(c gospec.Context) {
 			commitables := make([]git.Commitable, 0, len(entryCases))
 
 			for i, entryCase := range entryCases {
-				fixedEntry, changes, err := entryCase.FixedEntry()
+				fixedEntry, changes, err := entryCase.fixedEntry()
 				c.Expect(err, IsNil)
 				entriesFixed = append(entriesFixed, fixedEntry)
 				commitables = append(commitables, changes)

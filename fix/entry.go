@@ -12,7 +12,7 @@ type entry interface {
 	needsFixed() bool
 
 	// Return an Entry that has been fixed
-	FixedEntry() (entry, git.Commitable, error)
+	fixedEntry() (entry, git.Commitable, error)
 
 	// Returns a byte slice of the entry w/o fixes applied
 	Bytes() []byte
@@ -27,7 +27,7 @@ type entryCaseNeedsFixed struct {
 }
 
 func (e entryCaseNeedsFixed) needsFixed() bool { return len(e.fixes) > 0 }
-func (e entryCaseNeedsFixed) FixedEntry() (entry, git.Commitable, error) {
+func (e entryCaseNeedsFixed) fixedEntry() (entry, git.Commitable, error) {
 	var (
 		data []byte = e.bytes
 		err  error
@@ -55,7 +55,7 @@ type entryCaseCurrent struct {
 }
 
 func (e entryCaseCurrent) needsFixed() bool { return false }
-func (e entryCaseCurrent) FixedEntry() (entry, git.Commitable, error) {
+func (e entryCaseCurrent) fixedEntry() (entry, git.Commitable, error) {
 	return e, nil, nil
 }
 func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }

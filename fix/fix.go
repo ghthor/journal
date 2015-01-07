@@ -258,7 +258,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
-			entry, commitable, err := entry.FixedEntry()
+			entry, commitable, err := entry.fixedEntry()
 			if err != nil {
 				return nil, err
 			}
