@@ -89,7 +89,7 @@ func DescribeEntry(c gospec.Context) {
 					filename := filepath.Join(d, fmt.Sprintf("case_%d", i))
 					c.Assume(ioutil.WriteFile(filename, []byte(data), 0600), IsNil)
 
-					entryCase, err := NewEntryFromFile(filename)
+					entryCase, err := newEntryFromFile(filename)
 					c.Expect(err, IsNil)
 
 					actualData, err := ioutil.ReadAll(entryCase.NewReader())

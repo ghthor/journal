@@ -93,7 +93,7 @@ func newEntry(r io.Reader) (entry, error) {
 	return entryCaseCurrent{data}, nil
 }
 
-func NewEntryFromFile(filepath string) (entry, error) {
+func newEntryFromFile(filepath string) (entry, error) {
 	f, err := os.OpenFile(filepath, os.O_RDONLY, 0600)
 	if err != nil {
 		return nil, err
