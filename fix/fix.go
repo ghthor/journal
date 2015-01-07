@@ -317,3 +317,33 @@ func fixCase0(directory string) (refLog []string, err error) {
 
 	return
 }
+
+// If returns false, then error may or may not be nill
+// If returns true, error MUST be nil
+func NeedsFixed(directory string) (bool, error) {
+	entries, err := entriesIn(directory)
+	if err != nil {
+		return false, err
+	}
+
+	if len(entries) != 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func Fix(directory string) (refLog []string, err error) {
+	needsFixed, err := NeedsFixed(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	// Drop out early if theres nothing to fix
+	if !needsFixed {
+		return nil, nil
+	}
+
+	// Make a blanket assumption that we're dealing with case0
+	return fixCase0(directory)
+}
