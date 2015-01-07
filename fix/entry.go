@@ -18,7 +18,7 @@ type entry interface {
 	bytes() []byte
 
 	// Returns an io.Reader for the entry w/o fixes applied
-	NewReader() io.Reader
+	newReader() io.Reader
 }
 
 type entryCaseNeedsFixed struct {
@@ -46,7 +46,7 @@ func (e entryCaseNeedsFixed) fixedEntry() (entry, git.Commitable, error) {
 }
 
 func (e entryCaseNeedsFixed) bytes() []byte { return e.rawBytes }
-func (e entryCaseNeedsFixed) NewReader() io.Reader {
+func (e entryCaseNeedsFixed) newReader() io.Reader {
 	return bytes.NewReader(e.rawBytes)
 }
 
@@ -59,7 +59,7 @@ func (e entryCaseCurrent) fixedEntry() (entry, git.Commitable, error) {
 	return e, nil, nil
 }
 func (e entryCaseCurrent) bytes() []byte        { return e.rawBytes }
-func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.rawBytes) }
+func (e entryCaseCurrent) newReader() io.Reader { return bytes.NewReader(e.rawBytes) }
 
 func findErrorsInEntry(r io.Reader) (fixes []entryFix, err error) {
 	data, err := ioutil.ReadAll(r)

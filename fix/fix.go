@@ -263,7 +263,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
-			n, err := io.Copy(entryFile, entry.NewReader())
+			n, err := io.Copy(entryFile, entry.newReader())
 			if err != nil {
 				return nil, err
 			}

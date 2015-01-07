@@ -92,7 +92,7 @@ func DescribeEntry(c gospec.Context) {
 					entryCase, err := newEntryFromFile(filename)
 					c.Expect(err, IsNil)
 
-					actualData, err := ioutil.ReadAll(entryCase.NewReader())
+					actualData, err := ioutil.ReadAll(entryCase.newReader())
 					c.Assume(err, IsNil)
 					c.Expect(string(actualData), Equals, string(data))
 				}
@@ -118,7 +118,7 @@ func DescribeEntry(c gospec.Context) {
 
 			c.Specify("by returning an entry conforming current standard", func() {
 				for _, fixedEntry := range entriesFixed {
-					actualData, err := ioutil.ReadAll(fixedEntry.NewReader())
+					actualData, err := ioutil.ReadAll(fixedEntry.newReader())
 					c.Assume(err, IsNil)
 
 					c.Expect(string(actualData), Equals, entry_case_current)
@@ -138,7 +138,7 @@ func DescribeEntry(c gospec.Context) {
 
 		c.Specify("can be written", func() {
 			for i, entryCase := range entryCases {
-				actualData, err := ioutil.ReadAll(entryCase.NewReader())
+				actualData, err := ioutil.ReadAll(entryCase.newReader())
 				c.Assume(err, IsNil)
 				c.Expect(string(actualData), Equals, entryCasesData[i])
 			}
