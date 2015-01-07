@@ -62,7 +62,7 @@ func DescribeEntry(c gospec.Context) {
 		entry_case_4,
 		entry_case_current,
 	}
-	entryCases := make([]Entry, 0, len(entryCasesData))
+	entryCases := make([]entry, 0, len(entryCasesData))
 
 	for _, data := range entryCasesData {
 		entryCase, err := NewEntry(strings.NewReader(data))
@@ -100,7 +100,7 @@ func DescribeEntry(c gospec.Context) {
 		})
 
 		c.Specify("can be fixed", func() {
-			entriesFixed := make([]Entry, 0, len(entryCases))
+			entriesFixed := make([]entry, 0, len(entryCases))
 			commitables := make([]git.Commitable, 0, len(entryCases))
 
 			for i, entryCase := range entryCases {

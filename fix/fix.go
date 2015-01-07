@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ghthor/journal/entry"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
 	"os/exec"
@@ -14,18 +11,22 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	entryPkg "github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
 type EntriesByDate []string
 
 func (f EntriesByDate) Len() int { return len(f) }
 func (f EntriesByDate) Less(i, j int) bool {
-	iTime, err := time.Parse(entry.FilenameLayout, f[i])
+	iTime, err := time.Parse(entryPkg.FilenameLayout, f[i])
 	if err != nil {
 		panic(err)
 	}
 
-	jTime, err := time.Parse(entry.FilenameLayout, f[j])
+	jTime, err := time.Parse(entryPkg.FilenameLayout, f[j])
 	if err != nil {
 		panic(err)
 	}

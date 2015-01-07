@@ -8,12 +8,12 @@ import (
 	"os"
 )
 
-type Entry interface {
+type entry interface {
 	// Needs Fixed
 	NeedsFixed() bool
 
 	// Return an Entry that has been fixed
-	FixedEntry() (Entry, git.Commitable, error)
+	FixedEntry() (entry, git.Commitable, error)
 
 	// Returns a byte slice of the entry w/o fixes
 	Bytes() []byte
@@ -28,7 +28,7 @@ type entryCaseNeedsFixed struct {
 }
 
 func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
-func (e entryCaseNeedsFixed) FixedEntry() (Entry, git.Commitable, error) {
+func (e entryCaseNeedsFixed) FixedEntry() (entry, git.Commitable, error) {
 	var (
 		data []byte = e.bytes
 		err  error
@@ -56,7 +56,7 @@ type entryCaseCurrent struct {
 }
 
 func (e entryCaseCurrent) NeedsFixed() bool { return false }
-func (e entryCaseCurrent) FixedEntry() (Entry, git.Commitable, error) {
+func (e entryCaseCurrent) FixedEntry() (entry, git.Commitable, error) {
 	return e, nil, nil
 }
 func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
@@ -78,7 +78,7 @@ func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
 	return
 }
 
-func NewEntry(r io.Reader) (Entry, error) {
+func NewEntry(r io.Reader) (entry, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func NewEntry(r io.Reader) (Entry, error) {
 	return entryCaseCurrent{data}, nil
 }
 
-func NewEntryFromFile(filepath string) (Entry, error) {
+func NewEntryFromFile(filepath string) (entry, error) {
 	f, err := os.OpenFile(filepath, os.O_RDONLY, 0600)
 	if err != nil {
 		return nil, err
