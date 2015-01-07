@@ -212,7 +212,7 @@ Mon Jan  6 00:01:00 EST 2014
 				for i, entryFilename := range expectedEntries {
 					entry, err := newEntryFromFile(filepath.Join(d, "entry", entryFilename))
 					c.Assume(err, IsNil)
-					c.Expect(entry.NeedsFixed(), IsFalse)
+					c.Expect(entry.needsFixed(), IsFalse)
 					c.Expect(string(entry.Bytes()), Equals, expectEntries[i])
 				}
 			})

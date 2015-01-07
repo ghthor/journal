@@ -252,7 +252,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 			return nil, err
 		}
 
-		if entry.NeedsFixed() {
+		if entry.needsFixed() {
 			_, err = entryFile.Seek(0, 0)
 			if err != nil {
 				return nil, err

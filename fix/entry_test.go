@@ -111,7 +111,7 @@ func DescribeEntry(c gospec.Context) {
 
 				if i == len(entryCases)-1 {
 					c.Specify("unless there are no errors to be fixed", func() {
-						c.Expect(entryCase.NeedsFixed(), IsFalse)
+						c.Expect(entryCase.needsFixed(), IsFalse)
 					})
 				}
 			}
@@ -127,7 +127,7 @@ func DescribeEntry(c gospec.Context) {
 
 			c.Specify("returns a commitable with message format", func() {
 				for i, changes := range commitables {
-					if entryCases[i].NeedsFixed() {
+					if entryCases[i].needsFixed() {
 						c.Expect(changes.CommitMsg(), Equals, "entry - format updated")
 					} else {
 						c.Expect(changes, Equals, nil)
