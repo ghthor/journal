@@ -16,7 +16,7 @@ var entryFixes []entryFix
 
 func init() {
 	entryFixes = []entryFix{
-		FixAddClosedAtTimestamp{},
+		fixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
 		FixCommitMessagePrefixWithTilde{},
 		FixIdeasInBody{},
@@ -33,9 +33,9 @@ type entryFix interface {
 
 // Parse the opened at timestamp and add 2 mins
 // then append it to the end
-type FixAddClosedAtTimestamp struct{}
+type fixAddClosedAtTimestamp struct{}
 
-func (FixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
+func (fixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return false, err
@@ -57,7 +57,7 @@ func lastLineIsTimestamp(data []byte) bool {
 	return err == nil
 }
 
-func (FixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
+func (fixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 	// For adding 2 mins and making the closed at timestamp
 	var openedAt time.Time
 
