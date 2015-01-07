@@ -17,10 +17,10 @@ import (
 	"github.com/ghthor/journal/idea"
 )
 
-type EntriesByDate []string
+type entriesByDate []string
 
-func (f EntriesByDate) Len() int { return len(f) }
-func (f EntriesByDate) Less(i, j int) bool {
+func (f entriesByDate) Len() int { return len(f) }
+func (f entriesByDate) Less(i, j int) bool {
 	iTime, err := time.Parse(entryPkg.FilenameLayout, f[i])
 	if err != nil {
 		panic(err)
@@ -33,7 +33,7 @@ func (f EntriesByDate) Less(i, j int) bool {
 
 	return jTime.After(iTime)
 }
-func (f EntriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
+func (f entriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 func entriesIn(directory string) (entries []string, err error) {
 	err = filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
@@ -49,7 +49,7 @@ func entriesIn(directory string) (entries []string, err error) {
 		return nil
 	})
 
-	sort.Sort(EntriesByDate(entries))
+	sort.Sort(entriesByDate(entries))
 
 	return
 }
