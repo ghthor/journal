@@ -17,7 +17,7 @@ var entryFixes []entryFix
 func init() {
 	entryFixes = []entryFix{
 		fixAddClosedAtTimestamp{},
-		FixSplitCommitMessage{},
+		fixSplitCommitMessage{},
 		fixCommitMessagePrefixWithTilde{},
 		fixIdeasInBody{},
 	}
@@ -113,9 +113,9 @@ func (fixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 		# Commit Msg | Additional Msg
 
 */
-type FixSplitCommitMessage struct{}
+type fixSplitCommitMessage struct{}
 
-func (FixSplitCommitMessage) CanFix(r io.Reader) (bool, error) {
+func (fixSplitCommitMessage) CanFix(r io.Reader) (bool, error) {
 	return hasSplitCommitMsg(r), nil
 }
 
@@ -133,7 +133,7 @@ func hasSplitCommitMsg(r io.Reader) bool {
 	return false
 }
 
-func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
+func (fixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
