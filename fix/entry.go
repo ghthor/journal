@@ -9,16 +9,15 @@ import (
 )
 
 type entry interface {
-	// Needs Fixed
 	needsFixed() bool
 
 	// Return an Entry that has been fixed
 	FixedEntry() (entry, git.Commitable, error)
 
-	// Returns a byte slice of the entry w/o fixes
+	// Returns a byte slice of the entry w/o fixes applied
 	Bytes() []byte
 
-	// Returns an io.Reader for the entry w/o fixes
+	// Returns an io.Reader for the entry w/o fixes applied
 	NewReader() io.Reader
 }
 
