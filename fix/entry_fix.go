@@ -19,7 +19,7 @@ func init() {
 		fixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
 		fixCommitMessagePrefixWithTilde{},
-		FixIdeasInBody{},
+		fixIdeasInBody{},
 	}
 }
 
@@ -238,13 +238,13 @@ func (fixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
 	We assume that the ideas have already been
 	parsed and saved in an earlier fix step.
 */
-type FixIdeasInBody struct{}
+type fixIdeasInBody struct{}
 
-func (FixIdeasInBody) CanFix(r io.Reader) (bool, error) {
+func (fixIdeasInBody) CanFix(r io.Reader) (bool, error) {
 	return idea.NewIdeaScanner(r).Scan(), nil
 }
 
-func (FixIdeasInBody) Execute(r io.Reader) ([]byte, error) {
+func (fixIdeasInBody) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
