@@ -77,7 +77,7 @@ func DescribeEntry(c gospec.Context) {
 				for _, data := range entryCasesData {
 					entryCase, err := newEntry(strings.NewReader(data))
 					c.Expect(err, IsNil)
-					c.Expect(string(entryCase.Bytes()), Equals, string(data))
+					c.Expect(string(entryCase.bytes()), Equals, string(data))
 				}
 			})
 

@@ -213,7 +213,7 @@ Mon Jan  6 00:01:00 EST 2014
 					entry, err := newEntryFromFile(filepath.Join(d, "entry", entryFilename))
 					c.Assume(err, IsNil)
 					c.Expect(entry.needsFixed(), IsFalse)
-					c.Expect(string(entry.Bytes()), Equals, expectEntries[i])
+					c.Expect(string(entry.bytes()), Equals, expectEntries[i])
 				}
 			})
 
