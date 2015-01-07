@@ -10,6 +10,7 @@ func TestUnitSpecs(t *testing.T) {
 	r := gospec.NewRunner()
 
 	r.AddSpec(DescribeEntry)
+	r.AddSpec(DescribeEntriesCollector)
 
 	cleanupFn, err := initCase0()
 	if err != nil {

@@ -43,12 +43,22 @@ func entriesIn(directory string) (entries []string, err error) {
 
 		if !info.IsDir() {
 			if !strings.Contains(filepath.Dir(path), ".git") {
-				entries = append(entries, info.Name())
+				if _, err = time.Parse(entryPkg.FilenameLayout, info.Name()); err == nil {
+					entries = append(entries, info.Name())
+				}
 			}
 		}
 		return nil
 	})
 
+	// Recover from panic'ed errors in sort.Sort()
+	defer func() {
+		if perr := recover(); perr != nil {
+			err = perr.(error)
+		}
+	}()
+
+	// Can Panic, Should never ever panic due to specified behavior
 	sort.Sort(entriesByDate(entries))
 
 	return
