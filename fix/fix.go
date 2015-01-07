@@ -102,11 +102,11 @@ func lastCommitHashIn(directory string) (string, error) {
 	return string(bytes.TrimSpace(o)), err
 }
 
-type JournalFixCommit struct {
+type journalFixCommit struct {
 	git.Commitable
 }
 
-func (c JournalFixCommit) CommitMsg() string {
+func (c journalFixCommit) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg()
 }
 
@@ -143,7 +143,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 		return nil, err
 	}
 
-	err = git.Commit(JournalFixCommit{changes})
+	err = git.Commit(journalFixCommit{changes})
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 		return nil, err
 	}
 
-	err = git.Commit(JournalFixCommit{changes})
+	err = git.Commit(journalFixCommit{changes})
 	if err != nil {
 		return nil, err
 	}
