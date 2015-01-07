@@ -2,17 +2,18 @@ package fix
 
 import (
 	"fmt"
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/git/gittest"
-	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/git/gittest"
+	"github.com/ghthor/journal/idea"
 )
 
 func newCase0(prefix string) (string, []string, error) {
