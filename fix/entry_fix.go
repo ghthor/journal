@@ -12,10 +12,10 @@ import (
 	"time"
 )
 
-var entryFixes []EntryFix
+var entryFixes []entryFix
 
 func init() {
-	entryFixes = []EntryFix{
+	entryFixes = []entryFix{
 		FixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
 		FixCommitMessagePrefixWithTilde{},
@@ -23,7 +23,7 @@ func init() {
 	}
 }
 
-type EntryFix interface {
+type entryFix interface {
 	// Parses io.Reader for the error that can be fixed
 	CanFix(io.Reader) (bool, error)
 

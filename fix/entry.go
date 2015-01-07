@@ -24,7 +24,7 @@ type entry interface {
 
 type entryCaseNeedsFixed struct {
 	bytes []byte
-	fixes []EntryFix
+	fixes []entryFix
 }
 
 func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
@@ -62,7 +62,7 @@ func (e entryCaseCurrent) FixedEntry() (entry, git.Commitable, error) {
 func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
 func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.bytes) }
 
-func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
+func findErrorsInEntry(r io.Reader) (fixes []entryFix, err error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
