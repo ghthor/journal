@@ -110,12 +110,12 @@ func (c journalFixCommit) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg()
 }
 
-type JournalFixCommitWithSuffix struct {
+type journalFixCommitWithSuffix struct {
 	git.Commitable
 	suffix string
 }
 
-func (c JournalFixCommitWithSuffix) CommitMsg() string {
+func (c journalFixCommitWithSuffix) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg() + " - " + c.suffix
 }
 
@@ -223,7 +223,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
-			err = git.Commit(JournalFixCommitWithSuffix{
+			err = git.Commit(journalFixCommitWithSuffix{
 				changes,
 				"src:" + entries[i],
 			})
@@ -277,7 +277,7 @@ func fixCase0(directory string) (refLog []string, err error) {
 			changes.Dir = directory
 			changes.Add(git.ChangedFile(entryFilename))
 
-			err = git.Commit(JournalFixCommitWithSuffix{
+			err = git.Commit(journalFixCommitWithSuffix{
 				changes,
 				entryFilename,
 			})
