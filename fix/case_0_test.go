@@ -29,12 +29,14 @@ func newCase0(prefix string) (string, []string, error) {
 		return d, nil, err
 	}
 
+	d = filepath.Join(d, filepath.Base(journal_case_0_directory))
+
 	entries, err := entriesIn(d)
 	if err != nil {
 		return d, nil, err
 	}
 
-	return filepath.Join(d, "case_0"), entries, nil
+	return d, entries, nil
 }
 
 const journal_case_0_directory = "journal_cases/case_0"

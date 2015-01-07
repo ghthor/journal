@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 
 	entryPkg "github.com/ghthor/journal/entry"
@@ -36,20 +35,31 @@ func (f entriesByDate) Less(i, j int) bool {
 func (f entriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 func entriesIn(directory string) (entries []string, err error) {
-	err = filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	f, err := os.Open(directory)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	contents, err := f.Readdir(0)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range contents {
+		// Ignore Directories
+		if info.IsDir() {
+			continue
 		}
 
-		if !info.IsDir() {
-			if !strings.Contains(filepath.Dir(path), ".git") {
-				if _, err = time.Parse(entryPkg.FilenameLayout, info.Name()); err == nil {
-					entries = append(entries, info.Name())
-				}
-			}
+		// Ignore any filesnames that aren't dates in the entry.FilenameLayout
+		if _, err := time.Parse(entryPkg.FilenameLayout, info.Name()); err != nil {
+			continue
+		} else {
+			// Collect Entry
+			entries = append(entries, info.Name())
 		}
-		return nil
-	})
+	}
 
 	// Recover from panic'ed errors in sort.Sort()
 	defer func() {
