@@ -18,7 +18,7 @@ func init() {
 	entryFixes = []entryFix{
 		fixAddClosedAtTimestamp{},
 		FixSplitCommitMessage{},
-		FixCommitMessagePrefixWithTilde{},
+		fixCommitMessagePrefixWithTilde{},
 		FixIdeasInBody{},
 	}
 }
@@ -185,9 +185,9 @@ func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 		# Commit Msg
 
 */
-type FixCommitMessagePrefixWithTilde struct{}
+type fixCommitMessagePrefixWithTilde struct{}
 
-func (FixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
+func (fixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		if strings.HasPrefix(scanner.Text(), "#~ ") {
@@ -202,7 +202,7 @@ func (FixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
 	return false, nil
 }
 
-func (FixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
+func (fixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
