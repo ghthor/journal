@@ -92,9 +92,9 @@ func mvEntriesIn(directory string, entries []string) (movedEntries []string, com
 	mvEntries := exec.Command(mvPath, mvArgs...)
 	mvEntries.Dir = directory
 
-	err = mvEntries.Run()
+	output, err := mvEntries.CombinedOutput()
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), err))
+		return nil, nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), string(output)))
 	}
 
 	changes := git.NewChangesIn(directory)
