@@ -2,10 +2,11 @@ package fix
 
 import (
 	"bytes"
-	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/ghthor/journal/git"
 )
 
 type entry interface {
