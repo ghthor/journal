@@ -30,9 +30,26 @@ func DescribeAFixableJournal(c gospec.Context) {
 
 			c.Specify("containing", func() {
 				c.Specify("an entry directory", func() {
-					// c.Expect(d, contains, "entry/")
+					entriesPath := filepath.Join(d, "entry")
+					fi, err := os.Stat(entriesPath)
+					c.Assume(err, IsNil)
+
+					c.Expect(fi.IsDir(), IsTrue)
+
 					c.Specify("with all entries using the current entry format", func() {
-						// c.Expect(d.entries, areCurrentFormat)
+						entriesDir, err := os.Open(entriesPath)
+						c.Assume(err, IsNil)
+
+						infos, err := entriesDir.Readdir(0)
+						c.Assume(err, IsNil)
+
+						for _, info := range infos {
+							//TODO use a public interface to check this
+							entry, err := newEntryFromFile(filepath.Join(entriesPath, info.Name()))
+							c.Assume(err, IsNil)
+
+							c.Expect(entry.needsFixed(), IsFalse)
+						}
 					})
 				})
 
