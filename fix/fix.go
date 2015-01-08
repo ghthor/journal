@@ -340,6 +340,12 @@ func NeedsFixed(directory string) (bool, error) {
 		return true, nil
 	}
 
+	if fi, err := os.Stat(filepath.Join(directory, "entry")); os.IsNotExist(err) {
+		return true, nil
+	} else if !fi.IsDir() {
+		return false, errors.New(fmt.Sprintf("%s filesystem node isn't a directory", filepath.Join(directory, "entry")))
+	}
+
 	return false, nil
 }
 
