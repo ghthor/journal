@@ -12,7 +12,13 @@ import (
 
 func DescribeAFixableJournal(c gospec.Context) {
 	c.Specify("a fixed journal is a", func() {
-		// d, _, _ := newCaseCurrent("case_current_spec")
+		// TODO this is a hack to create a fixed journal repo
+		d, _, err := newCase0("case_current_spec")
+		c.Assume(err, IsNil)
+
+		_, err = Fix(d)
+		c.Assume(err, IsNil)
+
 		c.Specify("directory", func() {
 			// c.Expect(d, isa, directory)
 			c.Specify("inside a git repository", func() {
