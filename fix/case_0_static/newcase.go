@@ -6,9 +6,32 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
+	"time"
+
+	entryPkg "github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/git"
 
 	"code.google.com/p/go.tools/godoc/vfs/mapfs"
 )
+
+type entriesByDate []string
+
+func (f entriesByDate) Len() int { return len(f) }
+func (f entriesByDate) Less(i, j int) bool {
+	iTime, err := time.Parse(entryPkg.FilenameLayout, f[i])
+	if err != nil {
+		panic(err)
+	}
+
+	jTime, err := time.Parse(entryPkg.FilenameLayout, f[j])
+	if err != nil {
+		panic(err)
+	}
+
+	return jTime.After(iTime)
+}
+func (f entriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 // This algorithm will only mkdir's of 1 depth
 func mkDirsIn(directory string, paths []string) (dirMap map[string][]string, err error) {
@@ -81,5 +104,27 @@ func NewIn(directory string) (case_0_directory string, entries []string, err err
 		}
 	}
 
-	return filepath.Join(directory, "case_0"), dirMap["case_0"], nil
+	// Initialize a git repository in the case_0/ directory and commit all the entries
+	case_0_directory = filepath.Join(directory, "case_0")
+
+	err = git.Init(case_0_directory)
+	if err != nil {
+		return "", nil, err
+	}
+
+	entries = dirMap["case_0"]
+	sort.Sort(entriesByDate(entries))
+
+	// Commit the entries into git
+	for i, entryFilename := range entries {
+		changes := git.NewChangesIn(case_0_directory)
+		changes.Add(git.ChangedFile(entryFilename))
+		changes.Msg = fmt.Sprintf("Commit Msg | Entry %d\n", i+1)
+		err = changes.Commit()
+		if err != nil {
+			return "", nil, err
+		}
+	}
+
+	return case_0_directory, entries, nil
 }

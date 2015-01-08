@@ -1,12 +1,16 @@
 package case_0_static_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/ghthor/journal/fix/case_0_static"
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/git/gittest"
 
 	"github.com/ghthor/gospec"
 	. "github.com/ghthor/gospec"
@@ -51,18 +55,44 @@ func DescribeNewCase0(c gospec.Context) {
 				case_0_dir, err := os.Open(d)
 				c.Assume(err, IsNil)
 
-				entryInfos, err := case_0_dir.Readdir(0)
+				infos, err := case_0_dir.Readdir(0)
 				c.Assume(err, IsNil)
+
+				entryInfos := make([]os.FileInfo, 0, len(infos)-1)
+
+				for _, info := range infos {
+					if info.IsDir() {
+						c.Expect(info.Name(), Equals, ".git")
+					} else {
+						entryInfos = append(entryInfos, info)
+					}
+				}
 
 				c.Expect(len(entryInfos), Equals, len(entries))
 			})
 
 			c.Specify("as a git repository", func() {
-				c.Specify("and contains committed entry", func() {
-				})
-			})
+				c.Expect(d, gittest.IsAGitRepository)
+				c.Expect(git.IsClean(d), IsNil)
 
-			c.Specify("that can be fixed", func() {
+				c.Specify("and contains committed entry", func() {
+					for i := 0; i < len(entries); i++ {
+						entryFilename := entries[i]
+
+						c.Specify(entryFilename, func() {
+							// Check that the files were commited in the correct order
+							o, err := git.Command(d, "show", "--name-only", "--pretty=format:",
+								fmt.Sprintf("HEAD%s", strings.Repeat("^", len(entries)-1-i))).Output()
+							c.Assume(err, IsNil)
+							c.Expect(strings.TrimSpace(string(o)), Equals, entryFilename)
+						})
+					}
+
+					// Verify the git tree hash is the same
+					o, err := git.Command(d, "show", "-s", "--pretty=format:%T").Output()
+					c.Assume(err, IsNil)
+					c.Expect(string(o), Equals, "eda50d431c6ffed54ad220b15e5451d4c19d2d02")
+				})
 			})
 		})
 
