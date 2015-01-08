@@ -20,9 +20,12 @@ func DescribeAFixableJournal(c gospec.Context) {
 		c.Assume(err, IsNil)
 
 		c.Specify("directory", func() {
-			// c.Expect(d, isa, directory)
+			fi, err := os.Stat(d)
+			c.Assume(err, IsNil)
+			c.Expect(fi.IsDir(), IsTrue)
+
 			c.Specify("inside a git repository", func() {
-				// c.Expect(d, isa, gitrepo)
+				c.Expect(d, gittest.IsAGitRepository)
 			})
 
 			c.Specify("containing", func() {
