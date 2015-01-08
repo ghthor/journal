@@ -8,6 +8,7 @@ import (
 	. "github.com/ghthor/gospec"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/git/gittest"
+	"github.com/ghthor/journal/idea"
 )
 
 func DescribeAFixableJournal(c gospec.Context) {
@@ -54,8 +55,11 @@ func DescribeAFixableJournal(c gospec.Context) {
 				})
 
 				c.Specify("an idea directory store", func() {
-					// c.Expect(d.ideas, exists)
-					// c.Expect(d.ideas, isEdittable)
+					_, err := idea.NewDirectoryStore(filepath.Join(d, "idea"))
+					c.Assume(err, IsNil)
+
+					//TODO Make sure ideas exist
+					//TODO Make sure ideas are edittable
 				})
 			})
 		})
