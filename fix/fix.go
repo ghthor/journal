@@ -328,7 +328,8 @@ func fixCase0(directory string) (refLog []string, err error) {
 	return
 }
 
-// If returns false, then error may or may not be nill
+// If returns false, then error may or may not be nil.
+//
 // If returns true, error MUST be nil
 func NeedsFixed(directory string) (bool, error) {
 	entries, err := entriesIn(directory)
