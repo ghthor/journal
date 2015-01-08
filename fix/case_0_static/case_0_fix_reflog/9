@@ -1,0 +1,15 @@
+journal - fix - entry - format updated - entry/2014-01-03-0000-EST
+
+diff --git a/entry/2014-01-03-0000-EST b/entry/2014-01-03-0000-EST
+index 18aae5d..7202c60 100644
+--- a/entry/2014-01-03-0000-EST
++++ b/entry/2014-01-03-0000-EST
+@@ -1,7 +1,6 @@
+ Fri Jan  3 00:00:00 EST 2014
+ 
+-#~ Commit Msg
+-# Entry 3
++# Commit Msg | Entry 3
+ Entry Body
+ 
+ entry_case_2
