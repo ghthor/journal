@@ -1,20 +1,37 @@
 package fix
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/fix/case_0_static"
 	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/git/gittest"
 	"github.com/ghthor/journal/idea"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
 )
 
 func DescribeAFixableJournal(c gospec.Context) {
+	tmpDir := func(prefix string) (directory string, cleanUp func()) {
+		directory, err := ioutil.TempDir("", prefix+"_")
+		c.Assume(err, IsNil)
+
+		cleanUp = func() {
+			c.Assume(os.RemoveAll(directory), IsNil)
+		}
+
+		return
+	}
+
+	baseDir, cleanUp := tmpDir("journal_fix")
+	defer cleanUp()
+
 	c.Specify("a fixed journal is a", func() {
 		// TODO this is a hack to create a fixed journal repo
-		d, _, err := newCase0("case_current_spec")
+		d, _, err := case_0_static.NewIn(baseDir)
 		c.Assume(err, IsNil)
 
 		_, err = Fix(d)
@@ -66,7 +83,7 @@ func DescribeAFixableJournal(c gospec.Context) {
 	})
 
 	c.Specify("a fixable journal is a", func() {
-		d, _, err := newCase0("case_0_is_fixable")
+		d, _, err := case_0_static.NewIn(baseDir)
 		c.Assume(err, IsNil)
 
 		c.Specify("directory", func() {
