@@ -1,7 +1,6 @@
 package fix
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -37,7 +36,7 @@ func DescribeAFixableJournal(c gospec.Context) {
 	})
 
 	c.Specify("a fixable journal is a", func() {
-		d, entries, err := newCase0("case_0_is_fixable")
+		d, _, err := newCase0("case_0_is_fixable")
 		c.Assume(err, IsNil)
 
 		c.Specify("directory", func() {
@@ -45,24 +44,8 @@ func DescribeAFixableJournal(c gospec.Context) {
 				c.Assume(d, gittest.IsAGitRepository)
 				c.Assume(git.IsClean(d), IsNil)
 
+				// Case 0
 				c.Specify("that contains entries", func() {
-					needsFixed, err := NeedsFixed(d)
-					c.Expect(needsFixed, IsTrue)
-
-					refLog, err := Fix(d)
-					c.Expect(err, IsNil)
-
-					fmt.Println(refLog)
-
-					needsFixed, err = NeedsFixed(d)
-					c.Expect(needsFixed, IsFalse)
-				})
-
-				c.Specify("that contains no entries", func() {
-					for _, filename := range entries {
-						c.Assume(os.Remove(filepath.Join(d, filename)), IsNil)
-					}
-
 					needsFixed, err := NeedsFixed(d)
 					c.Expect(needsFixed, IsTrue)
 
@@ -70,7 +53,7 @@ func DescribeAFixableJournal(c gospec.Context) {
 					c.Expect(err, IsNil)
 
 					needsFixed, err = NeedsFixed(d)
-					c.Expect(needsFixed, IsTrue)
+					c.Expect(needsFixed, IsFalse)
 				})
 			})
 		})
