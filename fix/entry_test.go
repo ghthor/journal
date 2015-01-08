@@ -2,12 +2,15 @@ package fix
 
 import (
 	"fmt"
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
-	"github.com/ghthor/journal/git"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ghthor/journal/git"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
 )
 
 const entry_case_0 = `Sun Jan 26 14:50:50 EST 2014
@@ -82,8 +85,12 @@ func DescribeEntry(c gospec.Context) {
 			})
 
 			c.Specify("from a file", func() {
-				d, err := ioutil.TempDir("_test", "entry_can_be_read_from_file_")
+				d, err := ioutil.TempDir("", "entry_can_be_read_from_file_")
 				c.Assume(err, IsNil)
+
+				defer func() {
+					c.Assume(os.RemoveAll(d), IsNil)
+				}()
 
 				for i, data := range entryCasesData {
 					filename := filepath.Join(d, fmt.Sprintf("case_%d", i))
