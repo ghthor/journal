@@ -77,6 +77,19 @@ Idea Body
 Mon Jan  6 00:01:00 EST 2014
 `,
 
+	"case_0/2014-01-07-0000-EST": `Mon Jan  7 00:00:00 EST 2014
+
+#~ Commit Msg | Entry 7
+Entry Body
+
+entry_case_4
+
+## [active] An Idea
+Idea Body
+
+Mon Jan  7 00:01:00 EST 2014
+`,
+
 	"case_0.json": `{
     "directory":"case_0"
 }

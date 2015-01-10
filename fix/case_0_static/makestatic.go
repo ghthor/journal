@@ -24,6 +24,7 @@ var files = []string{
 	"case_0/2014-01-04-0000-EST",
 	"case_0/2014-01-05-0000-EST",
 	"case_0/2014-01-06-0000-EST",
+	"case_0/2014-01-07-0000-EST",
 	"case_0.json",
 	"case_0_fix_reflog/0",
 	"case_0_fix_reflog/1",

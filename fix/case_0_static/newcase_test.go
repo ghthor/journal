@@ -50,7 +50,7 @@ func DescribeNewCase0(c gospec.Context) {
 			c.Expect(fi.IsDir(), IsTrue)
 
 			c.Specify("containing some entries", func() {
-				c.Expect(len(entries), Equals, 6)
+				c.Expect(len(entries), Equals, 7)
 
 				case_0_dir, err := os.Open(d)
 				c.Assume(err, IsNil)
@@ -91,7 +91,7 @@ func DescribeNewCase0(c gospec.Context) {
 					// Verify the git tree hash is the same
 					o, err := git.Command(d, "show", "-s", "--pretty=format:%T").Output()
 					c.Assume(err, IsNil)
-					c.Expect(string(o), Equals, "eda50d431c6ffed54ad220b15e5451d4c19d2d02")
+					c.Expect(string(o), Equals, "1731d5a3e0e5f6efacfee953262fe8bc82cc9a2e")
 				})
 			})
 		})
