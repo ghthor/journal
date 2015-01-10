@@ -98,6 +98,23 @@ index ca4acf0..0000000
 -Idea Body
 -
 -Mon Jan  6 00:01:00 EST 2014
+diff --git a/2014-01-07-0000-EST b/2014-01-07-0000-EST
+deleted file mode 100644
+index acdbfef..0000000
+--- a/2014-01-07-0000-EST
++++ /dev/null
+@@ -1,11 +0,0 @@
+-Mon Jan  7 00:00:00 EST 2014
+-
+-#~ Commit Msg | Entry 7
+-Entry Body
+-
+-entry_case_4
+-
+-## [active] An Idea
+-Idea Body
+-
+-Mon Jan  7 00:01:00 EST 2014
 diff --git a/entry/2014-01-01-0000-EST b/entry/2014-01-01-0000-EST
 new file mode 100644
 index 0000000..d824b23
@@ -196,3 +213,20 @@ index 0000000..ca4acf0
 +Idea Body
 +
 +Mon Jan  6 00:01:00 EST 2014
+diff --git a/entry/2014-01-07-0000-EST b/entry/2014-01-07-0000-EST
+new file mode 100644
+index 0000000..acdbfef
+--- /dev/null
++++ b/entry/2014-01-07-0000-EST
+@@ -0,0 +1,11 @@
++Mon Jan  7 00:00:00 EST 2014
++
++#~ Commit Msg | Entry 7
++Entry Body
++
++entry_case_4
++
++## [active] An Idea
++Idea Body
++
++Mon Jan  7 00:01:00 EST 2014

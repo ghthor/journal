@@ -12,18 +12,18 @@ import (
 	"time"
 )
 
-var entryFixes []EntryFix
+var entryFixes []entryFix
 
 func init() {
-	entryFixes = []EntryFix{
-		FixAddClosedAtTimestamp{},
-		FixSplitCommitMessage{},
-		FixCommitMessagePrefixWithTilde{},
-		FixIdeasInBody{},
+	entryFixes = []entryFix{
+		fixAddClosedAtTimestamp{},
+		fixSplitCommitMessage{},
+		fixCommitMessagePrefixWithTilde{},
+		fixIdeasInBody{},
 	}
 }
 
-type EntryFix interface {
+type entryFix interface {
 	// Parses io.Reader for the error that can be fixed
 	CanFix(io.Reader) (bool, error)
 
@@ -33,9 +33,9 @@ type EntryFix interface {
 
 // Parse the opened at timestamp and add 2 mins
 // then append it to the end
-type FixAddClosedAtTimestamp struct{}
+type fixAddClosedAtTimestamp struct{}
 
-func (FixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
+func (fixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return false, err
@@ -46,15 +46,18 @@ func (FixAddClosedAtTimestamp) CanFix(r io.Reader) (bool, error) {
 
 func lastLineIsTimestamp(data []byte) bool {
 	scanner := bufio.NewScanner(bytes.NewReader(data))
+
 	// Scan to the last line
+	var prevLine string
 	for scanner.Scan() {
+		prevLine = scanner.Text()
 	}
-	_, err := time.Parse(time.UnixDate, scanner.Text())
+	_, err := time.Parse(time.UnixDate, prevLine)
 
 	return err == nil
 }
 
-func (FixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
+func (fixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 	// For adding 2 mins and making the closed at timestamp
 	var openedAt time.Time
 
@@ -110,9 +113,9 @@ func (FixAddClosedAtTimestamp) Execute(r io.Reader) ([]byte, error) {
 		# Commit Msg | Additional Msg
 
 */
-type FixSplitCommitMessage struct{}
+type fixSplitCommitMessage struct{}
 
-func (FixSplitCommitMessage) CanFix(r io.Reader) (bool, error) {
+func (fixSplitCommitMessage) CanFix(r io.Reader) (bool, error) {
 	return hasSplitCommitMsg(r), nil
 }
 
@@ -130,7 +133,7 @@ func hasSplitCommitMsg(r io.Reader) bool {
 	return false
 }
 
-func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
+func (fixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
@@ -182,9 +185,9 @@ func (FixSplitCommitMessage) Execute(r io.Reader) ([]byte, error) {
 		# Commit Msg
 
 */
-type FixCommitMessagePrefixWithTilde struct{}
+type fixCommitMessagePrefixWithTilde struct{}
 
-func (FixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
+func (fixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		if strings.HasPrefix(scanner.Text(), "#~ ") {
@@ -199,7 +202,7 @@ func (FixCommitMessagePrefixWithTilde) CanFix(r io.Reader) (bool, error) {
 	return false, nil
 }
 
-func (FixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
+func (fixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 
@@ -235,13 +238,13 @@ func (FixCommitMessagePrefixWithTilde) Execute(r io.Reader) ([]byte, error) {
 	We assume that the ideas have already been
 	parsed and saved in an earlier fix step.
 */
-type FixIdeasInBody struct{}
+type fixIdeasInBody struct{}
 
-func (FixIdeasInBody) CanFix(r io.Reader) (bool, error) {
+func (fixIdeasInBody) CanFix(r io.Reader) (bool, error) {
 	return idea.NewIdeaScanner(r).Scan(), nil
 }
 
-func (FixIdeasInBody) Execute(r io.Reader) ([]byte, error) {
+func (fixIdeasInBody) Execute(r io.Reader) ([]byte, error) {
 	// For storing the fixed output
 	b := bytes.NewBuffer(make([]byte, 0, 1024))
 

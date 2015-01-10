@@ -1,22 +1,20 @@
 package fix
 
 import (
-	"github.com/ghthor/gospec"
 	"testing"
+
+	"github.com/ghthor/gospec"
 )
 
 func TestUnitSpecs(t *testing.T) {
-
 	r := gospec.NewRunner()
 
 	r.AddSpec(DescribeEntry)
+	r.AddSpec(DescribeEntriesCollector)
 
-	cleanupFn, err := initCase0()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cleanupFn()
-	r.AddSpec(DescribeJournalCase0)
+	r.AddSpec(DescribeFixingCase0)
+
+	r.AddSpec(DescribeAFixableJournal)
 
 	gospec.MainGoTest(r, t)
 }

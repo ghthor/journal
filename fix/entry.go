@@ -2,35 +2,35 @@ package fix
 
 import (
 	"bytes"
-	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/ghthor/journal/git"
 )
 
-type Entry interface {
-	// Needs Fixed
-	NeedsFixed() bool
+type entry interface {
+	needsFixed() bool
 
 	// Return an Entry that has been fixed
-	FixedEntry() (Entry, git.Commitable, error)
+	fixedEntry() (entry, git.Commitable, error)
 
-	// Returns a byte slice of the entry w/o fixes
-	Bytes() []byte
+	// Returns a byte slice of the entry w/o fixes applied
+	bytes() []byte
 
-	// Returns an io.Reader for the entry w/o fixes
-	NewReader() io.Reader
+	// Returns an io.Reader for the entry w/o fixes applied
+	newReader() io.Reader
 }
 
 type entryCaseNeedsFixed struct {
-	bytes []byte
-	fixes []EntryFix
+	rawBytes []byte
+	fixes    []entryFix
 }
 
-func (e entryCaseNeedsFixed) NeedsFixed() bool { return len(e.fixes) > 0 }
-func (e entryCaseNeedsFixed) FixedEntry() (Entry, git.Commitable, error) {
+func (e entryCaseNeedsFixed) needsFixed() bool { return len(e.fixes) > 0 }
+func (e entryCaseNeedsFixed) fixedEntry() (entry, git.Commitable, error) {
 	var (
-		data []byte = e.bytes
+		data []byte = e.rawBytes
 		err  error
 	)
 
@@ -46,23 +46,23 @@ func (e entryCaseNeedsFixed) FixedEntry() (Entry, git.Commitable, error) {
 	}, nil
 }
 
-func (e entryCaseNeedsFixed) Bytes() []byte { return e.bytes }
-func (e entryCaseNeedsFixed) NewReader() io.Reader {
-	return bytes.NewReader(e.bytes)
+func (e entryCaseNeedsFixed) bytes() []byte { return e.rawBytes }
+func (e entryCaseNeedsFixed) newReader() io.Reader {
+	return bytes.NewReader(e.rawBytes)
 }
 
 type entryCaseCurrent struct {
-	bytes []byte
+	rawBytes []byte
 }
 
-func (e entryCaseCurrent) NeedsFixed() bool { return false }
-func (e entryCaseCurrent) FixedEntry() (Entry, git.Commitable, error) {
+func (e entryCaseCurrent) needsFixed() bool { return false }
+func (e entryCaseCurrent) fixedEntry() (entry, git.Commitable, error) {
 	return e, nil, nil
 }
-func (e entryCaseCurrent) Bytes() []byte        { return e.bytes }
-func (e entryCaseCurrent) NewReader() io.Reader { return bytes.NewReader(e.bytes) }
+func (e entryCaseCurrent) bytes() []byte        { return e.rawBytes }
+func (e entryCaseCurrent) newReader() io.Reader { return bytes.NewReader(e.rawBytes) }
 
-func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
+func findErrorsInEntry(r io.Reader) (fixes []entryFix, err error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func findErrorsInEntry(r io.Reader) (fixes []EntryFix, err error) {
 	return
 }
 
-func NewEntry(r io.Reader) (Entry, error) {
+func newEntry(r io.Reader) (entry, error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -93,11 +93,11 @@ func NewEntry(r io.Reader) (Entry, error) {
 	return entryCaseCurrent{data}, nil
 }
 
-func NewEntryFromFile(filepath string) (Entry, error) {
+func newEntryFromFile(filepath string) (entry, error) {
 	f, err := os.OpenFile(filepath, os.O_RDONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	return NewEntry(f)
+	return newEntry(f)
 }

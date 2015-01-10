@@ -4,51 +4,72 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ghthor/journal/entry"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
+
+	entryPkg "github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
-type EntriesByDate []string
+type entriesByDate []string
 
-func (f EntriesByDate) Len() int { return len(f) }
-func (f EntriesByDate) Less(i, j int) bool {
-	iTime, err := time.Parse(entry.FilenameLayout, f[i])
+func (f entriesByDate) Len() int { return len(f) }
+func (f entriesByDate) Less(i, j int) bool {
+	iTime, err := time.Parse(entryPkg.FilenameLayout, f[i])
 	if err != nil {
 		panic(err)
 	}
 
-	jTime, err := time.Parse(entry.FilenameLayout, f[j])
+	jTime, err := time.Parse(entryPkg.FilenameLayout, f[j])
 	if err != nil {
 		panic(err)
 	}
 
 	return jTime.After(iTime)
 }
-func (f EntriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
+func (f entriesByDate) Swap(i, j int) { f[i], f[j] = f[j], f[i] }
 
 func entriesIn(directory string) (entries []string, err error) {
-	err = filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+	f, err := os.Open(directory)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	contents, err := f.Readdir(0)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range contents {
+		// Ignore Directories
+		if info.IsDir() {
+			continue
 		}
 
-		if !info.IsDir() {
-			if !strings.Contains(filepath.Dir(path), ".git") {
-				entries = append(entries, info.Name())
-			}
+		// Ignore any filesnames that aren't dates in the entry.FilenameLayout
+		if _, err := time.Parse(entryPkg.FilenameLayout, info.Name()); err != nil {
+			continue
+		} else {
+			// Collect Entry
+			entries = append(entries, info.Name())
 		}
-		return nil
-	})
+	}
 
-	sort.Sort(EntriesByDate(entries))
+	// Recover from panic'ed errors in sort.Sort()
+	defer func() {
+		if perr := recover(); perr != nil {
+			err = perr.(error)
+		}
+	}()
+
+	// Can Panic, Should never ever panic due to specified behavior
+	sort.Sort(entriesByDate(entries))
 
 	return
 }
@@ -71,9 +92,9 @@ func mvEntriesIn(directory string, entries []string) (movedEntries []string, com
 	mvEntries := exec.Command(mvPath, mvArgs...)
 	mvEntries.Dir = directory
 
-	err = mvEntries.Run()
+	output, err := mvEntries.CombinedOutput()
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), err))
+		return nil, nil, errors.New(fmt.Sprintf("error moving entries to %s : %v", filepath.Join(directory, "entry/"), string(output)))
 	}
 
 	changes := git.NewChangesIn(directory)
@@ -101,24 +122,24 @@ func lastCommitHashIn(directory string) (string, error) {
 	return string(bytes.TrimSpace(o)), err
 }
 
-type JournalFixCommit struct {
+type journalFixCommit struct {
 	git.Commitable
 }
 
-func (c JournalFixCommit) CommitMsg() string {
+func (c journalFixCommit) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg()
 }
 
-type JournalFixCommitWithSuffix struct {
+type journalFixCommitWithSuffix struct {
 	git.Commitable
 	suffix string
 }
 
-func (c JournalFixCommitWithSuffix) CommitMsg() string {
+func (c journalFixCommitWithSuffix) CommitMsg() string {
 	return "journal - fix - " + c.Commitable.CommitMsg() + " - " + c.suffix
 }
 
-func FixCase0(directory string) (refLog []string, err error) {
+func fixCase0(directory string) (refLog []string, err error) {
 	// Mark the begining of the fix commit log
 	err = git.CommitEmpty(directory, "journal - fix - begin")
 	if err != nil {
@@ -142,7 +163,7 @@ func FixCase0(directory string) (refLog []string, err error) {
 		return nil, err
 	}
 
-	err = git.Commit(JournalFixCommit{changes})
+	err = git.Commit(journalFixCommit{changes})
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +185,7 @@ func FixCase0(directory string) (refLog []string, err error) {
 		return nil, err
 	}
 
-	err = git.Commit(JournalFixCommit{changes})
+	err = git.Commit(journalFixCommit{changes})
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +243,12 @@ func FixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
-			err = git.Commit(JournalFixCommitWithSuffix{
+			if changes == nil {
+				// The idea wasn't modified
+				continue
+			}
+
+			err = git.Commit(journalFixCommitWithSuffix{
 				changes,
 				"src:" + entries[i],
 			})
@@ -246,23 +272,23 @@ func FixCase0(directory string) (refLog []string, err error) {
 		}
 		defer entryFile.Close()
 
-		entry, err := NewEntry(entryFile)
+		entry, err := newEntry(entryFile)
 		if err != nil {
 			return nil, err
 		}
 
-		if entry.NeedsFixed() {
+		if entry.needsFixed() {
 			_, err = entryFile.Seek(0, 0)
 			if err != nil {
 				return nil, err
 			}
 
-			entry, commitable, err := entry.FixedEntry()
+			entry, commitable, err := entry.fixedEntry()
 			if err != nil {
 				return nil, err
 			}
 
-			n, err := io.Copy(entryFile, entry.NewReader())
+			n, err := io.Copy(entryFile, entry.newReader())
 			if err != nil {
 				return nil, err
 			}
@@ -276,7 +302,7 @@ func FixCase0(directory string) (refLog []string, err error) {
 			changes.Dir = directory
 			changes.Add(git.ChangedFile(entryFilename))
 
-			err = git.Commit(JournalFixCommitWithSuffix{
+			err = git.Commit(journalFixCommitWithSuffix{
 				changes,
 				entryFilename,
 			})
@@ -305,4 +331,41 @@ func FixCase0(directory string) (refLog []string, err error) {
 	refLog = append(refLog, completedHash)
 
 	return
+}
+
+// If returns false, then error may or may not be nil.
+//
+// If returns true, error MUST be nil
+func NeedsFixed(directory string) (bool, error) {
+	entries, err := entriesIn(directory)
+	if err != nil {
+		return false, err
+	}
+
+	if len(entries) != 0 {
+		return true, nil
+	}
+
+	if fi, err := os.Stat(filepath.Join(directory, "entry")); os.IsNotExist(err) {
+		return true, nil
+	} else if !fi.IsDir() {
+		return false, errors.New(fmt.Sprintf("%s filesystem node isn't a directory", filepath.Join(directory, "entry")))
+	}
+
+	return false, nil
+}
+
+func Fix(directory string) (refLog []string, err error) {
+	needsFixed, err := NeedsFixed(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	// Drop out early if theres nothing to fix
+	if !needsFixed {
+		return nil, nil
+	}
+
+	// Make a blanket assumption that we're dealing with case0
+	return fixCase0(directory)
 }
