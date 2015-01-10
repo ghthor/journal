@@ -198,6 +198,23 @@ index ca4acf0..0000000
 -Idea Body
 -
 -Mon Jan  6 00:01:00 EST 2014
+diff --git a/2014-01-07-0000-EST b/2014-01-07-0000-EST
+deleted file mode 100644
+index acdbfef..0000000
+--- a/2014-01-07-0000-EST
++++ /dev/null
+@@ -1,11 +0,0 @@
+-Mon Jan  7 00:00:00 EST 2014
+-
+-#~ Commit Msg | Entry 7
+-Entry Body
+-
+-entry_case_4
+-
+-## [active] An Idea
+-Idea Body
+-
+-Mon Jan  7 00:01:00 EST 2014
 diff --git a/entry/2014-01-01-0000-EST b/entry/2014-01-01-0000-EST
 new file mode 100644
 index 0000000..d824b23
@@ -296,6 +313,23 @@ index 0000000..ca4acf0
 +Idea Body
 +
 +Mon Jan  6 00:01:00 EST 2014
+diff --git a/entry/2014-01-07-0000-EST b/entry/2014-01-07-0000-EST
+new file mode 100644
+index 0000000..acdbfef
+--- /dev/null
++++ b/entry/2014-01-07-0000-EST
+@@ -0,0 +1,11 @@
++Mon Jan  7 00:00:00 EST 2014
++
++#~ Commit Msg | Entry 7
++Entry Body
++
++entry_case_4
++
++## [active] An Idea
++Idea Body
++
++Mon Jan  7 00:01:00 EST 2014
 `,
 
 	"case_0_fix_reflog/10": `journal - fix - entry - format updated - entry/2014-01-04-0000-EST
@@ -365,7 +399,28 @@ index ca4acf0..f55fe5f 100644
  Mon Jan  6 00:01:00 EST 2014
 `,
 
-	"case_0_fix_reflog/13": `journal - fix - completed
+	"case_0_fix_reflog/13": `journal - fix - entry - format updated - entry/2014-01-07-0000-EST
+
+diff --git a/entry/2014-01-07-0000-EST b/entry/2014-01-07-0000-EST
+index acdbfef..e2d10a5 100644
+--- a/entry/2014-01-07-0000-EST
++++ b/entry/2014-01-07-0000-EST
+@@ -1,11 +1,8 @@
+ Mon Jan  7 00:00:00 EST 2014
+ 
+-#~ Commit Msg | Entry 7
++# Commit Msg | Entry 7
+ Entry Body
+ 
+ entry_case_4
+ 
+-## [active] An Idea
+-Idea Body
+-
+ Mon Jan  7 00:01:00 EST 2014
+`,
+
+	"case_0_fix_reflog/14": `journal - fix - completed
 `,
 
 	"case_0_fix_reflog/2": `journal - fix - idea directory store initialized

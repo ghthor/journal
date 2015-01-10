@@ -32,6 +32,7 @@ var files = []string{
 	"case_0_fix_reflog/11",
 	"case_0_fix_reflog/12",
 	"case_0_fix_reflog/13",
+	"case_0_fix_reflog/14",
 	"case_0_fix_reflog/2",
 	"case_0_fix_reflog/3",
 	"case_0_fix_reflog/4",
