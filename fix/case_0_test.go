@@ -121,6 +121,15 @@ Entry Body
 entry_case_4
 
 Mon Jan  6 00:01:00 EST 2014
+`,
+				`Mon Jan  7 00:00:00 EST 2014
+
+# Commit Msg | Entry 7
+Entry Body
+
+entry_case_4
+
+Mon Jan  7 00:01:00 EST 2014
 `}
 
 			for i, entryFilename := range expectedEntries {
