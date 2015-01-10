@@ -134,11 +134,11 @@ Mon Jan  6 00:01:00 EST 2014
 		c.Specify("and all changes will be commited", func() {
 			c.Expect(git.IsClean(d), IsNil)
 
+			vfs := mapfs.New(case_0_static.Files)
+
 			for i, ref := range refLog {
 				actual, err := git.Command(d, "show", "--pretty=format:%s%n", ref).Output()
 				c.Assume(err, IsNil)
-
-				vfs := mapfs.New(case_0_static.Files)
 
 				expectedOutputFilename := filepath.Join("case_0_fix_reflog", fmt.Sprint(i))
 				expectedFile, err := vfs.Open(expectedOutputFilename)
