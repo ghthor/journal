@@ -60,6 +60,41 @@ func mkDirsIn(directory string, paths []string) (dirMap map[string][]string, err
 	return dirMap, nil
 }
 
+// Copies all the static resources into directory
+// with all the entries commited to the repository.
+// The directory will also contain a reflog of
+// the commits that fix will create to
+// update the journal to the current format.
+//
+// The directory tree will be
+/*
+	directory/
+	├── case_0
+	│   ├── 2014-01-01-0000-EST
+	│   ├── 2014-01-02-0000-EST
+	│   ├── 2014-01-03-0000-EST
+	│   ├── 2014-01-04-0000-EST
+	│   ├── 2014-01-05-0000-EST
+	│   ├── 2014-01-06-0000-EST
+	│   └── 2014-01-07-0000-EST
+	├── case_0.json
+	└── case_0_fix_reflog
+	    ├── 0
+	    ├── 1
+	    ├── 10
+	    ├── 11
+	    ├── 12
+	    ├── 13
+	    ├── 14
+	    ├── 2
+	    ├── 3
+	    ├── 4
+	    ├── 5
+	    ├── 6
+	    ├── 7
+	    ├── 8
+	    └── 9
+*/
 func NewIn(directory string) (case_0_directory string, entries []string, err error) {
 	// Build a slice of the file names from the static mapfs Files
 	paths := make([]string, 0, len(Files))
