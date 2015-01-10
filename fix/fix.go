@@ -243,6 +243,11 @@ func fixCase0(directory string) (refLog []string, err error) {
 				return nil, err
 			}
 
+			if changes == nil {
+				// The idea wasn't modified
+				continue
+			}
+
 			err = git.Commit(journalFixCommitWithSuffix{
 				changes,
 				"src:" + entries[i],
