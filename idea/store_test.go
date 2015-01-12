@@ -479,5 +479,39 @@ The file should be truncated to reflect the shorter body.
 				})
 			})
 		})
+
+		c.Specify("can contain some active ideas", func() {
+			ds, _, cleanUp := makeDirectoryStore("directory_store_active_ideas")
+			defer cleanUp()
+
+			activeIdeas := []*Idea{{
+				Status: IS_Active,
+				Name:   "active idea 0",
+				Body:   "active idea 0 body\n",
+			}, {
+				Status: IS_Active,
+				Name:   "active idea 1",
+				Body:   "active idea 0 body\n",
+			}}
+
+			inactiveIdeas := []*Idea{{
+				Status: IS_Inactive,
+				Name:   "inactive idea 0",
+				Body:   "inactive idea body 0\n",
+			}}
+
+			ideas := append(activeIdeas, inactiveIdeas...)
+			for _, idea := range ideas {
+				_, err := ds.SaveIdea(idea)
+				c.Assume(err, IsNil)
+			}
+
+			actualIdeas, err := ds.ActiveIdeas()
+			c.Assume(err, IsNil)
+
+			for i, actual := range actualIdeas {
+				c.Expect(actual, Equals, *activeIdeas[i])
+			}
+		})
 	})
 }

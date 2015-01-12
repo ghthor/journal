@@ -302,3 +302,64 @@ func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
 
 	return changes, nil
 }
+
+func activeIdeasIn(directory string) (activeIds []uint, err error) {
+	// Scan in the id's from the index file
+	data, err := ioutil.ReadFile(filepath.Join(directory, "active"))
+	if err != nil {
+		return nil, err
+	}
+
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	activeIds = make([]uint, 0, 3)
+
+	for scanner.Scan() {
+		var id uint
+		_, err := fmt.Fscan(bytes.NewReader(scanner.Bytes()), &id)
+		if err != nil {
+			return nil, err
+		}
+
+		activeIds = append(activeIds, id)
+	}
+	return
+}
+
+// unoptimized
+func readIdeaFrom(directory string, id uint) (idea Idea, err error) {
+	f, err := os.OpenFile(filepath.Join(directory, fmt.Sprint(id)), os.O_RDONLY, 0600)
+	if err != nil {
+		return Idea{}, nil
+	}
+	defer f.Close()
+
+	scanner := NewIdeaScanner(f)
+	scanner.Scan()
+
+	if scanner.Err() != nil {
+		return Idea{}, scanner.Err()
+	}
+
+	idea = *scanner.Idea()
+	return idea, nil
+}
+
+// Returns a slice of the active ideas from the store
+func (d DirectoryStore) ActiveIdeas() (ideas []Idea, err error) {
+	activeIds, err := activeIdeasIn(d.root)
+	if err != nil {
+		return nil, err
+	}
+
+	ideas = make([]Idea, 0, len(activeIds))
+	for _, id := range activeIds {
+		idea, err := readIdeaFrom(d.root, id)
+		if err != nil {
+			return nil, err
+		}
+
+		ideas = append(ideas, idea)
+	}
+
+	return ideas, nil
+}
