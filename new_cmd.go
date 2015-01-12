@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"flag"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -14,6 +12,9 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
 var editEntry bool
