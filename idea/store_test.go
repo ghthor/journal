@@ -513,5 +513,22 @@ The file should be truncated to reflect the shorter body.
 				c.Expect(actual, Equals, *activeIdeas[i])
 			}
 		})
+
+		c.Specify("can retrieve an idea by it's id", func() {
+			ds, _, cleanUp := makeDirectoryStore("directory_store_active_ideas")
+			defer cleanUp()
+
+			newIdeas, _, _ := someIdeas()
+			for _, iio := range newIdeas {
+				c.Assume(SaveNewIn(ds, iio), IsNil)
+				c.Assume(iio.changes, Not(IsNil))
+			}
+
+			for _, iio := range newIdeas {
+				idea, err := ds.IdeaById(iio.idea.Id)
+				c.Assume(err, IsNil)
+				c.Expect(idea, Equals, *iio.idea)
+			}
+		})
 	})
 }

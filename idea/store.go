@@ -363,3 +363,23 @@ func (d DirectoryStore) ActiveIdeas() (ideas []Idea, err error) {
 
 	return ideas, nil
 }
+
+// Returns the Idea object stored by the id
+func (d DirectoryStore) IdeaById(id uint) (idea Idea, err error) {
+	f, err := os.OpenFile(filepath.Join(d.root, fmt.Sprint(id)), os.O_RDONLY, 0600)
+	if err != nil {
+		return Idea{}, err
+	}
+	defer f.Close()
+
+	scanner := NewIdeaScanner(f)
+	scanner.Scan()
+
+	if scanner.Err() != nil {
+		return Idea{}, err
+	}
+
+	idea = *scanner.Idea()
+
+	return idea, nil
+}
