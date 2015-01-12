@@ -3,7 +3,6 @@ package fix
 import (
 	"errors"
 	"flag"
-	"log"
 	"path/filepath"
 
 	"github.com/ghthor/journal/fix"
@@ -60,7 +59,7 @@ func (c *cmd) Exec(args []string) error {
 	// FIX
 	_, err := fix.Fix(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
