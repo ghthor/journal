@@ -37,30 +37,35 @@ func UpdateIn(d *DirectoryStore, iio *IdeaIO) error {
 
 func DescribeIdeaStore(c gospec.Context) {
 	c.Specify("a directory store", func() {
-		makeEmptyDirectory := func(prefix string) string {
-			d, err := ioutil.TempDir("_test", prefix+"_")
+		makeEmptyDirectory := func(prefix string) (directory string, cleanUp func()) {
+			directory, err := ioutil.TempDir("", prefix+"_")
 			c.Assume(err, IsNil)
-			return d
+
+			cleanUp = func() {
+				c.Assume(os.RemoveAll(directory), IsNil)
+			}
+
+			return directory, cleanUp
 		}
 
-		makeDirectoryStore := func(prefix string) (*DirectoryStore, string) {
-			d := makeEmptyDirectory(prefix)
+		makeDirectoryStore := func(prefix string) (directoryStore *DirectoryStore, directory string, cleanUp func()) {
+			directory, cleanUp = makeEmptyDirectory(prefix)
 
 			// Verify the directory isn't an DirectoryStore
-			_, err := NewDirectoryStore(d)
+			_, err := NewDirectoryStore(directory)
 			c.Assume(IsInvalidDirectoryStoreError(err), IsTrue)
 
 			// Initialize the directory
-			ds, _, err := InitDirectoryStore(d)
+			directoryStore, _, err = InitDirectoryStore(directory)
 			c.Assume(err, IsNil)
-			c.Assume(ds, Not(IsNil))
+			c.Assume(directoryStore, Not(IsNil))
 
 			// Verify the directory has been initialized
-			ds, err = NewDirectoryStore(d)
+			directoryStore, err = NewDirectoryStore(directory)
 			c.Assume(err, IsNil)
-			c.Assume(ds, Not(IsNil))
+			c.Assume(directoryStore, Not(IsNil))
 
-			return ds, d
+			return directoryStore, directory, cleanUp
 		}
 
 		activeIdeasIn := func(d *DirectoryStore) (activeIds []uint) {
@@ -83,7 +88,8 @@ func DescribeIdeaStore(c gospec.Context) {
 		}
 
 		c.Specify("can be initialized", func() {
-			d := makeEmptyDirectory("directory_store_init")
+			d, cleanUp := makeEmptyDirectory("directory_store_init")
+			defer cleanUp()
 
 			ds, commitable, err := InitDirectoryStore(d)
 			c.Assume(err, IsNil)
@@ -129,7 +135,8 @@ index 0000000..d00491f
 		})
 
 		c.Specify("that is empty", func() {
-			_, d := makeDirectoryStore("directory_store_spec")
+			_, d, cleanUp := makeDirectoryStore("directory_store_spec")
+			defer cleanUp()
 
 			c.Specify("has a next available id of 1", func() {
 				data, err := ioutil.ReadFile(filepath.Join(d, "nextid"))
@@ -213,7 +220,8 @@ The file should be truncated to reflect the shorter body.
 		}
 
 		c.Specify("can create a new idea", func() {
-			ds, d := makeDirectoryStore("directory_store_create")
+			ds, d, cleanUp := makeDirectoryStore("directory_store_create")
+			defer cleanUp()
 
 			newIdeas, activeIdeas, notActiveIdeas := someIdeas()
 			for _, iio := range newIdeas {
@@ -342,7 +350,8 @@ The file should be truncated to reflect the shorter body.
 		})
 
 		c.Specify("can update an existing idea", func() {
-			ds, d := makeDirectoryStore("directory_store_update")
+			ds, d, cleanUp := makeDirectoryStore("directory_store_update")
+			defer cleanUp()
 
 			newIdeas, activeIdeas, notActiveIdeas := someIdeas()
 
