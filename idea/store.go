@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ghthor/journal/git"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/ghthor/journal/git"
 )
 
 // Used to manage idea storage in a directory

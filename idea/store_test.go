@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
-	"github.com/ghthor/journal/git"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
+	"github.com/ghthor/journal/git"
 )
 
 type IdeaIO struct {
