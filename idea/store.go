@@ -218,7 +218,7 @@ func (d DirectoryStore) UpdateIdea(idea Idea) (git.Commitable, error) {
 
 	if idea == *ideaOnDisk {
 		// No change
-		return nil, nil
+		return nil, ErrIdeaNotModified
 	}
 
 	// Write to new idea data to file

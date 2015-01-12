@@ -355,7 +355,7 @@ The file should be truncated to reflect the shorter body.
 
 			c.Specify("unless it hasn't been modified", func() {
 				for _, iio := range ideas {
-					c.Assume(UpdateIn(ds, iio), IsNil)
+					c.Assume(UpdateIn(ds, iio), Equals, ErrIdeaNotModified)
 					c.Assume(iio.changes, IsNil)
 				}
 			})
