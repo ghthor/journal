@@ -2,10 +2,11 @@ package idea
 
 import (
 	"bytes"
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
 	"io"
 	"strings"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
 )
 
 func DescribeIdea(c gospec.Context) {
