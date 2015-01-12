@@ -66,7 +66,8 @@ func DescribeIdea(c gospec.Context) {
 	})
 
 	c.Specify("an idea", func() {
-		const someData = `
+		c.Specify("can be scanned from some data", func() {
+			const someData = `
 Some other markdowned text.
 Doesn't matter what it is,
 it will be skipped by the scanner.
@@ -88,7 +89,6 @@ in the body of this Idea.
 
 Sun Jan 26 15:03:44 EST 2014
 `
-		c.Specify("can be scanned from some data", func() {
 			iscan := NewIdeaScanner(strings.NewReader(someData))
 
 			ideas := make([]*Idea, 0, 3)
@@ -132,6 +132,59 @@ in the body of this Idea.
 in the body of this Idea.
 `)
 			})
+		})
+
+		c.Specify("can be scanned from an idea file", func() {
+			ideaFiles := []string{
+				`## [active] active idea
+The newline at the end of this file should be included
+
+in the body of this Idea.
+`,
+				`## [active] [] active idea
+The newline at the end of this file should be included
+
+in the body of this Idea.
+`,
+				`## [active] [1] active idea 1
+The newline at the end of this file should be included
+
+in the body of this Idea.
+`}
+			expected := []Idea{{
+				IS_Active,
+				0,
+				"active idea",
+				`The newline at the end of this file should be included
+
+in the body of this Idea.
+`,
+			}, {
+				IS_Active,
+				0,
+				"active idea",
+				`The newline at the end of this file should be included
+
+in the body of this Idea.
+`,
+			}, {
+				IS_Active,
+				1,
+				"active idea 1",
+				`The newline at the end of this file should be included
+
+in the body of this Idea.
+`,
+			}}
+
+			for i, _ := range ideaFiles {
+				file := strings.NewReader(ideaFiles[i])
+				scanner := NewIdeaScanner(file)
+
+				c.Expect(scanner.Scan(), IsTrue)
+				actual := scanner.Idea()
+				c.Expect(*actual, Equals, expected[i])
+			}
 		})
 	})
 
