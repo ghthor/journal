@@ -1,0 +1,3 @@
+## [inactive] [9] `journal last`
+Open the last entry written in the editor as Read-Only
+Could be utilized by a Vim extension so as you're writing the current entry it opens the last entry in a split window.
