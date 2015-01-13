@@ -4,20 +4,20 @@
     - [X] with an empty active idea index
     - [X] and return a commitable
 
-- [ ] `idea/nextid` will store the next available id
+- [X] `idea/nextid` will store the next available id
 - [ ] `idea/active` will index which ideas are active
     - [ ] 1 id per line
 
-- [ ] Create a new idea
-    - [ ] Retrieve nextid and increment
-        - [ ] Returns a CommitableChange
-    - [ ] Write idea to `idea/{id}`
-        - [ ] Returns a CommitableChange
-    - [ ] If it is active, append id to `idea/active` index
-        - [ ] Returns a CommitableChange
+- [X] Create a new idea
+    - [X] Retrieve nextid and increment
+        - [X] Returns a CommitableChange
+    - [X] Write idea to `idea/{id}`
+        - [X] Returns a CommitableChange
+    - [X] If it is active, append id to `idea/active` index
+        - [X] Returns a CommitableChange
 
-    - [ ] Create a Commitable with all 3 changes and a msg
-        - [ ] commit message format "IDEA - {id} - Created"
+    - [X] Create a Commitable with all 3 changes and a msg
+        - [X] commit message format "IDEA - {id} - Created"
 
 - [ ] Update an existing idea
     - [ ] Write idea to `idea/{id}`
