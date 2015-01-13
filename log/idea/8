@@ -1,0 +1,5 @@
+## [inactive] [8] `journal sync`
+Sync a registered journal repositories.
+Currently it isn't much of a hassle to do it manually.
+But that's only 2 machines.
+I'm sure it could get much much more complicated.
