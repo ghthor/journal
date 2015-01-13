@@ -56,12 +56,14 @@ func main() {
 	// Check that a verb exists in the arguments
 	args := flag.Args()
 	if len(args) == 0 {
+		fmt.Println("user error: no command\n")
 		showUsageAndExit(EC_NO_CMD)
 	}
 
 	// Retrieve the command bound to the verb
 	cmd := cmd_verbs.MatchVerb(args[0])
 	if cmd == nil {
+		fmt.Printf("user error: unknown command `%s`\n\n", args[0])
 		showUsageAndExit(EC_UNKNOWN_COMMAND)
 	}
 
@@ -77,6 +79,7 @@ func main() {
 	// Execute the command
 	err = cmd.Exec(args[1:])
 	if err != nil {
-		showUsageAndExit(EC_CMD_ERROR)
+		fmt.Printf("error: %s\n", err)
+		os.Exit(EC_CMD_ERROR)
 	}
 }
