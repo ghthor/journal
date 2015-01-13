@@ -1,7 +1,7 @@
 ## [active] [24] journal version 1
 - [ ] idea "package journal/cmd" completed
 - [ ] commands implemented
-    - [ ] journal init - WIP
+    - [x] journal init
     - [ ] journal fix
     - [ ] journal new
     - [ ] journal help
