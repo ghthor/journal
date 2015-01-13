@@ -20,21 +20,20 @@ const (
 
 func usage() {
 	fmt.Print(usagePrefix)
-	flag.PrintDefaults()
 	usageTmpl.Execute(os.Stdout, cmd_verbs.Usages())
 }
 
-var usagePrefix = `journal is a filesystem text based journal that stores metadata about each entry
+var usagePrefix = `journal is a wrapper around git for creating a project/personal log.
 
 Usage:
-    journal [options] <subcommand> [subcommand options]
 
-Options:
+	journal command [command arguments]
+
 `
 var usageTmpl = template.Must(template.New("usage").Parse(
-	`
-Commands:{{range .}}
+	`The commands are:{{range .}}
     {{.Verb | printf "%-10s"}} {{.Summary}}{{end}}
+
 `))
 
 func showUsageAndExit(exitCode int) {
@@ -43,28 +42,25 @@ func showUsageAndExit(exitCode int) {
 }
 
 func main() {
-	showUsage := flag.Bool("h", false, "show this usage documentation")
-
 	flag.Usage = usage
 	flag.Parse()
-
-	// Show Help
-	if *showUsage {
-		showUsageAndExit(EC_HELP)
-	}
 
 	// Check that a verb exists in the arguments
 	args := flag.Args()
 	if len(args) == 0 {
-		fmt.Println("user error: no command\n")
 		showUsageAndExit(EC_NO_CMD)
 	}
 
 	// Retrieve the command bound to the verb
 	cmd := cmd_verbs.MatchVerb(args[0])
 	if cmd == nil {
-		fmt.Printf("user error: unknown command `%s`\n\n", args[0])
-		showUsageAndExit(EC_UNKNOWN_COMMAND)
+		if args[0] == "help" {
+			showUsageAndExit(EC_HELP)
+		}
+
+		fmt.Printf("journal: unknown command `%s`\n", args[0])
+		fmt.Println("Run 'journal help' for usage.")
+		os.Exit(EC_UNKNOWN_COMMAND)
 	}
 
 	// Set Working Directory
