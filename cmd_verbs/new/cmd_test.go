@@ -216,7 +216,7 @@ func DescribeNewCmd(c gospec.Context) {
 			// Entry will be shown in the git repository
 			c.Expect(git.IsClean(journalDir), IsNil)
 
-			// Save test output dir for inspection
+			// Save test output dir for manual inspection
 			// c.Assume(exec.Command("cp", "-r", journalDir, filepath.Join("/tmp", "new_cmd_git_commit")).Run(), IsNil)
 
 			lastCommitBytes, err := git.Command(journalDir, "show", "--pretty=format:%T").Output()
@@ -241,7 +241,58 @@ index 0000000..c85666f
 		})
 
 		c.Specify("will commit any modifications to the idea store", func() {
-			// Any modifed Ideas will also have commits
+			cmd := NewCmd(nil)
+			cmd.SetWd(journalDir)
+
+			// Create an active idea
+			store, err := idea.NewDirectoryStore(filepath.Join(journalDir, "idea"))
+			c.Assume(err, IsNil)
+
+			activeIdea := idea.Idea{
+				Status: idea.IS_Active,
+				Name:   "tset idea",
+				Body:   "test idea body\n",
+			}
+
+			commitable, err := store.SaveIdea(&activeIdea)
+			c.Assume(err, IsNil)
+			c.Assume(git.Commit(commitable), IsNil)
+
+			// Mock time to control the filename and openedAt/closedAt times stored in the entry
+			openedAt := time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC)
+			cmd.Now = func() time.Time { return openedAt }
+
+			entryFilename := openedAt.Format(entry.FilenameLayout)
+
+			// Edit to fix the misspelled title in the idea
+			editCmd := exec.Command("sed", "-i", "s_tset_test_", entryFilename)
+			editCmd.Dir = filepath.Join(journalDir, "entry")
+			cmd.EditorProcess = editCmd
+
+			// Run `journal new` with mocked EditorProcess and Now functions
+			c.Assume(cmd.Exec(nil), IsNil)
+
+			c.Expect(git.IsClean(journalDir), IsNil)
+
+			// Save test output dir for manual inspection
+			// c.Assume(exec.Command("cp", "-r", journalDir, filepath.Join("/tmp", "new_cmd_git_commit")).Run(), IsNil)
+
+			lastCommitBytes, err := git.Command(journalDir, "show", "--pretty=format:%T", "HEAD^").Output()
+			c.Assume(err, IsNil)
+			c.Expect(string(lastCommitBytes), Equals, `d6551c5250432aaa5244aa7767ae672cb316c1bb
+diff --git a/idea/1 b/idea/1
+index 83f5e84..0b22af3 100644
+--- a/idea/1
++++ b/idea/1
+@@ -1,2 +1,2 @@
+-## [active] [1] tset idea
++## [active] [1] test idea
+ test idea body
+`)
+			hashAndTitleBytes, err := git.Command(journalDir, "show", "-s", "--format=%s", "HEAD^").Output()
+			c.Assume(err, IsNil)
+			c.Expect(string(hashAndTitleBytes), Equals, "idea - updated - 1\n")
+
 		})
 
 		c.Specify("will fail", func() {

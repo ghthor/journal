@@ -105,12 +105,17 @@ func (c cmd) Exec(args []string) error {
 
 	// Save the ideas to the store
 	for _, i := range ideas {
-		_, err := ideaStore.SaveIdea(&i)
+		commitable, err := ideaStore.SaveIdea(&i)
 		if err != nil {
 			if err == idea.ErrIdeaNotModified {
 				continue
 			}
 
+			return err
+		}
+
+		err = git.Commit(commitable)
+		if err != nil {
 			return err
 		}
 	}
