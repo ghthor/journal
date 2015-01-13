@@ -1,23 +1,11 @@
 ## [active] [1] Idea Management
-This is an Idea.
-An Idea can have a task list and a status[active|inactive|completed]
-
-To find the currently active ideas, you search the previous journal entry.
-All active Ideas found in the previous entry will be carried over to a new entry.
-
-All tasks will be bound to an Idea.
-Expected line form will be as follows.
-
-- [ ] Task - {{.TaskText}}
-
-If a task is checked off in an journal entry it is removed from the ideas task list with a commit.
-The commit is seperate from the commit for the journal entry itself.
-
 To make an Idea inactive you change the status to inactive in the journal entry.
-An inactive Idea will not be carried into the next new entry.
+An inactive Idea will not be visible when writing the next entry.
+
 To make an Idea active you type some sort of valid go template command.
 
 Something like this perhaps?:
 {{.Task.Find("Idea Manager")}}
 
-And then when you save the entry file `journal` will use the file as a template and expand it.
+Saving the entry will trigger journal to parse the file and expand any templates it finds.
+Then when the idea is present in the entry you can mark it as active.
