@@ -1,4 +1,4 @@
-## [active] [13] package entry
+## [completed] [13] package entry
 An entry is a simple state machine where each type is a state that has methods on it to transform it.
 An entry has 3 states.
 
@@ -14,8 +14,8 @@ I'm really happy with this design thus far.
 Especially happy with the git.Commitable interface that will be implemented by ClosedEntry.
 This is the type of decoupling that I was looking for during this redesign and I think I've found it.
 
-- [ ] OpenEntry Specification & Implementation
-- [ ] ClosedEntry Specification & Implementation
+- [X] OpenEntry Specification & Implementation
+- [X] ClosedEntry Specification & Implementation
 
 Before I can use the entry package in `newEntry()` I'll have to specify the git committable nature of the type idea.Idea.
 This is because the only behavior of the entry package will be to remove the ideas from the entry file as it is being closed.
