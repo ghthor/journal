@@ -1,8 +1,9 @@
 ## [active] [17] git interfaces
-- [ ] a CommitableChange can be Add(c CommitableChange)'ed to the index
-    - should have a filepath for executing `git add {filepath}`
-- [ ] a Commitable can be Commit(c Commitable)'ed to the repository
-    - should have a list of CommitableChanges
-    - should have a commit message
+- [X] a CommitableChange can be `git add`'ed to the index
+    - will have a filepath for executing `git add {filepath}`
+- [X] a Commitable can be Commit(c Commitable)'ed to the repository
+    - will have a working directory
+    - will have a list of changes
+    - will have a commit message
 
 - [ ] A function to commit an empty commit with a message
