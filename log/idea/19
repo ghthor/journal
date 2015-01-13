@@ -1,4 +1,9 @@
 ## [active] [19] `idea/` directory
+- [X] initialize an empty directory
+    - [X] with the next available idea of 1
+    - [X] with an empty active idea index
+    - [X] and return a commitable
+
 - [ ] `idea/nextid` will store the next available id
 - [ ] `idea/active` will index which ideas are active
     - [ ] 1 id per line
