@@ -1,12 +1,5 @@
-## [active] [22] package journal/fix
-- [ ] A function to check if a journal directory can be fixed
-    - is directory initialized?
-        - yes - can NOT be fixed
-        - no  - does directory contain entries?
-            - yes - can be fixed
-            - no  - can NOT be fixed
-
-- [ ] A function to check if a journal directory needs to be fixed
+## [completed] [22] package journal/fix
+- [x] A function to check if a journal directory needs to be fixed
     - is directory initialized?
         - yes - does not need fixed
         - no  - does directory contain entries?
