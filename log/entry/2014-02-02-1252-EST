@@ -1,6 +1,6 @@
 Sun Feb  2 12:52:30 EST 2014
 
-#~ Stuck with low motivation
+# Stuck with low motivation
 I'm fighting myself about how to specify the behavior of the idea package.
 There so many possible cases that I just don't know how to specify them.
 
@@ -18,35 +18,5 @@ Am I over thinking it?
 
 I think I'm just not in it today despite really wanting this feature.
 I'll revisit it later, for now I need to do something else and let my mind wander.
-
-## [active] Idea Storage
-Right now each Idea is getting repeated with each entry.
-In the short run this is fine and will work for the immediate future.
-But in the long run I don't like it at all.
-
-If we splice the Ideas out of the entry and store them by themselves we get the following for free.
-
-- Modification tracking through git, don't have to make it ourselves
-- Idea indexing by ID
-- Can change the name of an Idea
-- No stress to keep the Idea short
-- Idea browsing without having to parse through all the previous journal entries
-
-It's a persistent document, It should be treated as such.
-
-So heres the plan.
-Editing and saving Ideas will function the same.
-They will be appended to the entry when it is made and you can edit them the same way.
-When the entry is saved and the editor is closed we parse out the Ideas and removed them from the entry.
-If an Idea is missing an Id, that means it's new and hasn't been seen before, so we give it one.
-
-The Id is used as the filename for the Idea in the `$journal/idea/` directory.
-Active Idea's can be indexed in the `$journal/idea/active` file, each line with an Id.
-We store the next available Id in the `$journal/idea/next` file.
-
-I should also go back and remove all the ideas from journal entries and bring them into the new system.
-Should do this manually I think since I can track the renames and more major edits.
-I could play around with automating this though, but I don't think it's worth the time right now.
-
 
 Sun Feb  2 12:59:44 EST 2014
