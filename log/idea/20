@@ -1,0 +1,24 @@
+## [inactive] [20] `git add` and deleted files
+It might be nice to experiment with using types to solve the `git add` issue.
+The current solution is a hack that adds `--all` to the args list to `git add`.
+Would be be to use interfacing and types to determine what `git index` modification takes place.
+
+These 3 types are what I have in mind.
+
+```go
+type DeletedFile string
+
+type NewFile string
+
+type ModifiedFile string
+```
+
+They should satisfy an interface like this.
+
+```go
+type IndexModification interface {
+    ModifyIndex() error
+}
+```
+
+Then each respective type can `git add` or `git rm` or whatever it needs to get the change it represents into the index before a commit takes place.
