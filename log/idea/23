@@ -9,10 +9,7 @@ I expect this package can be extracted into it's own project in the future.
     - [x] options
         - [x] -no-commit | Will not commit an changes in the directory to git repository.
 
-- [ ] package journal/cmd_verbs/fix
-    - [ ] options
-        - [ ] -no-commit | Will not commit any of the modifications when fixing the journal's structure and data
-        - [ ] -check     | Will run a check on the journal to see if it needs fixing
+- [x] package journal/cmd_verbs/fix
 
 - [ ] package journal/cmd_verbs/new
     - [ ] options
