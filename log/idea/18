@@ -1,0 +1,24 @@
+## [active] [18] `fix` command
+- [ ] Mark upgrade beginning with an empty git commit
+    - message "FIX - Begin - Upgrade JournalVersion_1_2"
+
+- [ ] Identify Entry version
+    - [ ] EntryVersion_1 has no ClosedAt timestamp.
+    - [ ] EntryVersion_2 has ClosedAt timestamp and may have ideas.
+    - [ ] EntryVersion_3 has ClosedAt timestamp and doesn't have any ideas.
+
+- [ ] Identify Journal version
+    - [ ] JournalVersion_1 does not have an `entry/` or `idea/` directory
+        - [ ] JournalVersion_1 can ONLY contain EntryVersion_1 or EntryVersion_2
+    - [ ] JournalVersion_2 uses `entry/` and `idea/` to store entries and ideas
+        - [ ] JournalVersion_2 can ONLY contain EntryVersion_3
+
+- [ ] Upgrade JournalVersion_1_2
+    - [ ] Upgrade all EntryVersion_1's to EntryVersion_2's
+    - [ ] Create `entry/` and `idea/`
+    - [ ] Upgrade all EntryVersion_2's to EntryVersion_3's
+        - [ ] Remove any ideas from the entry and store them in `idea/`
+            - [ ] If and idea in `idea/` has the same name assume the idea's are the same and perform an Update instead of a Create
+        - [ ] Store EntryVersion_3 in `entry/`
+    - [ ] Mark upgrade complete with an empty git commit
+        - message "FIX - Completed - Upgrade JournalVersion_1_2"
