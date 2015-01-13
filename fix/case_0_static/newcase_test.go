@@ -109,7 +109,7 @@ func DescribeNewCase0(c gospec.Context) {
 				reflogInfos, err := reflogDir.Readdir(0)
 				c.Assume(err, IsNil)
 
-				c.Expect(len(reflogInfos), Equals, 14)
+				c.Expect(len(reflogInfos), Equals, 15)
 			})
 		})
 
