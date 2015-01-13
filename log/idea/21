@@ -1,18 +1,21 @@
 ## [active] [21] package journal/init
-- [ ] A function to check if journal directory can be initialized
-    - does directory exist?
-        - yes - is directory empty?
-            - yes - directory can be initialized
-            - no  - directory can NOT be initialized
-        - no  - directory can be initialized
+- [x] A function to check if journal directory can be initialized
+    - [x] Create specification
+        - does directory exist?
+            - yes - is directory empty?
+                - yes - directory can be initialized
+                - no  - directory can NOT be initialized
+            - no  - directory can be initialized
 
 - [ ] A function to check if a directory has been initialized
-    - is directory in a git repository?
-        - yes - If entry directory exists and idea directory store exists
-            - yes - journal has been initialized
+    - [ ] Create specification
+        - is directory in a git repository?
+            - yes - If entry directory exists and idea directory store exists
+                - yes - journal has been initialized
+                - no  - journal has not been initialized
             - no  - journal has not been initialized
-        - no  - journal has not been initialized
 
 - [ ] A function to initialize a journal directory
-    - create entry directory
-    - create idea directory store
+    - [ ] Create specification
+        - create entry directory
+        - create idea directory store
