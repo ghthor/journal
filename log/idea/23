@@ -7,8 +7,7 @@ I expect this package can be extracted into it's own project in the future.
 
 - [ ] package journal/cmd_verbs/init
     - [ ] options
-        - [ ] -ignore-git | Will not run `git init` on the journal directory.
-                          | Will not commit an changes in the directory to git repository.
+        - [ ] -no-commit | Will not commit an changes in the directory to git repository.
 
 - [ ] package journal/cmd_verbs/fix
     - [ ] options
