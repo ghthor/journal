@@ -1,13 +1,22 @@
 package new
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"path/filepath"
+	"time"
+
+	"github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/idea"
 )
 
 var Cmd = NewCmd(nil)
 
 type cmd struct {
+	EditorProcess entry.EditorProcess
+	Now           func() time.Time
+
 	flagSet *flag.FlagSet
 
 	wd string // working directory
@@ -33,8 +42,80 @@ func (c *cmd) SetWd(directory string) {
 	c.wd = directory
 }
 
-func (c cmd) Exec([]string) error {
-	fmt.Println("Executing the command bound to `new` verb")
+func (c cmd) Exec(args []string) error {
+	c.flagSet.Parse(args)
+
+	a := c.flagSet.Args()
+
+	var path string
+
+	switch len(a) {
+	case 0:
+		path = c.wd
+	case 1:
+		path = a[0]
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(c.wd, path)
+		}
+
+	default:
+		return errors.New("too many arguments")
+	}
+
+	// Set defaults
+	if c.EditorProcess == nil {
+		// Set Up Vim
+	}
+
+	if c.Now == nil {
+		c.Now = time.Now
+	}
+
+	// Make a new entry
+	entry := entry.New(filepath.Join(path, "entry"))
+
+	ideaStore, err := idea.NewDirectoryStore(filepath.Join(path, "idea"))
+	if err != nil {
+		return err
+	}
+
+	ideas, err := ideaStore.ActiveIdeas()
+	if err != nil {
+		return err
+	}
+
+	// Open entry w/ ideas
+	openEntry, err := entry.Open(c.Now(), ideas)
+	if err != nil {
+		return err
+	}
+
+	// Start editor
+	openEntry, err = openEntry.Edit(c.EditorProcess)
+	if err != nil {
+		return fmt.Errorf("error during edit: %s", err)
+	}
+
+	// Parse out the ideas
+	ideas, err = openEntry.Ideas()
+	if err != nil {
+		return err
+	}
+
+	// Save the ideas to the store
+	for _, idea := range ideas {
+		_, err := ideaStore.SaveIdea(&idea)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Save the entry and commit it
+	_, err = openEntry.Close(c.Now())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
