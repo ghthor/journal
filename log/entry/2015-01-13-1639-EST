@@ -1,0 +1,10 @@
+Tue Jan 13 16:39:50 EST 2015
+
+# journal - Removed the config/ package
+I don't see the need for it anymore.
+Maybe if I bring in prefix's.
+
+I can just do the prefix's manually for now.
+But I could see a use for them in the future.
+
+Tue Jan 13 16:41:29 EST 2015
