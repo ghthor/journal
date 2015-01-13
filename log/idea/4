@@ -1,4 +1,4 @@
-## [active] [4] Missing Specifications
+## [inactive] [4] Missing Specifications
 In a rush to get Idea's functional enough to use today I passed over a few specifications.
 On top of that the terminal usage needs to be specified.
 Realized that it wasn't a difficult task today, see main_test.go, and made specs for a few of todays additions
