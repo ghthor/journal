@@ -1,4 +1,7 @@
-## [active] [2] Ideas and Tasks
+## [inactive] [2] Ideas and Tasks
+Going to archive this for a bit.
+No need to keep it around for now.
+
 This is an Idea.
 
 Currently Idea's cannot be renamed.
@@ -24,7 +27,7 @@ An inactive Idea will not be carried into the next new entry.
 To make an Idea active you type some sort of valid go template command.
 
 Something like this perhaps?:
-{{.Task.Find("Idea Manager")}}
+{{.Task.Find("Ideas and Tasks")}}
 
 And then when you save the entry file `journal` will use the file as a template and expand it.
 
