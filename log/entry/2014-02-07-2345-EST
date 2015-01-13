@@ -1,7 +1,6 @@
 Fri Feb  7 23:45:10 EST 2014
 
-#~ Updating `fix` command tasklist
-I think I've figured out the commit message format that will be used by the fix command.
+# Updating `fix` command tasklist | I think I've figured out the commit message format that will be used by the fix command.
 I'm going to updated the tasklist with this new format.
 Fix entries is the only implemented example of this format.
 
@@ -28,66 +27,5 @@ Nice and uniform.
 
 I'm happy with it.
 Now just to write the specification for fixing this journal_case/
-
-## [active] `fix` command
-- [ ] Mark fix beginning with an empty git commit
-    - message "journal - fix - begin"
-
-- [ ] fix journal
-    - [ ] fix | does NOT store entries in `entry/` directory
-        - create `entry/` directory and move all entries
-        - message "journal - fix - moved all entries to entry/"
-
-    - [ ] fix | does NOT store ideas in `idea/` directory
-        - fix ideas
-
-    - [ ] fix | has entries that don't conform to the current feature set
-        - [X] fix entries
-
-- [ ] fix ideas
-    - [ ] create `idea/` directory structure
-        - message "journal - fix - created idea/ directory structure"
-    - [ ] Parse ideas from entries starting from oldest
-        - If an idea doesn't exist in `idea/' w/ matching name
-            - create the idea
-            - message "idea - created - {id} - {origin entry filename}"
-        - If an idea exists in `idea/` /w matching name
-            - update the idea
-            - message "idea - modified - {id} - {origin entry filename}"
-
-- [X] fix entries
-    - [X] fix | does NOT have a closed timestamp as the final line
-        - append a closed timestamp for 30secs after opened timestamp
-
-    - [X] fix | does NOT have a commit message header w/ format
-        - format "# Commit Message\n"
-        - change "#~ Text\n" -> "# Text\n"
-        - change
-```
-#~ Text
-#  More Text
-```
-
-to
-
-```
-# Text | More Text
-```
-
-    - [X] fix | does have ideas in the body
-        - remove ideas
-
-    - [X] Current Features
-        - should have a timestamp as the first line
-        - should have a commit msg line w/ format "# Commit Msg\n"
-        - should NOT have any ideas in the body
-        - should have a timestamp as the final line
-
-    - [ ] return a commitable with msg format
-        - format "entry - format updated - {filename}"
-
-- [ ] Mark fix complete with an empty git commit
-    - message "journal - fix - complete"
-
 
 Fri Feb  7 23:55:10 EST 2014
