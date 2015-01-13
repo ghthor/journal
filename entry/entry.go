@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
 //A layout to use as the entry's filename
@@ -23,7 +24,7 @@ var entryTmpl = template.Must(template.New("entry").Parse(
 # Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 {{range .ActiveIdeas}}
-## [{{.Status}}] {{.Name}}
+## [{{.Status}}]{{if .Id}} [{{.Id}}]{{end}} {{.Name}}
 {{.Body}}{{end}}`))
 
 type NewEntry interface {

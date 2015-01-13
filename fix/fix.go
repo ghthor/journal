@@ -240,12 +240,11 @@ func fixCase0(directory string) (refLog []string, err error) {
 
 			changes, err = ideaStore.SaveIdea(newIdea)
 			if err != nil {
-				return nil, err
-			}
+				if err == idea.ErrIdeaNotModified {
+					continue
+				}
 
-			if changes == nil {
-				// The idea wasn't modified
-				continue
+				return nil, err
 			}
 
 			err = git.Commit(journalFixCommitWithSuffix{

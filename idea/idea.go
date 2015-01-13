@@ -114,6 +114,11 @@ func parseHeader(raw string) (status string, id uint, name string, err error) {
 	}
 
 	status = strings.Trim(status, "[]")
+
+	if strings.Index(raw, name) == strings.Index(raw, status) {
+		// Strip off the `## [status]` portion from string
+		raw = raw[strings.Index(raw, status)+len(status)+1:]
+	}
 	name = raw[strings.Index(raw, name):]
 	name = strings.TrimRight(name, "\n")
 

@@ -3,23 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ghthor/journal/config"
-	"github.com/ghthor/journal/git"
 	"log"
 	"os"
 	"text/template"
+
+	"github.com/ghthor/journal/cmd_verbs"
+	"github.com/ghthor/journal/config"
 )
 
 const (
 	EC_OK int = iota
 	EC_NO_CMD
+	EC_CMD_ERROR
 	EC_UNKNOWN_COMMAND
+	EC_HELP
 )
 
 func usage() {
 	fmt.Print(usagePrefix)
 	flag.PrintDefaults()
-	usageTmpl.Execute(os.Stdout, commands)
+	usageTmpl.Execute(os.Stdout, cmd_verbs.Usages())
 }
 
 var usagePrefix = `
@@ -33,7 +36,7 @@ Options:
 var usageTmpl = template.Must(template.New("usage").Parse(
 	`
 Commands:{{range .}}
-    {{.Name | printf "%-10s"}} {{.Summary}}{{end}}
+    {{.Verb | printf "%-10s"}} {{.Summary}}{{end}}
 `))
 
 func showUsageAndExit(exitCode int) {
@@ -41,22 +44,17 @@ func showUsageAndExit(exitCode int) {
 	os.Exit(exitCode)
 }
 
-var commands = []*Command{
-	newEntryCmd,
-}
-
 func main() {
 	showUsage := flag.Bool("h", false, "show this usage documentation")
 
 	configPath := flag.String("config", "$HOME/.journal-config.json", "a path to the configuration file")
-	init := flag.Bool("init", false, "`git init` the journal directory if it doesn't exist")
 
 	flag.Usage = usage
 	flag.Parse()
 
 	// Show Help
 	if *showUsage {
-		showUsageAndExit(EC_OK)
+		showUsageAndExit(EC_HELP)
 	}
 
 	*configPath = os.ExpandEnv(*configPath)
@@ -69,13 +67,11 @@ func main() {
 
 	// Check if Directory exists
 	_, err = os.Stat(config.Directory)
-
-	// If NOT, Create and `git init` Directory
-	if os.IsNotExist(err) && *init {
-		err = git.Init(config.Directory)
+	if os.IsNotExist(err) {
+		log.Fatal(err)
 	}
 
-	// Check for `git init` error or Stat error that isn't os.IsNotExist()
+	// Check for Stat error that isn't os.IsNotExist()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,29 +81,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Check that a verb exists in the arguments
 	args := flag.Args()
-
 	if len(args) == 0 {
 		showUsageAndExit(EC_NO_CMD)
 	}
 
-	var cmd *Command
-	name := args[0]
-
-	for _, c := range commands {
-		if c.Name == name {
-			cmd = c
-			break
-		}
-	}
-
+	// Retrieve the command bound to the verb
+	cmd := cmd_verbs.MatchVerb(args[0])
 	if cmd == nil {
-		fmt.Printf("error: unknown command %q\n", name)
 		showUsageAndExit(EC_UNKNOWN_COMMAND)
 	}
 
+	// Execute the command
 	err = cmd.Exec(args[1:])
 	if err != nil {
-		log.Fatal(err)
+		showUsageAndExit(EC_CMD_ERROR)
 	}
 }
