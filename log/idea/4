@@ -3,8 +3,10 @@ In a rush to get Idea's functional enough to use today I passed over a few speci
 On top of that the terminal usage needs to be specified.
 Realized that it wasn't a difficult task today, see main_test.go, and made specs for a few of todays additions
 
+- [ ] Spec Environment Expansion of all User provided path's
+    - [x] config path
+    - [x] config.directory path
 - [ ] Spec the terminal usage of the `journal` command
 - [ ] Spec the "lastTwoBytes" tidbit
 - [ ] From now on all flags and terminal interaction will be specced
-- [ ] Spec the config to expand environment variables on the Directory
 - [ ] During the newEntry func -> type conversion rewrite all specifications as the behavior is introduced to avoid missing anything
