@@ -2,6 +2,6 @@
 - [ ] idea "package journal/cmd" completed
 - [ ] commands implemented
     - [x] journal init
-    - [ ] journal fix
+    - [x] journal fix
     - [ ] journal new
     - [ ] journal help
