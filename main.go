@@ -3,12 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"text/template"
 
 	"github.com/ghthor/journal/cmd_verbs"
-	"github.com/ghthor/journal/config"
 )
 
 const (
@@ -16,6 +14,7 @@ const (
 	EC_NO_CMD
 	EC_CMD_ERROR
 	EC_UNKNOWN_COMMAND
+	EC_WD_ERROR
 	EC_HELP
 )
 
@@ -47,38 +46,12 @@ func showUsageAndExit(exitCode int) {
 func main() {
 	showUsage := flag.Bool("h", false, "show this usage documentation")
 
-	configPath := flag.String("config", "$HOME/.journal-config.json", "a path to the configuration file")
-
 	flag.Usage = usage
 	flag.Parse()
 
 	// Show Help
 	if *showUsage {
 		showUsageAndExit(EC_HELP)
-	}
-
-	*configPath = os.ExpandEnv(*configPath)
-
-	// Open the Config file
-	config, err := config.ReadFromFile(*configPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check if Directory exists
-	_, err = os.Stat(config.Directory)
-	if os.IsNotExist(err) {
-		log.Fatal(err)
-	}
-
-	// Check for Stat error that isn't os.IsNotExist()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Change Working Directory to the one in the configuration file
-	if err := os.Chdir(config.Directory); err != nil {
-		log.Fatal(err)
 	}
 
 	// Check that a verb exists in the arguments
@@ -92,6 +65,15 @@ func main() {
 	if cmd == nil {
 		showUsageAndExit(EC_UNKNOWN_COMMAND)
 	}
+
+	// Set Working Directory
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("error retrieving working directory")
+		os.Exit(EC_WD_ERROR)
+	}
+
+	cmd.SetWd(wd)
 
 	// Execute the command
 	err = cmd.Exec(args[1:])
