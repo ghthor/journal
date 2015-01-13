@@ -5,9 +5,9 @@ I expect this package can be extracted into it's own project in the future.
 - [ ] journal/cmd
     - [ ] ALL commands MUST accept the -h flag
 
-- [ ] package journal/cmd_verbs/init
-    - [ ] options
-        - [ ] -no-commit | Will not commit an changes in the directory to git repository.
+- [x] package journal/cmd_verbs/init
+    - [x] options
+        - [x] -no-commit | Will not commit an changes in the directory to git repository.
 
 - [ ] package journal/cmd_verbs/fix
     - [ ] options
