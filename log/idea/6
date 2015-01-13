@@ -1,0 +1,3 @@
+## [inactive] [6] `journal amend`
+Pretty much a wrapper for `git amend`.
+Open the previous entry in the editor and `git amend` afterwards.
