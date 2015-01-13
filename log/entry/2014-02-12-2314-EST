@@ -1,6 +1,6 @@
 Wed Feb 12 23:14:41 EST 2014
 
-#~ Journal Version 1 Plan
+# Journal Version 1 Plan
 Working on a design to implement commands.
 My current idea is to store routines shared by all commands in the package journal/cmd.
 Then implement each separate command in a subdirectory package (see idea "package journal/cmd").
@@ -12,85 +12,5 @@ This is due to actually executing the journal command via os/exec.
 
 If this proves to be too compartmentalized then each command package can be combined into a single package, journal/cmd.
 This package could still be extracted later as a stand alone project in either format.
-
-## [active] package journal/init
-- [ ] A function to check if journal directory can be initialized
-    - does directory exist?
-        - yes - is directory empty?
-            - yes - directory can be initialized
-            - no  - directory can NOT be initialized
-        - no  - directory can be initialized
-
-- [ ] A function to check if a directory has been initialized
-    - is directory in a git repository?
-        - yes - If entry directory exists and idea directory store exists
-            - yes - journal has been initialized
-            - no  - journal has not been initialized
-        - no  - journal has not been initialized
-
-- [ ] A function to initialize a journal directory
-    - create entry directory
-    - create idea directory store
-
-## [active] package journal/fix
-- [ ] A function to check if a journal directory can be fixed
-    - is directory initialized?
-        - yes - can NOT be fixed
-        - no  - does directory contain entries?
-            - yes - can be fixed
-            - no  - can NOT be fixed
-
-- [ ] A function to check if a journal directory needs to be fixed
-    - is directory initialized?
-        - yes - does not need fixed
-        - no  - does directory contain entries?
-            - yes - needs fixed
-            - no  - needs initialized
-
-## [active] package journal/cmd
-This is package is routines shared by all command packages.
-I expect this package can be extracted into it's own project in the future.
-
-- [ ] journal/cmd
-    - [ ] ALL commands MUST accept the -h flag
-
-- [ ] package journal/cmd/init
-    - [ ] options
-        - [ ] -ignore-git | Will not run `git init` on the journal directory.
-                          | Will not commit an changes in the directory to git repository.
-
-- [ ] package journal/cmd/fix
-    - [ ] options
-        - [ ] -ignore-git     | Will not commit any fixes or modifications to git
-        - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
-
-- [ ] package journal/cmd/new
-    - [ ] options
-        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
-        - [ ] -no-edit    | Will not open the entry in an interactive editor
-                          | This options implies -ignoregit because the entry created will not be committed.
-
-- [ ] package journal/cmd/help
-    - example usage
-```
->$ journal help init
-Print formatted usage and options for `init` command.
->$ journal help new
-Print formatted usage and options for `new` command.
-```
-    - [ ] will only accept registered commands as an argument
-    - [ ] will execute the registered command with -h flag as the only argument
-
-## [active] journal version 1
-- [ ] idea "package journal/cmd" completed
-- [ ] commands implemented
-    - [ ] journal init
-    - [ ] journal fix
-    - [ ] journal new
-    - [ ] journal help
-
-## [completed] `fix` command
-See idea "package journal/cmd" for command specific tasks
-See idea "package journal/fix" for package specific tasks
 
 Thu Feb 13 00:45:36 EST 2014
