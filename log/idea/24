@@ -1,7 +1,5 @@
-## [active] [24] journal version 1
-- [ ] idea "package journal/cmd" completed
-- [ ] commands implemented
+## [completed] [24] journal version 1 rewrite
+- [x] commands implemented
     - [x] journal init
     - [x] journal fix
-    - [ ] journal new
-    - [ ] journal help
+    - [X] journal new
