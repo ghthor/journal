@@ -1,0 +1,33 @@
+## [active] [23] package journal/cmd
+This is package is routines shared by all command packages.
+I expect this package can be extracted into it's own project in the future.
+
+- [ ] journal/cmd
+    - [ ] ALL commands MUST accept the -h flag
+
+- [ ] package journal/cmd/init
+    - [ ] options
+        - [ ] -ignore-git | Will not run `git init` on the journal directory.
+                          | Will not commit an changes in the directory to git repository.
+
+- [ ] package journal/cmd/fix
+    - [ ] options
+        - [ ] -ignore-git     | Will not commit any fixes or modifications to git
+        - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
+
+- [ ] package journal/cmd/new
+    - [ ] options
+        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
+        - [ ] -no-edit    | Will not open the entry in an interactive editor
+                          | This options implies -ignoregit because the entry created will not be committed.
+
+- [ ] package journal/cmd/help
+    - example usage
+```
+>$ journal help init
+Print formatted usage and options for `init` command.
+>$ journal help new
+Print formatted usage and options for `new` command.
+```
+    - [ ] will only accept registered commands as an argument
+    - [ ] will execute the registered command with -h flag as the only argument
