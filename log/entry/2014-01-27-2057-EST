@@ -1,6 +1,6 @@
 Mon Jan 27 20:57:41 EST 2014
 
-#~ Wake up check in
+# Wake up check in
 Made some QoL changes to the main func.
 Fixed a few bugs I found.
 Did all this last night before I went to sleep.
@@ -23,74 +23,5 @@ I might check in and make a list before I get started today, after I eat.
 Maybe make an Idea for each day.
 So the begin check in makes an Idea.
 And the end check in completes tasks and hopefully completes the Idea as a whole.
-
-## [active] Ideas and Tasks
-This is an Idea.
-
-Currently Idea's cannot be renamed.
-A way to fix this is to give an Idea a unique ID.
-By default maybe it doesn't have an Id
-- [ ] An Idea can have an Id
-
-All tasks will be bound to an Idea.
-Expected line form will be as follows.
-
-- [ ] Task - {{.TaskText}}
-- [ ] An Idea can have tasks
-
-- [x] To find the currently active ideas, you search the previous journal entry.
-- [x] All active Ideas found in the previous entry will be carried over to a new entry.
-- [x] An inactive or completed idea doesn't get carried over to a new entry
-
-If a task is checked off in an journal entry it is removed from the ideas task list with a commit.
-The commit is seperate from the commit for the journal entry itself.
-
-To make an Idea inactive you change the status to inactive in the journal entry.
-An inactive Idea will not be carried into the next new entry.
-To make an Idea active you type some sort of valid go template command.
-
-Something like this perhaps?:
-{{.Task.Find("Idea Manager")}}
-
-And then when you save the entry file `journal` will use the file as a template and expand it.
-
-- [ ] Vim snippets and maybe a filetype definition with closes'm going to open an Idea concerning missing specifications.
-
-
-## [active] Software Architecture
-I'm not exactly happy with what's happening due to this rapid feature adding.
-Everything sort of getting out of hand, haha.
-It's not quite there but some of the functions are really long.
-
-I'd really like to revisit the Idea parser for some readability improvements.
-
-I also have a way to handle the pre and post processing of the entry.
-
-- [ ] Extract the entry into a type, currently it's just a big function
-- [ ] Identify a common interface for Pre and Post processes
-- [ ] Extract all current modifications into these Pre and Post processors
-- [ ] Chain them together
-
-Regarding the `type Command` that was yanked from the go cmd.
-It isn't really all that useful.
-I think it'd be a good Idea to revisit this structure and simplify it.
-Nothing from the struct itself is needed by the `new` command during execution
-
-I'd like to get the command itself fully spec'ed.
-Just today I realized how to test the command as used from the terminal.
-Pretty proud of that realization, it will be useful in the future.
-
-
-## [active] Missing Specifications
-In a rush to get Idea's functional enough to use today I passed over a few specifications.
-On top of that the terminal usage needs to be specified.
-Realized that it wasn't a difficult task today, see main_test.go, and made specs for a few of todays additions
-
-- [ ] Spec the terminal usage of the `journal` command
-- [ ] Spec the "lastTwoBytes" tidbit
-- [ ] From now on all flags and terminal interaction will be specced
-- [ ] Spec the config to expand environment variables on the Directory
-- [ ] During the newEntry func -> type conversion rewrite all specifications as the behavior is introduced to avoid missing anything
-
 
 Mon Jan 27 21:03:45 EST 2014
