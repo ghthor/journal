@@ -197,19 +197,51 @@ func DescribeNewCmd(c gospec.Context) {
 		})
 
 		c.Specify("will commit the entry to the git repository", func() {
-			// Run `new`
-			// Will succeed
-			// Entry will be shown in the git repository
+			cmd := NewCmd(nil)
+			cmd.SetWd(journalDir)
 
-			c.Specify("and will commit any modifications to the idea store", func() {
-				// Any modifed Ideas will also have commits
-			})
+			// Mock time to control the filename and openedAt/closedAt times stored in the entry
+			openedAt := time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC)
+			cmd.Now = func() time.Time { return openedAt }
+
+			// Mocked editor that does nothing
+			cmd.EditorProcess = mockEditor{
+				start: func() {},
+				wait:  func() {},
+			}
+
+			// Run `journal new` with mocked EditorProcess and Now functions
+			c.Assume(cmd.Exec(nil), IsNil)
+
+			// Entry will be shown in the git repository
+			c.Expect(git.IsClean(journalDir), IsNil)
+
+			// Save test output dir for inspection
+			// c.Assume(exec.Command("cp", "-r", journalDir, filepath.Join("/tmp", "new_cmd_git_commit")).Run(), IsNil)
+
+			lastCommitBytes, err := git.Command(journalDir, "show", "--pretty=format:%T").Output()
+			c.Assume(err, IsNil)
+			c.Expect(string(lastCommitBytes), Equals, `2d0f3cbd0e6d8409c9bb767b7bcc09fb569eaa06
+diff --git a/entry/2015-01-01-0000-UTC b/entry/2015-01-01-0000-UTC
+new file mode 100644
+index 0000000..c85666f
+--- /dev/null
++++ b/entry/2015-01-01-0000-UTC
+@@ -0,0 +1,6 @@
++Thu Jan  1 00:00:00 UTC 2015
++
++# Title(will be used as commit message)
++TODO Make this some random quote or something stupid
++
++Thu Jan  1 00:00:00 UTC 2015
+`)
+			hashAndTitleBytes, err := git.Command(journalDir, "show", "-s", "--format=%s").Output()
+			c.Assume(err, IsNil)
+			c.Expect(string(hashAndTitleBytes), Equals, "Title(will be used as commit message)\n")
 		})
 
-		c.Specify("will append the current time after editting is completed", func() {
-			// Run `new`
-			// Will succeed
-			// Entry will have closing time appended
+		c.Specify("will commit any modifications to the idea store", func() {
+			// Any modifed Ideas will also have commits
 		})
 
 		c.Specify("will fail", func() {

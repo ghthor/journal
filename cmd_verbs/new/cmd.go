@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ghthor/journal/entry"
+	"github.com/ghthor/journal/git"
 	"github.com/ghthor/journal/idea"
 )
 
@@ -115,7 +116,12 @@ func (c cmd) Exec(args []string) error {
 	}
 
 	// Save the entry and commit it
-	_, err = openEntry.Close(c.Now())
+	closedEntry, err := openEntry.Close(c.Now())
+	if err != nil {
+		return err
+	}
+
+	err = git.Commit(closedEntry)
 	if err != nil {
 		return err
 	}
