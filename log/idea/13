@@ -1,0 +1,22 @@
+## [active] [13] package entry
+An entry is a simple state machine where each type is a state that has methods on it to transform it.
+An entry has 3 states.
+
+new -> open -> closed
+
+A type NewEntry can be Open()'ed  which creates the file in the filesystem and returns an type OpenEntry.
+An type OpenEntry can be Edit()'ed and Close()'d  which returns a type ClosedEntry.
+A type ClosedEntry committable to git.
+
+Note: The state when an entry is being edited currently isn't a type, but it may become one in the future.
+
+I'm really happy with this design thus far.
+Especially happy with the git.Commitable interface that will be implemented by ClosedEntry.
+This is the type of decoupling that I was looking for during this redesign and I think I've found it.
+
+- [ ] OpenEntry Specification & Implementation
+- [ ] ClosedEntry Specification & Implementation
+
+Before I can use the entry package in `newEntry()` I'll have to specify the git committable nature of the type idea.Idea.
+This is because the only behavior of the entry package will be to remove the ideas from the entry file as it is being closed.
+The process of saving Idea's as files will fall to the idea package.
