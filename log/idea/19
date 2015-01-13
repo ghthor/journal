@@ -22,5 +22,5 @@
     - [ ] If it is inactive, make sure it doesn't exist in `idea/active` index
         - [ ] If modified return a CommitableChange
 
-    - [ ] Create a Commitable with all 3 changes and a msg 
+    - [ ] Create a Commitable with all 3 changes and a msg
         - [ ] msg format "IDEA - {id} - Updated"
