@@ -1,6 +1,6 @@
 Sat Aug 30 10:38:44 EDT 2014
 
-#~ Assessing and modifying my existing plan for Journal version 1
+# Assessing and modifying my existing plan for Journal version 1
 Recently have been piddling around with completing version 1.
 Last week I worked on some of the spec for the `journal/init` package.
 When I was working last week I did not look over this plan.
@@ -17,88 +17,5 @@ Continuing forward I am going to apply the same principles I used during this pr
 
 So my immediate plan is to finish the spec and implementation of the `journal/init` package.
 After that is complete I will implement the `journal init` command as a cmd_verb.
-
-## [active] package journal/init
-- [x] A function to check if journal directory can be initialized
-    - [x] Create specification
-        - does directory exist?
-            - yes - is directory empty?
-                - yes - directory can be initialized
-                - no  - directory can NOT be initialized
-            - no  - directory can be initialized
-
-- [ ] A function to check if a directory has been initialized
-    - [ ] Create specification
-        - is directory in a git repository?
-            - yes - If entry directory exists and idea directory store exists
-                - yes - journal has been initialized
-                - no  - journal has not been initialized
-            - no  - journal has not been initialized
-
-- [ ] A function to initialize a journal directory
-    - [ ] Create specification
-        - create entry directory
-        - create idea directory store
-
-
-## [active] package journal/fix
-- [ ] A function to check if a journal directory can be fixed
-    - is directory initialized?
-        - yes - can NOT be fixed
-        - no  - does directory contain entries?
-            - yes - can be fixed
-            - no  - can NOT be fixed
-
-- [ ] A function to check if a journal directory needs to be fixed
-    - is directory initialized?
-        - yes - does not need fixed
-        - no  - does directory contain entries?
-            - yes - needs fixed
-            - no  - needs initialized
-
-
-## [active] package journal/cmd
-This is package is routines shared by all command packages.
-I expect this package can be extracted into it's own project in the future.
-
-- [ ] journal/cmd
-    - [ ] ALL commands MUST accept the -h flag
-
-- [ ] package journal/cmd_verbs/init
-    - [ ] options
-        - [ ] -ignore-git | Will not run `git init` on the journal directory.
-                          | Will not commit an changes in the directory to git repository.
-
-- [ ] package journal/cmd_verbs/fix
-    - [ ] options
-        - [ ] -ignore-git     | Will not commit any fixes or modifications to git
-        - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
-
-- [ ] package journal/cmd_verbs/new
-    - [ ] options
-        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
-        - [ ] -no-edit    | Will not open the entry in an interactive editor
-                          | This options implies -ignoregit because the entry created will not be committed.
-
-- [ ] package journal/cmd_verbs/help
-    - example usage
-```
->$ journal help init
-Print formatted usage and options for `init` command.
->$ journal help new
-Print formatted usage and options for `new` command.
-```
-    - [ ] will only accept registered commands as an argument
-    - [ ] will execute the registered command with -h flag as the only argument
-
-
-## [active] journal version 1
-- [ ] idea "package journal/cmd" completed
-- [ ] commands implemented
-    - [ ] journal init
-    - [ ] journal fix
-    - [ ] journal new
-    - [ ] journal help
-
 
 Sat Aug 30 10:58:55 EDT 2014
