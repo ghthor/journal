@@ -1,4 +1,4 @@
-## [active] [14] Impose Entry workflow that should prevent data loss
+## [completed] [14] Impose Entry workflow that should prevent data loss
 I'm also sort of worried about Ideas getting lost between Close() and when they've been written to files.
 So I'm thinking maybe the package user calls OpenEntry.Ideas() before Close() and saves the Ideas then.
 If that's successful, then Close() is called.
@@ -6,5 +6,5 @@ To impose this path on the user, the []idea.Idea return val from Close() will be
 This would force a call to Ideas() before Close() if the user wants a list of Ideas.
 Then if there was an error while saving that list there still exist in the un-truncated entry file.
 
-- [ ] Scan entry for Idea's in OpenEntry.Ideas() method
-- [ ] Remove []idea.Idea rval from OpenEntry.Close()
+- [X] Scan entry for Idea's in OpenEntry.Ideas() method
+- [X] Remove []idea.Idea rval from OpenEntry.Close()
