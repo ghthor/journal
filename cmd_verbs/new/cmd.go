@@ -103,9 +103,13 @@ func (c cmd) Exec(args []string) error {
 	}
 
 	// Save the ideas to the store
-	for _, idea := range ideas {
-		_, err := ideaStore.SaveIdea(&idea)
+	for _, i := range ideas {
+		_, err := ideaStore.SaveIdea(&i)
 		if err != nil {
+			if err == idea.ErrIdeaNotModified {
+				continue
+			}
+
 			return err
 		}
 	}

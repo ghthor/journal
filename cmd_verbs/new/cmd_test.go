@@ -58,8 +58,6 @@ func DescribeNewCmd(c gospec.Context) {
 			c.Assume(err, IsNil)
 			c.Assume(git.Commit(commitable), IsNil)
 
-			activeIdea.Id = 0
-
 			cmd := NewCmd(nil)
 			cmd.SetWd(journalDir)
 
@@ -138,6 +136,9 @@ func DescribeNewCmd(c gospec.Context) {
 			cmd.EditorProcess = sedCmd
 
 			c.Expect(cmd.Exec(nil), IsNil)
+
+			// Modify the status to reflect what happened during the edit
+			activeIdea.Status = idea.IS_Inactive
 
 			// Idea in the IdeaStore will be updated if it was editted
 			idea, err := store.IdeaById(activeIdea.Id)
