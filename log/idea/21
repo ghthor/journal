@@ -1,4 +1,4 @@
-## [active] [21] package journal/init
+## [completed] [21] package journal/init
 - [x] A function to check if journal directory can be initialized
     - [x] Create specification
         - does directory exist?
@@ -7,15 +7,15 @@
                 - no  - directory can NOT be initialized
             - no  - directory can be initialized
 
-- [ ] A function to check if a directory has been initialized
-    - [ ] Create specification
+- [x] A function to check if a directory has been initialized
+    - [x] Create specification
         - is directory in a git repository?
             - yes - If entry directory exists and idea directory store exists
                 - yes - journal has been initialized
                 - no  - journal has not been initialized
             - no  - journal has not been initialized
 
-- [ ] A function to initialize a journal directory
-    - [ ] Create specification
+- [x] A function to initialize a journal directory
+    - [x] Create specification
         - create entry directory
         - create idea directory store
