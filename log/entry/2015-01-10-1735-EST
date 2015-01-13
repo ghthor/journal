@@ -1,6 +1,6 @@
 Sat Jan 10 17:35:32 EST 2015
 
-#~ Finished with the journal-fix command
+# Finished with the journal-fix command
 As far as I'm concerned the `journal-fix` command is now complete.
 I've left out a `CanBeFixed()` function because it isn't needed.
 If fixing fails, it fails.
@@ -19,54 +19,5 @@ As I work, I expect I'll find some features that would be useful and I'll be abl
 Then once I pile up a few useful features I can spec and impl them and see how this project's growth feels.
 If it is too rigid I'll need to take a step back and really assess how the tests are written.
 Looking for way to remove any binding's to the impl wherever possible and enable more fluidity.
-
-## [active] journal version 1
-- [ ] idea "package journal/cmd" completed
-- [ ] commands implemented
-    - [x] journal init
-    - [x] journal fix
-    - [ ] journal new
-    - [ ] journal help
-
-
-## [completed] package journal/fix
-- [x] A function to check if a journal directory needs to be fixed
-    - is directory initialized?
-        - yes - does not need fixed
-        - no  - does directory contain entries?
-            - yes - needs fixed
-            - no  - needs initialized
-
-
-## [active] package journal/cmd
-This is package is routines shared by all command packages.
-I expect this package can be extracted into it's own project in the future.
-
-- [ ] journal/cmd
-    - [ ] ALL commands MUST accept the -h flag
-
-- [x] package journal/cmd_verbs/init
-    - [x] options
-        - [x] -no-commit | Will not commit an changes in the directory to git repository.
-
-- [x] package journal/cmd_verbs/fix
-
-- [ ] package journal/cmd_verbs/new
-    - [ ] options
-        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
-        - [ ] -no-edit    | Will not open the entry in an interactive editor
-                          | This options implies -ignoregit because the entry created will not be committed.
-
-- [ ] package journal/cmd_verbs/help
-    - example usage
-```
->$ journal help init
-Print formatted usage and options for `init` command.
->$ journal help new
-Print formatted usage and options for `new` command.
-```
-    - [ ] will only accept registered commands as an argument
-    - [ ] will execute the registered command with -h flag as the only argument
-
 
 Sat Jan 10 17:43:25 EST 2015
