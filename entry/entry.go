@@ -24,7 +24,7 @@ var entryTmpl = template.Must(template.New("entry").Parse(
 # Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 {{range .ActiveIdeas}}
-## [{{.Status}}] {{.Name}}
+## [{{.Status}}]{{if .Id}} [{{.Id}}]{{end}} {{.Name}}
 {{.Body}}{{end}}`))
 
 type NewEntry interface {
