@@ -1,12 +1,12 @@
-## [active] [19] `idea/` directory
+## [completed] [19] `idea/` directory
 - [X] initialize an empty directory
     - [X] with the next available idea of 1
     - [X] with an empty active idea index
     - [X] and return a commitable
 
 - [X] `idea/nextid` will store the next available id
-- [ ] `idea/active` will index which ideas are active
-    - [ ] 1 id per line
+- [X] `idea/active` will index which ideas are active
+    - [X] 1 id per line
 
 - [X] Create a new idea
     - [X] Retrieve nextid and increment
@@ -16,16 +16,16 @@
     - [X] If it is active, append id to `idea/active` index
         - [X] Returns a CommitableChange
 
-    - [X] Create a Commitable with all 3 changes and a msg
+    - [X] Create a Commitable with all [2|3] changes and a msg
         - [X] commit message format "IDEA - {id} - Created"
 
-- [ ] Update an existing idea
-    - [ ] Write idea to `idea/{id}`
-        - [ ] Returns a CommitableChange
-    - [ ] If it is active, make sure it exists in `idea/active` index
-        - [ ] If modified return a CommitableChange
-    - [ ] If it is inactive, make sure it doesn't exist in `idea/active` index
-        - [ ] If modified return a CommitableChange
+- [X] Update an existing idea
+    - [X] Write idea to `idea/{id}`
+        - [X] Returns a CommitableChange
+    - [X] If it is active, make sure it exists in `idea/active` index
+        - [X] If modified return a CommitableChange
+    - [X] If it is inactive, make sure it doesn't exist in `idea/active` index
+        - [X] If modified return a CommitableChange
 
-    - [ ] Create a Commitable with all 3 changes and a msg
-        - [ ] msg format "IDEA - {id} - Updated"
+    - [X] Create a Commitable with all 2 changes and a msg
+        - [X] msg format "IDEA - {id} - Updated"
