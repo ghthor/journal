@@ -1,26 +1,28 @@
 ## [active] [18] `fix` command
 - [ ] Mark fix beginning with an empty git commit
-    - message "FIX - Journal - Begin"
+    - message "journal - fix - begin"
 
 - [ ] fix journal
-    - fix | does NOT store ideas in `idea/` directory
-        - fix ideas
-    - fix | has entries that don't conform to the current feature set
-        - fix entries
-    - fix | does NOT store entries in `entry/` directory
+    - [ ] fix | does NOT store entries in `entry/` directory
         - create `entry/` directory and move all entries
-        - message "FIX - Journal - Moved all entries to entry/ directory"
+        - message "journal - fix - moved all entries to entry/"
+
+    - [ ] fix | does NOT store ideas in `idea/` directory
+        - fix ideas
+
+    - [ ] fix | has entries that don't conform to the current feature set
+        - [X] fix entries
 
 - [ ] fix ideas
     - [ ] create `idea/` directory structure
-        - message "FIX - Journal - Created idea/ directory structure"
+        - message "journal - fix - created idea/ directory structure"
     - [ ] Parse ideas from entries starting from oldest
         - If an idea doesn't exist in `idea/' w/ matching name
-            - Create the idea
-            - message "FIX - Idea - Created - {timestamp}"
+            - create the idea
+            - message "idea - created - {id} - {origin entry filename}"
         - If an idea exists in `idea/` /w matching name
-            - Update the idea
-            - message "FIX - Idea - Modified - {timestamp}"
+            - update the idea
+            - message "idea - modified - {id} - {origin entry filename}"
 
 - [X] fix entries
     - [X] fix | does NOT have a closed timestamp as the final line
@@ -51,7 +53,7 @@ to
         - should have a timestamp as the final line
 
     - [ ] return a commitable with msg format
-        - format "entry - {filename} - format updated"
+        - format "entry - format updated - {filename}"
 
 - [ ] Mark fix complete with an empty git commit
-    - message "FIX - Journal - Complete"
+    - message "journal - fix - complete"
