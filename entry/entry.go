@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
 //A layout to use as the entry's filename
