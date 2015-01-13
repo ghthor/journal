@@ -296,10 +296,22 @@ index 83f5e84..0b22af3 100644
 		})
 
 		c.Specify("will fail", func() {
-			// Dirty the test journal
+			cmd := NewCmd(nil)
+			cmd.SetWd(journalDir)
+
 			c.Specify("if the journal directory has a dirty git repository", func() {
-				// Run `new`
+				// Dirty the test journal
+				c.Assume(exec.Command("touch", filepath.Join(journalDir, "makedirty")).Run(), IsNil)
+				c.Assume(git.IsClean(journalDir), Not(IsNil))
+
+				// Mocked editor that does nothing
+				cmd.EditorProcess = mockEditor{
+					start: func() {},
+					wait:  func() {},
+				}
+
 				// Will fail with an error
+				c.Expect(cmd.Exec(nil), Equals, ErrGitIsDirty)
 			})
 		})
 	})

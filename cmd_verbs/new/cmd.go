@@ -25,6 +25,8 @@ type cmd struct {
 	// noCommit bool
 }
 
+var ErrGitIsDirty = errors.New("git is dirty")
+
 func NewCmd(flagSet *flag.FlagSet) *cmd {
 	if flagSet == nil {
 		flagSet = flag.NewFlagSet("new", flag.ExitOnError)
@@ -61,6 +63,10 @@ func (c cmd) Exec(args []string) error {
 
 	default:
 		return errors.New("too many arguments")
+	}
+
+	if git.IsClean(path) != nil {
+		return ErrGitIsDirty
 	}
 
 	// Set defaults
