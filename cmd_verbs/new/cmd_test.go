@@ -1,6 +1,7 @@
 package new
 
 import (
+	"bufio"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -144,6 +145,55 @@ func DescribeNewCmd(c gospec.Context) {
 			idea, err := store.IdeaById(activeIdea.Id)
 			c.Assume(err, IsNil)
 			c.Expect(idea, Equals, activeIdea)
+		})
+
+		c.Specify("will append the current time after editting is completed", func() {
+			cmd := NewCmd(nil)
+			cmd.SetWd(journalDir)
+
+			// Mock time to control the filename and openedAt/closedAt times stored in the entry
+			openedAt := time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC)
+			closedAt := time.Date(2015, 1, 2, 0, 0, 0, 0, time.UTC)
+
+			// This is a roundabout mock from hell...but it works...
+			// TODO figure more elegant mock for this
+			var nowFn func() time.Time
+			nowFn = func() time.Time {
+				// Mutate during first call to return ClosedAt time
+				nowFn = func() time.Time { return closedAt }
+				// OpenedAt time
+				return openedAt
+			}
+			cmd.Now = func() time.Time { return nowFn() }
+
+			entryFilename := openedAt.Format(entry.FilenameLayout)
+
+			// Mocked editor that does nothing
+			cmd.EditorProcess = mockEditor{
+				start: func() {},
+				wait:  func() {},
+			}
+
+			// Run `journal new` with mocked EditorProcess and Now functions
+			c.Assume(cmd.Exec(nil), IsNil)
+
+			// Entry will have closing time appended
+			f, err := os.OpenFile(filepath.Join(journalDir, "entry", entryFilename), os.O_RDONLY, 0600)
+			c.Assume(err, IsNil)
+			defer f.Close()
+
+			scanner := bufio.NewScanner(f)
+			scanner.Split(bufio.ScanLines)
+
+			var prevLine string
+			for scanner.Scan() {
+				c.Assume(scanner.Err(), IsNil)
+				prevLine = scanner.Text()
+			}
+
+			t, err := time.Parse(time.UnixDate, prevLine)
+			c.Assume(err, IsNil)
+			c.Expect(t, Equals, closedAt)
 		})
 
 		c.Specify("will commit the entry to the git repository", func() {
