@@ -1,69 +1,10 @@
 Tue Sep  2 15:38:37 EDT 2014
 
-#~ Beginning work on `journal-fix` command and verb
+# Beginning work on `journal-fix` command and verb
 I've decided that the 2 options being passed to fix are pretty worthless.
 The only option I see that I NEEED right now it maybe -check.
 I need this becuase this state should be checked if something errors during `journal-new`
 
 Nevermind, I think the -no-commit option is important enough that I should add it.
-
-## [active] journal version 1
-- [ ] idea "package journal/cmd" completed
-- [ ] commands implemented
-    - [x] journal init
-    - [ ] journal fix
-    - [ ] journal new
-    - [ ] journal help
-
-
-## [active] package journal/fix
-- [ ] A function to check if a journal directory can be fixed
-    - is directory initialized?
-        - yes - can NOT be fixed
-        - no  - does directory contain entries?
-            - yes - can be fixed
-            - no  - can NOT be fixed
-
-- [ ] A function to check if a journal directory needs to be fixed
-    - is directory initialized?
-        - yes - does not need fixed
-        - no  - does directory contain entries?
-            - yes - needs fixed
-            - no  - needs initialized
-
-
-## [active] package journal/cmd
-This is package is routines shared by all command packages.
-I expect this package can be extracted into it's own project in the future.
-
-- [ ] journal/cmd
-    - [ ] ALL commands MUST accept the -h flag
-
-- [x] package journal/cmd_verbs/init
-    - [x] options
-        - [x] -no-commit | Will not commit an changes in the directory to git repository.
-
-- [ ] package journal/cmd_verbs/fix
-    - [ ] options
-        - [ ] -no-commit | Will not commit any of the modifications when fixing the journal's structure and data
-        - [ ] -check     | Will run a check on the journal to see if it needs fixing
-
-- [ ] package journal/cmd_verbs/new
-    - [ ] options
-        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
-        - [ ] -no-edit    | Will not open the entry in an interactive editor
-                          | This options implies -ignoregit because the entry created will not be committed.
-
-- [ ] package journal/cmd_verbs/help
-    - example usage
-```
->$ journal help init
-Print formatted usage and options for `init` command.
->$ journal help new
-Print formatted usage and options for `new` command.
-```
-    - [ ] will only accept registered commands as an argument
-    - [ ] will execute the registered command with -h flag as the only argument
-
 
 Tue Sep  2 15:48:58 EDT 2014
