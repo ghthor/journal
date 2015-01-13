@@ -5,23 +5,23 @@ I expect this package can be extracted into it's own project in the future.
 - [ ] journal/cmd
     - [ ] ALL commands MUST accept the -h flag
 
-- [ ] package journal/cmd/init
+- [ ] package journal/cmd_verbs/init
     - [ ] options
         - [ ] -ignore-git | Will not run `git init` on the journal directory.
                           | Will not commit an changes in the directory to git repository.
 
-- [ ] package journal/cmd/fix
+- [ ] package journal/cmd_verbs/fix
     - [ ] options
         - [ ] -ignore-git     | Will not commit any fixes or modifications to git
         - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
 
-- [ ] package journal/cmd/new
+- [ ] package journal/cmd_verbs/new
     - [ ] options
         - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
         - [ ] -no-edit    | Will not open the entry in an interactive editor
                           | This options implies -ignoregit because the entry created will not be committed.
 
-- [ ] package journal/cmd/help
+- [ ] package journal/cmd_verbs/help
     - example usage
 ```
 >$ journal help init
