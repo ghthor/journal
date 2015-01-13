@@ -1,0 +1,11 @@
+Sun Aug 31 20:09:46 EDT 2014
+
+# LOG | Mostly finished the journal/init package
+Completed the specification and implementation of the functions provided by the `journal/init` package.
+I believe the specifications cover all the use cases.
+When I'm implementing the command I believe I will have to bubble a git.Commitable object from the `init.Journal(directory)` function.
+
+I'm going to move forward and implement the `journal init` command.
+I've modified the proposed flags for `journal init` to align with the immediate uses of the command.
+
+Sun Aug 31 20:24:02 EDT 2014

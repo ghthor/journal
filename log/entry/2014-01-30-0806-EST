@@ -1,0 +1,12 @@
+Thu Jan 30 08:06:02 EST 2014
+
+# Working towards Idea Storage
+After a break due to my back being a little off, I'm back with a vengeance.
+Took an hour or so to come up with the new entry type plan.
+Wrote the spec a few different times before I landed on the current one in `entry/entry_test.go`.
+I'm pretty happy with it now and I think I've isolated the functionality it's supposed to contribute.
+
+This should culminate with Idea Storage as I complete the factorization.
+A few questions still remain as to the structure, I will lay them out in an Idea.
+
+Thu Jan 30 08:42:47 EST 2014

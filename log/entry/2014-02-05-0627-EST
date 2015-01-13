@@ -1,0 +1,13 @@
+Wed Feb  5 06:27:57 EST 2014
+
+# Finished up package git's expected usage pattern
+First package I've made where I worked on it w/ godoc for it open in the browser.
+Helped me write documentation as I updated the package.
+It might be the most documented package I've made.
+
+I think I will continue writting packages like this.
+Going to move forward with the fix command.
+
+Updated the plan for the fix command with some more in depth steps.
+
+Wed Feb  5 07:19:57 EST 2014

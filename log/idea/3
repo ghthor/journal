@@ -1,0 +1,22 @@
+## [inactive] [3] Software Architecture
+I'm not exactly happy with what's happening due to this rapid feature adding.
+Everything sort of getting out of hand, haha.
+It's not quite there but some of the functions are really long.
+
+I'd really like to revisit the Idea parser for some readability improvements.
+
+I also have a way to handle the pre and post processing of the entry.
+
+- [ ] Extract the entry into a type, currently it's just a big function
+- [ ] Identify a common interface for Pre and Post processes
+- [ ] Extract all current modifications into these Pre and Post processors
+- [ ] Chain them together
+
+Regarding the `type Command` that was yanked from the go cmd.
+It isn't really all that useful.
+I think it'd be a good Idea to revisit this structure and simplify it.
+Nothing from the struct itself is needed by the `new` command during execution
+
+I'd like to get the command itself fully spec'ed.
+Just today I realized how to test the command as used from the terminal.
+Pretty proud of that realization, it will be useful in the future.

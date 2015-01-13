@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/ghthor/journal/git"
-	"github.com/ghthor/journal/idea"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/ghthor/journal/git"
+	"github.com/ghthor/journal/idea"
 )
 
 //A layout to use as the entry's filename
@@ -20,10 +21,10 @@ const FilenameLayout = "2006-01-02-1504-MST"
 var entryTmpl = template.Must(template.New("entry").Parse(
 	`{{.OpenedAt}}
 
-#~ Title(will be used as commit message)
+# Title(will be used as commit message)
 TODO Make this some random quote or something stupid
 {{range .ActiveIdeas}}
-## [{{.Status}}] {{.Name}}
+## [{{.Status}}]{{if .Id}} [{{.Id}}]{{end}} {{.Name}}
 {{.Body}}{{end}}`))
 
 type NewEntry interface {
@@ -145,8 +146,8 @@ func (e *openEntry) Close(closedAt time.Time) (ClosedEntry, error) {
 		}
 
 		// Is a commit msg header
-		if i := strings.Index(line, "#~"); i != -1 {
-			commitMsg = strings.TrimSpace(strings.TrimPrefix(line, "#~"))
+		if i := strings.Index(line, "# "); i == 0 {
+			commitMsg = strings.TrimSpace(strings.TrimPrefix(line, "# "))
 		}
 
 		// Is the Start of an Idea block

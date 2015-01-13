@@ -1,0 +1,9 @@
+## [completed] [5] Simple Functionality
+The real basics I needed start keeping my journal and log.
+Automatic git commit's and some basic protections against breaking the repository causing manual intervention to clean up.
+
+- [x] Don't allow a new entry is the git wd is dirty
+- [x] Watch the journal entry file after it is created and store the time the entry was completed
+    - Completed with ease after I learned I didn't have to syscall.Exec() the editor. See mutate.go
+- [x] When the entry is completed store automatically make a git commit
+- [x] Use a config file stored in $HOME/.journal-config.json or something to point to the journal git repository

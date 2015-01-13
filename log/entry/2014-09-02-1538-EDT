@@ -1,0 +1,10 @@
+Tue Sep  2 15:38:37 EDT 2014
+
+# Beginning work on `journal-fix` command and verb
+I've decided that the 2 options being passed to fix are pretty worthless.
+The only option I see that I NEEED right now it maybe -check.
+I need this becuase this state should be checked if something errors during `journal-new`
+
+Nevermind, I think the -no-commit option is important enough that I should add it.
+
+Tue Sep  2 15:48:58 EDT 2014

@@ -1,0 +1,10 @@
+Mon Feb  3 13:54:41 EST 2014
+
+# Making Progress
+I think I've identified the path forward now.
+I'm going to implement the `fix` command.
+By doing this first I'll be using my new packages and paving the way to re-implement the `new` command.
+It also doesn't make much sense to implement the `new` command without a journal to use it on.
+Opening a new Idea for the `fix` command.
+
+Mon Feb  3 15:03:49 EST 2014

@@ -2,12 +2,15 @@ package fix
 
 import (
 	"fmt"
-	"github.com/ghthor/gospec"
-	. "github.com/ghthor/gospec"
-	"github.com/ghthor/journal/git"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ghthor/journal/git"
+
+	"github.com/ghthor/gospec"
+	. "github.com/ghthor/gospec"
 )
 
 const entry_case_0 = `Sun Jan 26 14:50:50 EST 2014
@@ -62,10 +65,10 @@ func DescribeEntry(c gospec.Context) {
 		entry_case_4,
 		entry_case_current,
 	}
-	entryCases := make([]Entry, 0, len(entryCasesData))
+	entryCases := make([]entry, 0, len(entryCasesData))
 
 	for _, data := range entryCasesData {
-		entryCase, err := NewEntry(strings.NewReader(data))
+		entryCase, err := newEntry(strings.NewReader(data))
 		c.Assume(err, IsNil)
 
 		entryCases = append(entryCases, entryCase)
@@ -75,24 +78,28 @@ func DescribeEntry(c gospec.Context) {
 		c.Specify("can be read", func() {
 			c.Specify("from an io.Reader", func() {
 				for _, data := range entryCasesData {
-					entryCase, err := NewEntry(strings.NewReader(data))
+					entryCase, err := newEntry(strings.NewReader(data))
 					c.Expect(err, IsNil)
-					c.Expect(string(entryCase.Bytes()), Equals, string(data))
+					c.Expect(string(entryCase.bytes()), Equals, string(data))
 				}
 			})
 
 			c.Specify("from a file", func() {
-				d, err := ioutil.TempDir("_test", "entry_can_be_read_from_file_")
+				d, err := ioutil.TempDir("", "entry_can_be_read_from_file_")
 				c.Assume(err, IsNil)
+
+				defer func() {
+					c.Assume(os.RemoveAll(d), IsNil)
+				}()
 
 				for i, data := range entryCasesData {
 					filename := filepath.Join(d, fmt.Sprintf("case_%d", i))
 					c.Assume(ioutil.WriteFile(filename, []byte(data), 0600), IsNil)
 
-					entryCase, err := NewEntryFromFile(filename)
+					entryCase, err := newEntryFromFile(filename)
 					c.Expect(err, IsNil)
 
-					actualData, err := ioutil.ReadAll(entryCase.NewReader())
+					actualData, err := ioutil.ReadAll(entryCase.newReader())
 					c.Assume(err, IsNil)
 					c.Expect(string(actualData), Equals, string(data))
 				}
@@ -100,25 +107,25 @@ func DescribeEntry(c gospec.Context) {
 		})
 
 		c.Specify("can be fixed", func() {
-			entriesFixed := make([]Entry, 0, len(entryCases))
+			entriesFixed := make([]entry, 0, len(entryCases))
 			commitables := make([]git.Commitable, 0, len(entryCases))
 
 			for i, entryCase := range entryCases {
-				fixedEntry, changes, err := entryCase.FixedEntry()
+				fixedEntry, changes, err := entryCase.fixedEntry()
 				c.Expect(err, IsNil)
 				entriesFixed = append(entriesFixed, fixedEntry)
 				commitables = append(commitables, changes)
 
 				if i == len(entryCases)-1 {
 					c.Specify("unless there are no errors to be fixed", func() {
-						c.Expect(entryCase.NeedsFixed(), IsFalse)
+						c.Expect(entryCase.needsFixed(), IsFalse)
 					})
 				}
 			}
 
 			c.Specify("by returning an entry conforming current standard", func() {
 				for _, fixedEntry := range entriesFixed {
-					actualData, err := ioutil.ReadAll(fixedEntry.NewReader())
+					actualData, err := ioutil.ReadAll(fixedEntry.newReader())
 					c.Assume(err, IsNil)
 
 					c.Expect(string(actualData), Equals, entry_case_current)
@@ -127,7 +134,7 @@ func DescribeEntry(c gospec.Context) {
 
 			c.Specify("returns a commitable with message format", func() {
 				for i, changes := range commitables {
-					if entryCases[i].NeedsFixed() {
+					if entryCases[i].needsFixed() {
 						c.Expect(changes.CommitMsg(), Equals, "entry - format updated")
 					} else {
 						c.Expect(changes, Equals, nil)
@@ -138,7 +145,7 @@ func DescribeEntry(c gospec.Context) {
 
 		c.Specify("can be written", func() {
 			for i, entryCase := range entryCases {
-				actualData, err := ioutil.ReadAll(entryCase.NewReader())
+				actualData, err := ioutil.ReadAll(entryCase.newReader())
 				c.Assume(err, IsNil)
 				c.Expect(string(actualData), Equals, entryCasesData[i])
 			}

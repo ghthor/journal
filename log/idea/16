@@ -1,0 +1,3 @@
+## [inactive] [16] Idea shortname
+If an Idea's name is long enough to be unusable in a git commit message it should have a shortname.
+When an Idea is created we should prompt and ask the user to add one or shorten the existing name.

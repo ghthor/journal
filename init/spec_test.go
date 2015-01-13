@@ -1,0 +1,15 @@
+package init_test
+
+import (
+	"github.com/ghthor/gospec"
+	"testing"
+)
+
+func TestUnitSpecs(t *testing.T) {
+
+	r := gospec.NewRunner()
+
+	r.AddSpec(DescribeInit)
+
+	gospec.MainGoTest(r, t)
+}

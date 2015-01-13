@@ -1,0 +1,23 @@
+Sat Jan 10 17:35:32 EST 2015
+
+# Finished with the journal-fix command
+As far as I'm concerned the `journal-fix` command is now complete.
+I've left out a `CanBeFixed()` function because it isn't needed.
+If fixing fails, it fails.
+
+Maybe I could prompt, "Would you like to backup the journal before fixing?"
+I dunno, I'm not all that worried about it honestly.
+
+With this out of the way I should be able to complete version 1 fairly soon.
+I estimate 2 days of work to implement the `new` command.
+Then a few hours to make sure all the documentation is consistent across the commands.
+Once that's all completed and I have a functioning command I may go back and work on some missing options.
+Or I'll just wrap it up, write up an extensive README and call it done for now.
+
+If it's functional enough I can start using the new format and working on the game engine.
+As I work, I expect I'll find some features that would be useful and I'll be able to start planning those out.
+Then once I pile up a few useful features I can spec and impl them and see how this project's growth feels.
+If it is too rigid I'll need to take a step back and really assess how the tests are written.
+Looking for way to remove any binding's to the impl wherever possible and enable more fluidity.
+
+Sat Jan 10 17:43:25 EST 2015

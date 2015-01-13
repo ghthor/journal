@@ -1,0 +1,5 @@
+## [completed] [24] journal version 1 rewrite
+- [x] commands implemented
+    - [x] journal init
+    - [x] journal fix
+    - [X] journal new

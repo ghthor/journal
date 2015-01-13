@@ -1,0 +1,31 @@
+Fri Feb  7 23:45:10 EST 2014
+
+# Updating `fix` command tasklist | I think I've figured out the commit message format that will be used by the fix command.
+I'm going to updated the tasklist with this new format.
+Fix entries is the only implemented example of this format.
+
+Tasklist was updated.
+Also made a test case journal in `fix/journal_cases/case_*/`
+
+Manually did the update process on this test case and I'm happy with the commit message formats.
+This is what it looks like.
+Nice and uniform.
+
+```
+┌ journal - fix - complete──(d8d778a)
+├ journal - fix - entry - format updated - 2014-02-08-0006-EST──(25714b3)
+├ journal - fix - entry - format updated - 2014-02-08-0005-EST──(1ad5198)
+├ journal - fix - entry - format updated - 2014-02-08-0003-EST──(7b707f3)
+├ journal - fix - entry - format updated - 2014-02-07-2359-EST──(1177fe7)
+├ journal - fix - idea - modified - 1 - 2014-02-08-0006-EST──(a23eb5c)
+├ journal - fix - idea - created - 2 - 2014-02-08-0005-EST──(7742712)
+├ journal - fix - idea - created - 1 - 2014-02-08-0005-EST──(21b1087)
+├ journal - fix - created idea/ directory structure──(43bb735)
+├ journal - fix - moved all entries to entry/──(2f2ed1c)
+├ journal - fix - begin──(7809279)
+```
+
+I'm happy with it.
+Now just to write the specification for fixing this journal_case/
+
+Fri Feb  7 23:55:10 EST 2014

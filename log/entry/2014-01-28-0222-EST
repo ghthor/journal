@@ -1,0 +1,13 @@
+Tue Jan 28 02:22:59 EST 2014
+
+# Grabbing a handle on specifying terminal interface | Also a Plan for Idea Storage improvement
+Got my hands wet in improving the situation by specifying the Environment variables expansion behavior.
+Moved all config files for test into the _test/ directory and they're generated during the test.
+
+There's some low hanging fruit for DRY improvements there which should be fun.
+Still many more specs to be made as well.
+
+Also, using journal for this work log is making me realize I'd like Ideas to be stored separately.
+Idea is as follows
+
+Tue Jan 28 02:55:49 EST 2014

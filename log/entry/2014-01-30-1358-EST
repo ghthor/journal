@@ -1,0 +1,9 @@
+Thu Jan 30 13:58:27 EST 2014
+
+# Completed Non-Error Specification of the entry package
+Completed all the non error specifications for the entry package.
+The one error case I really care about is if an Entry is missing a Commit message.
+I think this error case can be handled by the package user to reopen the editor.
+It needs to be checked during Close() and the file shouldn't be modified.
+
+Thu Jan 30 14:13:06 EST 2014

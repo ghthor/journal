@@ -1,0 +1,22 @@
+Sun Feb  2 12:52:30 EST 2014
+
+# Stuck with low motivation
+I'm fighting myself about how to specify the behavior of the idea package.
+There so many possible cases that I just don't know how to specify them.
+
+    - 1 new idea
+    - 2 new ideas
+    - 1 idea with id
+    - 1 idea with id and a new idea
+
+The list could go on.
+That's the thing that's bugging me I suppose.
+Should I make the framework to have an unlimited number of ideas?
+Should the specs for all these cases translate into something testable for the storage?
+
+Am I over thinking it?
+
+I think I'm just not in it today despite really wanting this feature.
+I'll revisit it later, for now I need to do something else and let my mind wander.
+
+Sun Feb  2 12:59:44 EST 2014

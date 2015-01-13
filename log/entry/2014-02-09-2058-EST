@@ -1,0 +1,44 @@
+Sun Feb  9 20:58:42 EST 2014
+
+# Completed fix algorithm for journal case 0
+Had a pretty productive day.
+Decided I wasn't going to finish till the commit sequence for case 0 was correct.
+
+This is want it looks like.
+Entry filename's lining up was not planned.
+
+```
+┌ journal - fix - completed──(4b4a936)
+├ journal - fix - entry - format updated - entry/2014-01-06-0000-EST──(c102d5c)
+├ journal - fix - entry - format updated - entry/2014-01-05-0000-EST──(ad9c636)
+├ journal - fix - entry - format updated - entry/2014-01-04-0000-EST──(cff28de)
+├ journal - fix - entry - format updated - entry/2014-01-03-0000-EST──(93c92a9)
+├ journal - fix - entry - format updated - entry/2014-01-01-0000-EST──(1425134)
+├ journal - fix - idea - updated - 3 - src:entry/2014-01-06-0000-EST──(7c2a8ec)
+├ journal - fix - idea - updated - 1 - src:entry/2014-01-06-0000-EST──(41902ef)
+├ journal - fix - idea - created - 3 - src:entry/2014-01-05-0000-EST──(f76f865)
+├ journal - fix - idea - created - 2 - src:entry/2014-01-05-0000-EST──(201094e)
+├ journal - fix - idea - created - 1 - src:entry/2014-01-05-0000-EST──(d5d29fb)
+├ journal - fix - idea directory store initialized──(7d259d0)
+├ journal - fix - moved all entries to entry/──(17a544f)
+├ journal - fix - begin──(437e273)
+├ Commit Msg | Entry 6──(ed7d8f3)
+├ Commit Msg | Entry 5──(d404edc)
+├ Commit Msg | Entry 4──(4c4c31c)
+├ Commit Msg | Entry 3──(8099e84)
+├ Commit Msg | Entry 2──(1589e95)
+└ Commit Msg | Entry 1──(9dd0649)
+```
+
+As usual I learned a lot about git during this process.
+Mostly about the formating options and params to `git show`.
+Also dealt with some `git add` issues concerning deleted files.
+The `git add` issue should probly be fixed with some additions to the git package.
+Opening an idea for these changes.
+
+Version 1 of journal is close once I get fix command added to the executable.
+Also need to update the new and init commands for the new format and to use the idea directory store.
+
+Overall a good productive day, signing out for now.
+
+Sun Feb  9 21:18:41 EST 2014

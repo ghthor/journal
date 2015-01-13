@@ -1,0 +1,9 @@
+Fri Feb  7 22:50:20 EST 2014
+
+# Plan to finish up `fix` command | This shouldn't take more then an hour or so.
+And watch it take 6 hours -.-
+
+Going to do the last task for fixing entries.
+The FixedEntry() method needs to return a commitable with the right message format.
+
+Fri Feb  7 23:26:30 EST 2014

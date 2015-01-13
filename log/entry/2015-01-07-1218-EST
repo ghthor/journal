@@ -1,0 +1,23 @@
+Wed Jan  7 12:18:39 EST 2015
+
+# In the middle of implementing fix.NeedsFixed()
+My work today has consisted of scowling at what I wrote 1 year ago.
+The more productive area from today was shrinking the fix package's public interface.
+
+I'm in the middle of implementing the public interface of.
+
+``` go
+NeedsFixed(directory string) (bool, error)
+Fix(directory string) (refLog []string, error)
+```
+
+I'm leaning on not implementing the, CanBeFixed() function.
+Reasoning being I want to get this done and it really isn't all that nesscary.
+Maybe in the future I'll worry about it when I come back I significantly modify the disk storage format and rebuild the fix package.
+But for now I'm the only user and I just need to get this overwith and move forward.
+
+The NeedsFixed() function has an error in it.
+It is walking into lower directories when it shouldn't be.
+I just identified this as an issue and I need to move forward with fixing it.
+
+Wed Jan  7 12:23:32 EST 2015

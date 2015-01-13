@@ -1,0 +1,27 @@
+Mon Jan 27 20:57:41 EST 2014
+
+# Wake up check in
+Made some QoL changes to the main func.
+Fixed a few bugs I found.
+Did all this last night before I went to sleep.
+None of it's spec'ed out, but that's today's task.
+
+Was reading a blog article from r/golang about a company, dramafever, transistioning their server to go.
+I liked a few of the ideas mentioned, but there was something big that I didn't know about.
+
+```shell
+$> go test -cover
+```
+
+Oh
+My
+God
+
+This new metric is going to rule me.
+Going to get some food.
+I might check in and make a list before I get started today, after I eat.
+Maybe make an Idea for each day.
+So the begin check in makes an Idea.
+And the end check in completes tasks and hopefully completes the Idea as a whole.
+
+Mon Jan 27 21:03:45 EST 2014

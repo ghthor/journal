@@ -1,0 +1,21 @@
+Sat Aug 30 10:38:44 EDT 2014
+
+# Assessing and modifying my existing plan for Journal version 1
+Recently have been piddling around with completing version 1.
+Last week I worked on some of the spec for the `journal/init` package.
+When I was working last week I did not look over this plan.
+
+I updated the pathing to the cmd_verbs package hierarchy.
+Looking over my work from last week I believe the specification for "A function to check if journal directory can be initialized" has been completed; along with the implementation.
+On top of that, I'm quite proud of the code produced as well.
+It is clean and concise and reading the spec was pretty straightforward.
+
+Continuing forward I am going to apply the same principles I used during this process.
+    - Write the spec
+        - Fix any spec failures so the response is unambiguous and it is apparent what exactly failed.
+    - Write the implementation
+
+So my immediate plan is to finish the spec and implementation of the `journal/init` package.
+After that is complete I will implement the `journal init` command as a cmd_verb.
+
+Sat Aug 30 10:58:55 EDT 2014

@@ -1,0 +1,4 @@
+## [inactive] [7] `journal fix`
+Something similar to the `go fix` command.
+The data format of the journal entries has gone through some evolution and will continue to do so.
+The fix command would assess the entrys in a journal and update them to the latest format.

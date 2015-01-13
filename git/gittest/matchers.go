@@ -3,27 +3,28 @@
 package gittest
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/ghthor/gospec"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
-// TODO: Specify the behavior of this matcher
 func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Message, neg gospec.Message, err error) {
 	d, ok := dir.(string)
 	if !ok {
 		return false, pos, neg, errors.New("directory is not a string")
 	}
 
-	// Check if jd exists and is a Directory
+	// Check if d exists and is a Directory
 	if info, err := os.Stat(d); !os.IsNotExist(err) {
 		if !info.IsDir() {
 			return false, pos, neg, errors.New(fmt.Sprintf("%s is not a directory", d))
 		}
 	} else {
-		// jd doesn't exist
+		// d doesn't exist
 		return false, pos, neg, err
 	}
 
@@ -44,5 +45,39 @@ func IsAGitRepository(dir interface{}, _ interface{}) (match bool, pos gospec.Me
 	neg = gospec.Messagef(d, "%s is NOT a git repository", d)
 
 	match = true
+	return
+}
+
+func IsInsideAGitRepository(dir interface{}, _ interface{}) (match bool, pos, neg gospec.Message, err error) {
+	d, ok := dir.(string)
+	if !ok {
+		return false, pos, neg, errors.New("directory is not a string")
+	}
+
+	// Check if d exists and is a Directory
+	if info, err := os.Stat(d); !os.IsNotExist(err) {
+		if !info.IsDir() {
+			return false, pos, neg, errors.New(fmt.Sprintf("%s is not a directory", d))
+		}
+	} else {
+		// d doesn't exist
+		return false, pos, neg, err
+	}
+
+	pos = gospec.Messagef(match, "%s is inside a git repository", d)
+	neg = gospec.Messagef(match, "%s is not inside a git repository", d)
+
+	git, err := exec.LookPath("git")
+	if err != nil {
+		return
+	}
+
+	cmd := exec.Command(git, "status")
+	cmd.Dir = d
+
+	o, _ := cmd.CombinedOutput()
+
+	match = !bytes.Contains(o, []byte("fatal: Not a git repository"))
+
 	return
 }

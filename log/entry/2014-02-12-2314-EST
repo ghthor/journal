@@ -1,0 +1,16 @@
+Wed Feb 12 23:14:41 EST 2014
+
+# Journal Version 1 Plan
+Working on a design to implement commands.
+My current idea is to store routines shared by all commands in the package journal/cmd.
+Then implement each separate command in a subdirectory package (see idea "package journal/cmd").
+
+The idea behind this strategy is isolation and compartmentalization of each commands execution environment.
+This should also help to eliminate the main_test.go specifications in favor of direct testing of each commands.
+I want to eliminate these specifications because they are a bottleneck that will not scale.
+This is due to actually executing the journal command via os/exec.
+
+If this proves to be too compartmentalized then each command package can be combined into a single package, journal/cmd.
+This package could still be extracted later as a stand alone project in either format.
+
+Thu Feb 13 00:45:36 EST 2014

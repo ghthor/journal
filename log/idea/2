@@ -1,0 +1,34 @@
+## [inactive] [2] Ideas and Tasks
+Going to archive this for a bit.
+No need to keep it around for now.
+
+This is an Idea.
+
+Currently Idea's cannot be renamed.
+A way to fix this is to give an Idea a unique ID.
+By default maybe it doesn't have an Id
+- [ ] An Idea can have an Id
+
+All tasks will be bound to an Idea.
+Expected line form will be as follows.
+
+- [ ] Task - {{.TaskText}}
+- [ ] An Idea can have tasks
+
+- [x] To find the currently active ideas, you search the previous journal entry.
+- [x] All active Ideas found in the previous entry will be carried over to a new entry.
+- [x] An inactive or completed idea doesn't get carried over to a new entry
+
+If a task is checked off in an journal entry it is removed from the ideas task list with a commit.
+The commit is seperate from the commit for the journal entry itself.
+
+To make an Idea inactive you change the status to inactive in the journal entry.
+An inactive Idea will not be carried into the next new entry.
+To make an Idea active you type some sort of valid go template command.
+
+Something like this perhaps?:
+{{.Task.Find("Ideas and Tasks")}}
+
+And then when you save the entry file `journal` will use the file as a template and expand it.
+
+- [ ] Vim snippets and maybe a filetype definition with closes'm going to open an Idea concerning missing specifications.

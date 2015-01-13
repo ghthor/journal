@@ -1,0 +1,11 @@
+## [active] [1] Idea Management
+To make an Idea inactive you change the status to inactive in the journal entry.
+An inactive Idea will not be visible when writing the next entry.
+
+To make an Idea active you type some sort of valid go template command.
+
+Something like this perhaps?:
+{{.Task.Find("Idea Manager")}}
+
+Saving the entry will trigger journal to parse the file and expand any templates it finds.
+Then when the idea is present in the entry you can mark it as active.

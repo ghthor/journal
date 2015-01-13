@@ -1,0 +1,18 @@
+Thu Feb  6 15:13:09 EST 2014
+
+# Completed the directory storage for ideas
+Implemented the final remaining specs for the idea directory store.
+Works as expected, pretty excited about this.
+
+Everything should be ready now to build the journal-fix command.
+Once that's completed I'll be able to rewrite the journal-new command.
+Then combine journal-fix and journal-new into the single command journal.
+
+Really enjoyed writing code today with this new procedure.
+Writing the entire spec and then the entire implementation is beautiful.
+Though I am wondering if I should be trading back and forth more often.
+
+What if my spec's aren't actually covering the implementation?
+Maybe I should go back through once more and verify each spec is upholding it's clause.
+
+Thu Feb  6 15:31:51 EST 2014
