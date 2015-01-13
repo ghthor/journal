@@ -24,8 +24,7 @@ func usage() {
 	usageTmpl.Execute(os.Stdout, cmd_verbs.Usages())
 }
 
-var usagePrefix = `
-journal is a filesystem text based journal that stores metadata about each entry
+var usagePrefix = `journal is a filesystem text based journal that stores metadata about each entry
 
 Usage:
     journal [options] <subcommand> [subcommand options]
