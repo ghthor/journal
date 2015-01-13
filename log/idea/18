@@ -1,24 +1,45 @@
 ## [active] [18] `fix` command
-- [ ] Mark upgrade beginning with an empty git commit
-    - message "FIX - Begin - Upgrade JournalVersion_1_2"
+- [ ] Mark fix beginning with an empty git commit
+    - message "FIX - Journal - Begin"
 
-- [ ] Identify Entry version
-    - [ ] EntryVersion_1 has no ClosedAt timestamp.
-    - [ ] EntryVersion_2 has ClosedAt timestamp and may have ideas.
-    - [ ] EntryVersion_3 has ClosedAt timestamp and doesn't have any ideas.
+- [ ] fix journal
+    - fix | does NOT store ideas in `idea/` directory
+        - fix ideas
+    - fix | has entries that don't conform to the current feature set
+        - fix entries
+    - fix | does NOT store entries in `entry/` directory
+        - create `entry/` directory and move all entries
+        - message "FIX - Journal - Moved all entries to entry/ directory"
 
-- [ ] Identify Journal version
-    - [ ] JournalVersion_1 does not have an `entry/` or `idea/` directory
-        - [ ] JournalVersion_1 can ONLY contain EntryVersion_1 or EntryVersion_2
-    - [ ] JournalVersion_2 uses `entry/` and `idea/` to store entries and ideas
-        - [ ] JournalVersion_2 can ONLY contain EntryVersion_3
+- [ ] fix ideas
+    - [ ] create `idea/` directory structure
+        - message "FIX - Journal - Created idea/ directory structure"
+    - [ ] Parse ideas from entries starting from oldest
+        - If an idea doesn't exist in `idea/' w/ matching name
+            - Create the idea
+            - message "FIX - Idea - Created - {timestamp}"
+        - If an idea exists in `idea/` /w matching name
+            - Update the idea
+            - message "FIX - Idea - Modified - {timestamp}"
 
-- [ ] Upgrade JournalVersion_1_2
-    - [ ] Upgrade all EntryVersion_1's to EntryVersion_2's
-    - [ ] Create `entry/` and `idea/`
-    - [ ] Upgrade all EntryVersion_2's to EntryVersion_3's
-        - [ ] Remove any ideas from the entry and store them in `idea/`
-            - [ ] If and idea in `idea/` has the same name assume the idea's are the same and perform an Update instead of a Create
-        - [ ] Store EntryVersion_3 in `entry/`
-    - [ ] Mark upgrade complete with an empty git commit
-        - message "FIX - Completed - Upgrade JournalVersion_1_2"
+- [ ] fix entries
+    - fix | does NOT have a commit message header w/ format "#~ Commit Message\n"
+        - change line format from "# Text\n" -> "#~ Text\n"
+        - message "FIX - Entry - Added commit message header"
+
+    - fix | does NOT have a closed timestamp as the final line
+        - append a closed timestamp for 30secs after opened timestamp
+        - message "FIX - Entry - Added closed timestamp"
+
+    - fix | does have ideas in the body
+        - remove ideas
+        - message "FIX - Entry - Removed ideas from body"
+
+    - [ ] Current Features
+        - should have a timestamp as the first line
+        - should have a commit msg line w/ format "#~ Commit Msg\n"
+        - should NOT have any ideas in the body
+        - should have a timestamp as the final line
+
+- [ ] Mark fix complete with an empty git commit
+    - message "FIX - Journal - Complete"
