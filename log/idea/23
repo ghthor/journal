@@ -10,12 +10,10 @@ I expect this package can be extracted into it's own project in the future.
         - [x] -no-commit | Will not commit an changes in the directory to git repository.
 
 - [x] package journal/cmd_verbs/fix
+    - No options
 
-- [ ] package journal/cmd_verbs/new
-    - [ ] options
-        - [ ] -ignore-git | Will not commit any ideas from the new entry or the entry itself to git.
-        - [ ] -no-edit    | Will not open the entry in an interactive editor
-                          | This options implies -ignoregit because the entry created will not be committed.
+- [x] package journal/cmd_verbs/new
+    - No options
 
 - [ ] package journal/cmd_verbs/help
     - example usage
