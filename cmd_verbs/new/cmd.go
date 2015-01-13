@@ -4,6 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -69,13 +71,30 @@ func (c cmd) Exec(args []string) error {
 		return ErrGitIsDirty
 	}
 
-	// Set defaults
-	if c.EditorProcess == nil {
-		// Set Up Vim
-	}
-
+	// Set default time provider
 	if c.Now == nil {
 		c.Now = time.Now
+	}
+
+	openedAt := c.Now()
+	entryFilename := openedAt.Format(entry.FilenameLayout)
+
+	// Set default editor
+	if c.EditorProcess == nil {
+		// Set Up Vim
+		vimBin, err := exec.LookPath("vim")
+		if err != nil {
+			return err
+		}
+
+		vimCmd := exec.Command(vimBin, entryFilename)
+		vimCmd.Dir = filepath.Join(path, "entry")
+
+		vimCmd.Stdout = os.Stdout
+		vimCmd.Stderr = os.Stderr
+		vimCmd.Stdin = os.Stdin
+
+		c.EditorProcess = vimCmd
 	}
 
 	// Make a new entry
@@ -92,7 +111,7 @@ func (c cmd) Exec(args []string) error {
 	}
 
 	// Open entry w/ ideas
-	openEntry, err := entry.Open(c.Now(), ideas)
+	openEntry, err := entry.Open(openedAt, ideas)
 	if err != nil {
 		return err
 	}
