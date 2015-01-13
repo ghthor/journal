@@ -160,5 +160,5 @@ func (c cmd) Exec(args []string) error {
 }
 
 func (c cmd) Summary() string {
-	return "    new\t\tcreate, edit, and save an entry to a journal"
+	return "create, edit, and save an entry to a journal"
 }

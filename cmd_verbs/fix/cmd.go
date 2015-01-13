@@ -66,5 +66,5 @@ func (c *cmd) Exec(args []string) error {
 }
 
 func (c cmd) Summary() string {
-	return "    fix\t\tupgrade the storage format"
+	return "upgrade the storage format"
 }

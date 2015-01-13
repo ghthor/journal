@@ -91,5 +91,5 @@ func (c *cmd) Exec(args []string) error {
 }
 
 func (c cmd) Summary() string {
-	return "how to use `init` verb"
+	return "initialize a new journal directory"
 }
