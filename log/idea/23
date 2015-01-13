@@ -11,8 +11,8 @@ I expect this package can be extracted into it's own project in the future.
 
 - [ ] package journal/cmd_verbs/fix
     - [ ] options
-        - [ ] -ignore-git     | Will not commit any fixes or modifications to git
-        - [ ] -print-hash-log | Print out the hash log and commit messages for the entire fix.
+        - [ ] -no-commit | Will not commit any of the modifications when fixing the journal's structure and data
+        - [ ] -check     | Will run a check on the journal to see if it needs fixing
 
 - [ ] package journal/cmd_verbs/new
     - [ ] options
