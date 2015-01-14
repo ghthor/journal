@@ -1,0 +1,18 @@
+Wed Jan 14 16:22:46 EST 2015
+
+# journal - Documenting some cleanup tasks
+While the code is functional, their are still many ways I can improve the source.
+I am mostly speaking to repetitive verbose specifications that can be refactored.
+Another target would be elevating the tests to the highest level.
+Using only the public interface to setup and specify the expectation.
+
+This may not be possible.
+Should something be exposed through the public interface only so it can be mocked?
+That seems just as bad as tying it to a private interface.
+
+The only real use case I'm imagining is if an external package ALSO needs to mock it.
+This could actually happen if I elevate the tests to the highest level.
+In theory I like this idea, but I also don't like it.
+Maybe I should reach out at hacker school and have a discussion with someone about it.
+
+Wed Jan 14 16:31:44 EST 2015
