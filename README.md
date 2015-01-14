@@ -77,12 +77,12 @@ for another editor please open a ticket or pull request.
 
 You must save the file before exiting the editor. `journal` uses a
 real file on the file system and if it is not saved it will commit
-and empty template.
+an empty template.
 
-When the editor is exited `journal` will commit the entry and any
+When you exit the editor, `journal` will commit the entry and any
 ideas(the persistent document type) to the repository. Review the
 git commit log and the contents of `entry/` and `idea/` directories
-to view how the entry is stored.
+to view how your entry is stored and committed.
 
 ### Using Ideas
 
