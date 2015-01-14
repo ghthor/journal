@@ -12,12 +12,6 @@ The following `go get` will install a single combined binary.
 
     $ go get github.com/ghthor/journal
 
-Each individual command is also available as a stand alone
-binary.
-
-    $ go get github.com/ghthor/journal/exec/journal-init
-    $ go get github.com/ghthor/journal/exec/journal-new
-
 ```
 someone@somewhere $ journal help
 journal is a wrapper around git for creating a project/personal log.
@@ -32,6 +26,12 @@ The commands are:
     new        create, edit, and save an entry to a journal
 
 ```
+
+Each individual command is also available as a stand alone
+binary.
+
+    $ go get github.com/ghthor/journal/exec/journal-init
+    $ go get github.com/ghthor/journal/exec/journal-new
 
 ### Using journal
 
