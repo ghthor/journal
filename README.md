@@ -45,7 +45,7 @@ a directory as a journal.
 You can also initialize a journal directory that is within an existing
 git repository. `journal` will use the existing git repository to
 store all the changes that are made as you add entries and ideas.
-You can view the [journal](https://github.com/ghthor/journal/tree/master/log)
+You can view the [log/](https://github.com/ghthor/journal/tree/master/log)
 for the journal project to see it working in action.
 
 After initializing a journal it will have the following directory tree.
@@ -76,7 +76,7 @@ implemented editor is vim. If you are interested in adding support
 for another editor please open a ticket or pull request.
 
 You must save the file before exiting the editor. `journal` uses a
-real file on the filesystem and if it is not saved it will commit
+real file on the file system and if it is not saved it will commit
 and empty template.
 
 When the editor is exited `journal` will commit the entry and any
