@@ -1,0 +1,13 @@
+## [active] [26] code cleanup
+Fix up sloppy or repetitive sections of code.
+Especially specifications that are boud to close to the implementation.
+
+    - [ ] github.com/ghthor/journal/cmd_verbs/new
+        - refactor tests
+
+    - [ ] github.com/ghthor/journal/fix
+        - refactor tests
+        - loosen the coupling to the implementation
+
+    - [ ] all
+        - read specifications & rewrite for consistency across packages
