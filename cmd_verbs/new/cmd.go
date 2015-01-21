@@ -87,7 +87,7 @@ func (c cmd) Exec(args []string) error {
 			return err
 		}
 
-		vimCmd := exec.Command(vimBin, entryFilename)
+		vimCmd := exec.Command(vimBin, "+set spell", entryFilename)
 		vimCmd.Dir = filepath.Join(path, "entry")
 
 		vimCmd.Stdout = os.Stdout
