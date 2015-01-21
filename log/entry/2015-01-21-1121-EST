@@ -1,0 +1,11 @@
+Wed Jan 21 11:21:31 EST 2015
+
+# journal - Enabling spelling was an easy upgrade
+I tried using a raw string like `+"set spell"` and it didn't work.
+exec.Command() must be doing something to the argument strings.
+Or maybe the quotes are consumed by bash, but not by the system level process executor.
+So that's why `vim +"set spell" file` worked from bash.
+
+Anyway, quick nice little fix!
+
+Wed Jan 21 11:24:23 EST 2015
