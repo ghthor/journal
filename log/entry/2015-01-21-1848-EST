@@ -1,0 +1,22 @@
+Wed Jan 21 18:48:35 EST 2015
+
+# journal - Some higher order feature ideas
+- In corporate todo.txt into journal
+- Enable journal to be aware of multiple journal data endpoints
+    - Examples
+        - personal
+        - work
+        - project/name
+    - Do content analysis to avoid
+    breaches in information from personal/private
+    from being added to a project journal
+     - Use CLA to register identify anomalies in work
+     related journals compared to private journals
+- Branch and register each change made during an editing session
+    - Use this data to train a CLA on the differences in editing style
+    - Can use this data to do anomaly detection to avoid breaches
+    - Can also be used to form a more accurate time estimation on editing duration
+    - Could produce more accurate results about editing time if
+    I walked away, mid edit, for 10 mins
+
+Wed Jan 21 18:56:43 EST 2015
