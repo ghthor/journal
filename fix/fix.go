@@ -214,25 +214,29 @@ func fixCase0(directory string) (refLog []string, err error) {
 					return err
 				}
 
-				if !info.IsDir() {
-					if info.Name() != "nextid" && info.Name() != "active" {
-						ideaFile, err := os.OpenFile(path, os.O_RDONLY, 0660)
-						if err != nil {
-							return err
-						}
-						defer ideaFile.Close()
+				if info.IsDir() {
+					return nil
+				}
 
-						scanner := idea.NewIdeaScanner(ideaFile)
-						if !scanner.Scan() {
-							return errors.New(fmt.Sprintf("unexpected file in idea store %s", path))
-						}
+				if info.Name() == "nextid" || info.Name() == "active" {
+					return nil
+				}
 
-						idea := scanner.Idea()
+				ideaFile, err := os.OpenFile(path, os.O_RDONLY, 0660)
+				if err != nil {
+					return err
+				}
+				defer ideaFile.Close()
 
-						if newIdea.Name == idea.Name {
-							newIdea.Id = idea.Id
-						}
-					}
+				scanner := idea.NewIdeaScanner(ideaFile)
+				if !scanner.Scan() {
+					return errors.New(fmt.Sprintf("unexpected file in idea store %s", path))
+				}
+
+				idea := scanner.Idea()
+
+				if newIdea.Name == idea.Name {
+					newIdea.Id = idea.Id
 				}
 
 				return nil
