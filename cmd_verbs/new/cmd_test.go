@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ghthor/journal/entry"
@@ -313,6 +314,30 @@ index 83f5e84..0b22af3 100644
 				// Will fail with an error
 				c.Expect(cmd.Exec(nil), Equals, ErrGitIsDirty)
 			})
+		})
+	})
+
+	c.Specify("the environment editor", func() {
+		c.Specify("will be vim", func() {
+			cmd, err := newEnvEditor("vim", "entryFilename")
+			c.Assume(err, IsNil)
+
+			c.Expect(filepath.Base(cmd.Args[0]), Equals, "vim")
+			c.Expect(strings.Join(cmd.Args[1:], " "), Equals, "+set spell entryFilename")
+		})
+
+		c.Specify("will be emacs", func() {
+			cmd, err := newEnvEditor("emacs", "entryFilename")
+			c.Assume(err, IsNil)
+
+			c.Expect(filepath.Base(cmd.Args[0]), Equals, "emacs")
+			c.Expect(strings.Join(cmd.Args[1:], " "), Equals, "entryFilename")
+
+			cmd, err = newEnvEditor("emacs -nw", "entryFilename")
+			c.Assume(err, IsNil)
+
+			c.Expect(filepath.Base(cmd.Args[0]), Equals, "emacs")
+			c.Expect(strings.Join(cmd.Args[1:], " "), Equals, "-nw entryFilename")
 		})
 	})
 }

@@ -48,6 +48,42 @@ func (c *cmd) SetWd(directory string) {
 	c.wd = directory
 }
 
+func newEnvEditor(envEditor string, entryFilename string) (*exec.Cmd, error) {
+	// Enable the $EDITOR variable to
+	// contain a string such a "emacs -nw"
+	editorArgs := strings.Split(envEditor, " ")
+
+	// Assume that the first item in the split list
+	// is the executable name, such as editorArgs[0] == "vim"
+	// and look it up.
+	editorBin, err := exec.LookPath(editorArgs[0])
+	if err != nil {
+		return nil, err
+	}
+
+	var editorCmd *exec.Cmd
+
+	// Create an *exec.Cmd that will be used to edit the entry
+	switch editorArgs[0] {
+	case "vim":
+		editorCmd = exec.Command(editorBin, "+set spell", entryFilename)
+	case "emacs":
+		// ignore the "emacs" token from the editorArgs slice
+		// and append the entry filename to the end of it
+		editorArgs = append(editorArgs[1:], entryFilename)
+		editorCmd = exec.Command(editorBin, editorArgs...)
+	default:
+		// Support for an editor is explicit
+		return nil, fmt.Errorf("%v is unimplemented", editorBin)
+	}
+
+	editorCmd.Stdout = os.Stdout
+	editorCmd.Stderr = os.Stderr
+	editorCmd.Stdin = os.Stdin
+
+	return editorCmd, nil
+}
+
 func (c cmd) Exec(args []string) error {
 	c.flagSet.Parse(args)
 
@@ -80,34 +116,14 @@ func (c cmd) Exec(args []string) error {
 	openedAt := c.Now()
 	entryFilename := openedAt.Format(entry.FilenameLayout)
 
-	// Set default editor
+	// Define the editor process using the $EDITOR variable
 	if c.EditorProcess == nil {
-		// Set Up the users editor
-		userEditor := os.Getenv("EDITOR")
-		editorArgs := strings.Split(userEditor, " ")
-		editorBin, err := exec.LookPath(editorArgs[0])
-
+		editorCmd, err := newEnvEditor(os.Getenv("EDITOR"), entryFilename)
 		if err != nil {
 			return err
 		}
 
-		var editorCmd *exec.Cmd
-
-		switch editorArgs[0] {
-		case "vim":
-			editorCmd = exec.Command(editorBin, "+set spell", entryFilename)
-		case "emacs":
-			editorArgs = append(editorArgs[1:], entryFilename)
-			editorCmd = exec.Command(editorBin, editorArgs...)
-		default:
-			return fmt.Errorf("%v is unimplemented", editorBin)
-		}
-
 		editorCmd.Dir = filepath.Join(path, "entry")
-
-		editorCmd.Stdout = os.Stdout
-		editorCmd.Stderr = os.Stderr
-		editorCmd.Stdin = os.Stdin
 
 		c.EditorProcess = editorCmd
 	}
