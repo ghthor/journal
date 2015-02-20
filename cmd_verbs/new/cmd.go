@@ -81,20 +81,31 @@ func (c cmd) Exec(args []string) error {
 
 	// Set default editor
 	if c.EditorProcess == nil {
-		// Set Up Vim
-		vimBin, err := exec.LookPath("vim")
+		// Set Up the users editor
+		userEditor := os.Getenv("EDITOR")
+		editorBin, err := exec.LookPath(userEditor)
 		if err != nil {
 			return err
 		}
 
-		vimCmd := exec.Command(vimBin, "+set spell", entryFilename)
-		vimCmd.Dir = filepath.Join(path, "entry")
+		var editorCmd *exec.Cmd
 
-		vimCmd.Stdout = os.Stdout
-		vimCmd.Stderr = os.Stderr
-		vimCmd.Stdin = os.Stdin
+		switch userEditor {
+		case "vim":
+			editorCmd = exec.Command(editorBin, "+set spell", entryFilename)
+		case "emacs":
+			editorCmd = exec.Command(editorBin, "-nw", entryFilename)
+		default:
+			return fmt.Errorf("%v is unimplemented", editorBin)
+		}
 
-		c.EditorProcess = vimCmd
+		editorCmd.Dir = filepath.Join(path, "entry")
+
+		editorCmd.Stdout = os.Stdout
+		editorCmd.Stderr = os.Stderr
+		editorCmd.Stdin = os.Stdin
+
+		c.EditorProcess = editorCmd
 	}
 
 	// Make a new entry
