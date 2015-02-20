@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ghthor/journal/entry"
@@ -83,18 +84,21 @@ func (c cmd) Exec(args []string) error {
 	if c.EditorProcess == nil {
 		// Set Up the users editor
 		userEditor := os.Getenv("EDITOR")
-		editorBin, err := exec.LookPath(userEditor)
+		editorArgs := strings.Split(userEditor, " ")
+		editorBin, err := exec.LookPath(editorArgs[0])
+
 		if err != nil {
 			return err
 		}
 
 		var editorCmd *exec.Cmd
 
-		switch userEditor {
+		switch editorArgs[0] {
 		case "vim":
 			editorCmd = exec.Command(editorBin, "+set spell", entryFilename)
 		case "emacs":
-			editorCmd = exec.Command(editorBin, "-nw", entryFilename)
+			editorArgs = append(editorArgs[1:], entryFilename)
+			editorCmd = exec.Command(editorBin, editorArgs...)
 		default:
 			return fmt.Errorf("%v is unimplemented", editorBin)
 		}
